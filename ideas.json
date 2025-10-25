@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "language": "Finnish",
+    "tone": "casual",
+    "length": "short"
+  },
+  "ideas": [
+    {
+      "title": "Kahvilassa",
+      "description": "Kaksi ystävää keskustelevat suosikki kahviloistaan ja siitä, missä on paras palvelu.",
+      "characters": [
+        {
+          "name": "Ella",
+          "gender": "female",
+          "default_tone": "calm",
+          "voice_id": "YSabzCJMvEHDduIDMdwV"
+        },
+        {
+          "name": "Mika",
+          "gender": "male",
+          "default_tone": "excited",
+          "voice_id": "NOpBlnGInO9m6vDvFkFC"
+        }
+      ]
+    },
+    {
+      "title": "Välineet etsitään",
+      "description": "Työpaikalla kaksi kollegaa keskustelevat puuttuvista työvälineistä.",
+      "characters": [
+        {
+          "name": "Sanna",
+          "gender": "female",
+          "default_tone": "calm",
+          "voice_id": "1SM7GgM6IMuvQlz2BwM3"
+        },
+        {
+          "name": "Jussi",
+          "gender": "male",
+          "default_tone": "excited",
+          "voice_id": "NOpBlnGInO9m6vDvFkFC"
+        }
+      ]
+    },
+    {
+      "title": "Lautapelilauantai",
+      "description": "Kaksi ystävää valitsevat lautapeliä viikonlopun peli-iltaan.",
+      "characters": [
+        {
+          "name": "Kati",
+          "gender": "female",
+          "default_tone": "calm",
+          "voice_id": "YSabzCJMvEHDduIDMdwV"
+        },
+        {
+          "name": "Antti",
+          "gender": "male",
+          "default_tone": "excited",
+          "voice_id": "dlbXHgJnwobU5JdZ8F5M"
+        }
+      ]
+    }
+  ]
+}
