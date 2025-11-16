@@ -1,0 +1,8 @@
+google-genai
+python-dotenv
+elevenlabs
+ffmpeg-python
+faster-whisper
+Pillow
+
+# Note: The FFmpeg binary is required for video/audio processing (install via system package manager).

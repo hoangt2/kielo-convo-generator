@@ -1,0 +1,16 @@
+# Bytecode and caches
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+venv*/
+
+# Editor files
+.vscode/
+.DS_Store
+
+# environment files
+.env
+
+*.json
