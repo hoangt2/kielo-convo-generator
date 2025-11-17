@@ -19,7 +19,7 @@ except Exception as e:
     print(f"❌ Error initializing Gemini client: {e}")
     print("Please ensure you have set the GEMINI_API_KEY environment variable.")
     # Exit if the client cannot be initialized due to missing key or other error
-    exit() 
+    exit()
 
 # --- Configuration ---
 INPUT_DIR = "scripts"
@@ -98,7 +98,7 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
     # --- GenerateContentConfig ---
     # Configure the response to request an image modality and set the aspect ratio.
     config = types.GenerateContentConfig(
-        response_modalities=[types.Modality.IMAGE], 
+        response_modalities=[types.Modality.IMAGE],
         image_config=types.ImageConfig(
             aspect_ratio=aspect_ratio,
         )
@@ -118,9 +118,9 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
     if not response.candidates:
         print(f"⚠️ **Response failed to generate candidates** for {os.path.basename(json_path)}.")
         if response.prompt_feedback.block_reason:
-            print(f"   Reason: Content was blocked due to {response.prompt_feedback.block_reason}.")
+            print(f"   Reason: Content was blocked due to {response.prompt_feedback.block_reason}.")
         else:
-            print("   Reason: Unknown failure. Check prompt safety or API logs.")
+            print("   Reason: Unknown failure. Check prompt safety or API logs.")
         return
 
     # Check 2 (The Fix): Ensure the content object exists to avoid AttributeError.
@@ -128,15 +128,15 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
     if first_candidate.content is None:
         print(f"⚠️ **Candidate content is None** for {os.path.basename(json_path)}. Likely due to a safety block on the *output*.")
         finish_reason = first_candidate.finish_reason.name if first_candidate.finish_reason else 'Unknown'
-        print(f"   Candidate Finish Reason: {finish_reason}.")
-        print("   Try simplifying the scene description or checking API safety guidelines.")
+        print(f"   Candidate Finish Reason: {finish_reason}.")
+        print("   Try simplifying the scene description or checking API safety guidelines.")
         return
 
     # Extract and save image(s)
     for part in first_candidate.content.parts:
         if part.inline_data is not None:
             image_data = part.inline_data.data
-            
+
             try:
                 image = Image.open(BytesIO(image_data))
             except Exception as e:
@@ -144,9 +144,12 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
                 continue
 
             os.makedirs(OUTPUT_DIR, exist_ok=True)
-            output_filename = os.path.splitext(os.path.basename(json_path))[0] + ".png"
+            # --- MODIFICATION START ---
+            base_filename = os.path.splitext(os.path.basename(json_path))[0]
+            output_filename = "conversation_" + base_filename + ".png"
+            # --- MODIFICATION END ---
             output_path = os.path.join(OUTPUT_DIR, output_filename)
-            
+
             image.save(output_path)
             print(f"✅ Image saved to {output_path}")
             return # Assuming only one image is desired per script
@@ -155,13 +158,13 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
 
 def main():
     """Main function to process all JSON scripts and generate illustrations."""
-    
+
     # Create the input directory if it doesn't exist for clarity
-    os.makedirs(INPUT_DIR, exist_ok=True) 
+    os.makedirs(INPUT_DIR, exist_ok=True)
 
     # Process all JSON files in the scripts/ directory
     files = [f for f in os.listdir(INPUT_DIR) if f.endswith(".json")]
-    
+
     if not files:
         print(f"⚠️ No JSON files found in {INPUT_DIR}/. Create some script JSON files to begin.")
         return
