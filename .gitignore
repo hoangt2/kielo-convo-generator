@@ -14,3 +14,13 @@ venv*/
 .env
 
 *.json
+
+# Folders to ignore
+illustrations/
+mp3/
+final_subtitled_videos/
+output/
+output_videos/
+scripts/
+podcast_scripts/
+subtitles/

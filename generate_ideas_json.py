@@ -72,6 +72,27 @@ VOICES = [
         "description": "A conversational, soft-spoken, sultry, and romantic voice with a vocal fry.",
         "voice_id": "1SM7GgM6IMuvQlz2BwM3",
     },
+    {
+        "name": "Grandma Rachel",
+        "gender": "female",
+        "age": "senior",
+        "description": "A friendly grandma who knows how to enthrall her audience with tall tales and fun adventures.",
+        "voice_id": "0rEo3eAjssGDUCXHYENf",
+    },
+    {
+        "name": "Gretchen - Valley Girl & Ditzy",
+        "gender": "female",
+        "age": "kid",
+        "description": "Your favorite valley & ditzy girl is perfect for social media, commercials, get ready with me, outfit of the day, narration, character, talking with friends, and Gen Z.",
+        "voice_id": "JVVJ6VsnUPJAdfGmEBGP",
+    },
+    {
+        "name": "Brayden - Conversational Older Teen",
+        "gender": "male",
+        "age": "teenager",
+        "description": "A deep-voiced male teenager. Perfect for conversations.",
+        "voice_id": "3XOBzXhnDY98yeWQ3GdM",
+    },
 ]
 
 # --- PODCAST-SPECIFIC VOICE LIST ---

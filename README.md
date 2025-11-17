@@ -8,6 +8,10 @@ A Python tool for generating Finnish conversation scripts and podcast episodes u
    ```powershell
    python -m venv .venv
    .\.venv\Scripts\Activate.ps1
+
+   # Mac
+   source ./venv/bin/activate
+
    # If you have a requirements.txt, run:
    pip install -r requirements.txt
    ```
