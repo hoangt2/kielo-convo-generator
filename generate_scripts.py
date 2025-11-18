@@ -54,7 +54,7 @@ def generate_conversation(idea, metadata):
     # 2. Build the detailed prompt instructing for JSON output (Unchanged)
     # The system instruction for strictly valid JSON is crucial for models that support it.
     prompt = f"""
-        You are a Finnish dialogue writer. Your task is to generate a short (1–2 minutes) natural and realistic conversation 
+        You are a Finnish dialogue writer. Your task is to generate a short (2–3 minutes) natural and realistic conversation 
         based on the provided idea.
 
         The output MUST be a single JSON object containing a key called 'dialogue_list'.

@@ -4,5 +4,8 @@ elevenlabs
 ffmpeg-python
 faster-whisper
 Pillow
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
 
 # Note: The FFmpeg binary is required for video/audio processing (install via system package manager).

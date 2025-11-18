@@ -41,7 +41,7 @@ ILLUSTRATION_STYLE = (
 ### 1. Prompt Generation
 
 def create_generic_prompt(data: dict) -> str:
-    """Create a general illustration prompt from conversation data."""
+    """Create a general illustration prompt from conversation data, including character details."""
 
     metadata = data.get("metadata", {})
     idea = data.get("idea", {})
@@ -54,7 +54,17 @@ def create_generic_prompt(data: dict) -> str:
     length = metadata.get("length", "short")
 
     characters = idea.get("characters", [])
-    character_names = ", ".join([c.get("name", "Unnamed") for c in characters])
+    
+    # --- MODIFICATION START: Extract and format detailed character descriptions ---
+    character_descriptions = []
+    for char in characters:
+        name = char.get("name", "Unnamed")
+        gender = char.get("gender", "unspecified gender")
+        age = char.get("age", "unspecified age")
+        character_descriptions.append(f"{name} ({gender}, {age})")
+    
+    detailed_characters_list = "; ".join(character_descriptions)
+    # --- MODIFICATION END ---
 
     # Sample dialogue preview
     all_lines = " ".join([d.get("text", "") for d in dialogues])
@@ -68,7 +78,7 @@ def create_generic_prompt(data: dict) -> str:
         f"Do not include any text or captions in the image. Ensure the image is a single, clear illustration. "
         f"The language of the script is {language}, and the tone is {tone}. "
         f"Scene description: {description or 'No explicit description provided.'} "
-        #f"Characters involved: {character_names or 'unspecified characters'}. "
+        f"The characters involved are: {detailed_characters_list or 'unspecified characters'}. " # Updated line
         f"Depict them naturally in a setting that fits the tone and context. "
         f"The mood and expressions should reflect the feel of this sample dialogue: '{sample_dialogue}'. "
     )
@@ -94,6 +104,7 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
 
     prompt = create_generic_prompt(data)
     print(f"\n🎨 Generating illustration for: {os.path.basename(json_path)}")
+    print(f"➡️ Prompt for image generation:\n{prompt[:250]}...\n") # Print a snippet of the new prompt
 
     # --- GenerateContentConfig ---
     # Configure the response to request an image modality and set the aspect ratio.
@@ -118,9 +129,9 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
     if not response.candidates:
         print(f"⚠️ **Response failed to generate candidates** for {os.path.basename(json_path)}.")
         if response.prompt_feedback.block_reason:
-            print(f"   Reason: Content was blocked due to {response.prompt_feedback.block_reason}.")
+            print(f"   Reason: Content was blocked due to {response.prompt_feedback.block_reason}.")
         else:
-            print("   Reason: Unknown failure. Check prompt safety or API logs.")
+            print("   Reason: Unknown failure. Check prompt safety or API logs.")
         return
 
     # Check 2 (The Fix): Ensure the content object exists to avoid AttributeError.
@@ -128,8 +139,8 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
     if first_candidate.content is None:
         print(f"⚠️ **Candidate content is None** for {os.path.basename(json_path)}. Likely due to a safety block on the *output*.")
         finish_reason = first_candidate.finish_reason.name if first_candidate.finish_reason else 'Unknown'
-        print(f"   Candidate Finish Reason: {finish_reason}.")
-        print("   Try simplifying the scene description or checking API safety guidelines.")
+        print(f"   Candidate Finish Reason: {finish_reason}.")
+        print("   Try simplifying the scene description or checking API safety guidelines.")
         return
 
     # Extract and save image(s)
@@ -144,7 +155,7 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16"):
                 continue
 
             os.makedirs(OUTPUT_DIR, exist_ok=True)
-            # --- MODIFICATION START ---
+            # --- MODIFICATION START (Preserved existing logic) ---
             base_filename = os.path.splitext(os.path.basename(json_path))[0]
             output_filename = "conversation_" + base_filename + ".png"
             # --- MODIFICATION END ---

@@ -22,7 +22,14 @@ A Python tool for generating Finnish conversation scripts and podcast episodes u
      ```
      GEMINI_API_KEY=your_gemini_api_key
      ELEVENLABS_API_KEY=your_elevenlabs_api_key
+     GOOGLE_SHEETS_ID=your_google_sheets_id
+     GOOGLE_SERVICE_ACCOUNT_FILE=path/to/service_account.json
      ```
+   - **For Google Sheets integration:**
+     - Create a Google Cloud project and enable the Google Sheets API
+     - Create a service account and download the JSON key
+     - Share your Google Sheet with the service account email
+     - Add the sheet ID and service account file path to `.env`
 
 ## Quick Start
 
@@ -39,6 +46,16 @@ python generate_scripts.py                   # Conversation scripts
 python generate_scripts.py podcast           # Podcast scripts
 ```
 Output: JSON dialogue files in `scripts/` or `podcast_scripts/`
+
+### 2.5 Sync Ideas to Google Sheets (Optional)
+```bash
+python ideas_to_sheets.py                    # Sync ideas to Google Sheets
+```
+This syncs generated ideas to Google Sheets, automatically:
+- Checks for duplicate titles to avoid repeats
+- Stores metadata and character details
+- Creates/updates Conversations and Podcasts sheets
+Output: Ideas logged in your Google Sheet
 
 ### 3. Generate Illustrations
 ```bash
@@ -73,6 +90,16 @@ These steps typically:
 
 Output: Final videos in `final_subtitled_videos/`
 
+### 6. Clean Up Generated Files
+```powershell
+python cleanup.py                             # Remove all generated files
+```
+This removes:
+- All generated JSON files (`ideas.json`, `podcast_ideas.json`)
+- All generated directories (`scripts/`, `mp3/`, `output/`, `output_videos/`, etc.)
+
+The script will prompt for confirmation before deletion.
+
 ## Full Pipeline
 
 For complete automation from ideas to final videos (example):
@@ -80,21 +107,31 @@ For complete automation from ideas to final videos (example):
 python generate_ideas_json.py
 python generate_scripts.py
 python tts_generator.py
+python generate_illustrations.py
 python generate_videos.py
-python music_mixer.py
 python generate_subtitled_videos.py
+```
+
+To clean up and start fresh:
+```powershell
+python cleanup.py
 ```
 
 ## Project Structure
 
 - `generate_ideas_json.py` - Generate conversation/podcast ideas via Gemini
+  - Conversations now support 2+ characters (flexible group conversations)
+  - Each character gets a unique voice matching their gender and age
+  - Each character includes a role (Speaker 1, Customer, etc.)
 - `generate_scripts.py` - Convert ideas into dialogue scripts
+- `ideas_to_sheets.py` - Sync ideas to Google Sheets with duplicate detection
 - `tts_generator.py` - Generate audio from scripts (ElevenLabs TTS)
 - `generate_videos.py` - Create videos from audio + illustrations
 - `generate_illustrations.py` - Generate visual assets
--- `subtitle_generator.py` - Auto-generate subtitles (helper functions)
--- `music_mixer.py` - Add background music to videos
--- `generate_subtitled_videos.py` - Create subtitled/final videos
+- `subtitle_generator.py` - Auto-generate subtitles (helper functions)
+- `music_mixer.py` - Add background music to videos
+- `generate_subtitled_videos.py` - Create subtitled/final videos
+- `cleanup.py` - Remove all generated files and directories
 
 ## Output Folders
 
