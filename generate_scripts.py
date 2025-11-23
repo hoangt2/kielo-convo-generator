@@ -25,7 +25,7 @@ client = genai.Client(api_key=api_key)
 
 def slugify(title):
     """Convert a title into a safe filename."""
-    return re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
+    return re.sub(r'[^a-z0-9äö]+', '-', title.lower()).strip('-')
 
 
 # --- Core Logic: Updated to use Gemini API ---
