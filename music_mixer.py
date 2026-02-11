@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import shutil
 import time
+import random
 
 # --- Configuration ---
 PRESETS_DIR = Path("presets")
@@ -14,7 +15,7 @@ OUTPUT_DIR = Path("output_videos")
 MUSIC_FILE_NAME = "background_music.mp3"
 
 # Define the amount to reduce the background music's volume
-MUSIC_VOLUME_REDUCTION_DB = -15.0
+MUSIC_VOLUME_REDUCTION_DB = -25.0
 # --- End Configuration ---
 
 # --- Helper Functions ---
@@ -24,6 +25,14 @@ def setup_directories():
     PRESETS_DIR.mkdir(exist_ok=True)
     SOURCE_DIR.mkdir(exist_ok=True)
     OUTPUT_DIR.mkdir(exist_ok=True)
+
+def get_random_music_file() -> Path:
+    """Randomly select a background music file from the presets folder."""
+    music_files = list(PRESETS_DIR.glob("background_music*.mp3"))
+    if not music_files:
+        # Fallback to the default name if no glob matches
+        return PRESETS_DIR / "background_music.mp3"
+    return random.choice(music_files)
     
 def get_video_duration(video_path: Path) -> float:
     """Get the duration of the video in seconds using ffprobe."""
@@ -64,7 +73,7 @@ def add_background_music(
     """
     setup_directories() 
     
-    music_path = PRESETS_DIR / MUSIC_FILE_NAME
+    music_path = get_random_music_file()
     video_path = input_video_path
     
     # CRITICAL: Define a temporary output path to avoid 'same as input/output' errors in FFmpeg and shutil
@@ -76,7 +85,7 @@ def add_background_music(
     
     if not music_path.exists():
         print(f"Error: Background music file not found at '{music_path}'")
-        print(f"Please place '{MUSIC_FILE_NAME}' in the '{PRESETS_DIR.name}' folder.")
+        print(f"Please ensure MP3 files are in the '{PRESETS_DIR.name}' folder.")
         
         # Fallback: Allow the subtitling process to continue with the original video
         print("Skipping music mix. Allowing downstream processes to continue with original video.")
@@ -149,7 +158,7 @@ def add_background_music(
         # 7. FINAL STEP: Move the temp file to the final destination, replacing the old file
         shutil.move(str(temp_output_path), str(final_output_path))
         
-        print(f"   ✅ Audio mix complete. Original file replaced by '{final_output_path.name}' with BGM.")
+        print(f"   ✅ Audio mix complete ({music_path.name}). Original file replaced by '{final_output_path.name}' with BGM.")
 
     except ffmpeg.Error as e:
         print("FFmpeg Error during music addition:", e.stderr.decode() if e.stderr else str(e))
@@ -181,7 +190,29 @@ def add_background_music(
         if temp_output_path.exists():
             os.remove(temp_output_path)
 
+def batch_process_videos():
+    """Batch process all videos in the source directory."""
+    setup_directories()
+    
+    video_extensions = ['*.mp4', '*.mov', '*.avi', '*.mkv']
+    video_files = []
+    for ext in video_extensions:
+        video_files.extend(SOURCE_DIR.glob(ext))
+        
+    if not video_files:
+        print(f"No video files found in the '{SOURCE_DIR.name}' folder.")
+        return
+
+    print(f"\nFound {len(video_files)} video(s) for background music mixing.")
+    
+    for i, video_file_path in enumerate(video_files):
+        print("\n" + "-"*40)
+        print(f"Video {i+1}/{len(video_files)}: {video_file_path.name}")
+        # Process in-place (the function handles the temp file)
+        add_background_music(
+            input_video_path=video_file_path, 
+            final_output_path=video_file_path
+        )
+
 if __name__ == "__main__":
-    # This block is for direct testing of the function
-    # NOTE: You would need a test video in output_videos/ and music in presets/
-    pass
+    batch_process_videos()

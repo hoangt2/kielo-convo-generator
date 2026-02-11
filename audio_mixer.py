@@ -2,14 +2,21 @@ import ffmpeg
 from pathlib import Path
 import os
 import shutil
+import random
 
 # --- Configuration ---
 PRESETS_DIR = Path("presets")
 SOURCE_DIR = Path("source")
 OUTPUT_DIR = Path("output")
 
-# Define the name of the background music file (must be in the /presets folder)
-MUSIC_FILE_NAME = "background_music.mp3"
+
+def get_random_music_file() -> str:
+    """Randomly select a background music file from the presets folder."""
+    music_files = list(PRESETS_DIR.glob("background_music*.mp3"))
+    if not music_files:
+        return "background_music.mp3"  # Fallback to default
+    selected = random.choice(music_files)
+    return selected.name
 
 # Define the amount to reduce the background music's volume
 MUSIC_VOLUME_REDUCTION_DB = -15.0
@@ -57,7 +64,8 @@ def add_background_music(
     """
     setup_directories() 
     
-    music_path = PRESETS_DIR / MUSIC_FILE_NAME
+    music_file = get_random_music_file()
+    music_path = PRESETS_DIR / music_file
     video_path = input_video_path
     
     # CRITICAL FIX: Define a temporary output path next to the final output file
@@ -69,9 +77,10 @@ def add_background_music(
     
     if not music_path.exists():
         print(f"Error: Background music file not found at '{music_path}'")
-        print(f"Please place '{MUSIC_FILE_NAME}' in the '{PRESETS_DIR.name}' folder.")
+        print(f"Please place '{music_file}' in the '{PRESETS_DIR.name}' folder.")
         return
 
+    print(f"🎵 Selected background music: {music_file}")
     print(f"Processing audio for video: {video_path.name}")
     
     try:

@@ -1,7 +1,8 @@
 import json
 import os
 import re
-import sys # Added for easier argument handling
+import sys
+import time
 from dotenv import load_dotenv
 # --- Import the new Google GenAI SDK components ---
 from google import genai
@@ -54,8 +55,15 @@ def generate_conversation(idea, metadata):
     # 2. Build the detailed prompt instructing for JSON output (Unchanged)
     # The system instruction for strictly valid JSON is crucial for models that support it.
     prompt = f"""
-        You are a Finnish dialogue writer. Your task is to generate a short (1–2 minutes) natural and realistic conversation 
-        based on the provided idea.
+        You are a Finnish dialogue writer specializing in NATURAL SPOKEN FINNISH (puhekieli).
+        Your task is to generate a short (1–2 minutes) realistic conversation based on the provided idea.
+
+        CRITICAL: Write in SPOKEN Finnish, NOT formal written Finnish. Use:
+        - Colloquial pronouns: "mä/mun/mua" instead of "minä/minun/minua", "sä/sun/sua" instead of "sinä/sinun/sinua"
+        - Spoken contractions: "oon" (olen), "oot" (olet), "ei oo" (ei ole), "meen" (menen), "tuun" (tulen)
+        - Casual expressions: "joo", "nii", "tota", "niinku", "eiku", "no", "hei"
+        - Dropped endings: "täs" (tässä), "siel" (siellä), "mis" (missä)
+        - Natural filler words and interjections
 
         The output MUST be a single JSON object containing a key called 'dialogue_list'.
         The 'dialogue_list' must be a JSON array of objects, where each object represents a dialogue line 
@@ -69,7 +77,7 @@ def generate_conversation(idea, metadata):
         {{
         "dialogue_list": [
             {{
-            "text": "[emotion] Dialogue line, including sound cues like [sigh] or [laugh].",
+            "text": "[emotion] Dialogue line in spoken Finnish, including sound cues like [sigh] or [laugh].",
             "voice_id": "The specific voice_id for this character from the list above."
             }},
             // ... more dialogue objects
@@ -79,11 +87,12 @@ def generate_conversation(idea, metadata):
         Instructions:
         - Use the **exact** 'voice_id' provided in the Characters list for each line.
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
+        - Write ONLY in natural spoken Finnish - avoid formal/written language!
         - Keep the speech natural, expressive, and varied.
         - Match each character's tone and personality.
 
         Metadata:
-        Language: {metadata.get('language', 'Finnish')}
+        Language: Finnish (spoken/puhekieli)
         Tone: {metadata.get('tone', 'neutral')}
         Length: {metadata.get('length', '1-2 minutes')}
 
@@ -91,42 +100,63 @@ def generate_conversation(idea, metadata):
         Title: {idea['title']}
         Description: {idea['description']}
 
-        Generate the full conversation in the specified JSON format.
+        Generate the full conversation in natural spoken Finnish.
     """
     
-    # --- Gemini API Call Changes ---
-    try:
-        # Configuration for the API call
-        config = types.GenerateContentConfig(
-            # Set the generation temperature
-            temperature=0.8,
-            # Enforce JSON output!
-            response_mime_type="application/json",
-            # Pass the system instruction for model behavior
-            system_instruction="You are a creative Finnish dialogue writer who writes expressive, natural speech, and you strictly output only valid JSON."
-        )
-
-        # Call the Gemini API. Use a model supporting JSON output, like gemini-2.5-flash.
-        response = client.models.generate_content(
-            model='gemini-2.5-flash', # A powerful model supporting JSON mode
-            contents=prompt,
-            config=config,
-        )
-
-    except APIError as e:
-        print(f"❌ Error during Gemini API call: {e}")
-        return {"dialogue_list": [], "error": f"API Error: {e}"}
-
-    # The response content is a JSON string in a special 'text' field.
-    json_string = response.text.strip()
+    # --- Gemini API Call with Retry Logic ---
+    max_retries = 3
+    retry_delay = 2  # seconds
     
-    try:
-        # Parse the JSON string and return
-        json_output = json.loads(json_string)
-        return json_output
-    except json.JSONDecodeError:
-        print("❌ Error: Gemini did not return valid JSON despite the configuration.")
-        return {"dialogue_list": [], "error": json_string}
+    for attempt in range(max_retries):
+        try:
+            # Configuration for the API call
+            config = types.GenerateContentConfig(
+                # Set the generation temperature
+                temperature=0.8,
+                # Enforce JSON output!
+                response_mime_type="application/json",
+                # Pass the system instruction for model behavior
+                system_instruction="You are a creative Finnish dialogue writer who writes natural SPOKEN Finnish (puhekieli), not formal written Finnish. Use colloquial forms like 'mä', 'sä', 'oon', 'ei oo'. You strictly output only valid JSON."
+            )
+
+            # Call the Gemini API. Use a model supporting JSON output, like gemini-2.5-flash.
+            response = client.models.generate_content(
+                model='gemini-2.5-flash', # A powerful model supporting JSON mode
+                contents=prompt,
+                config=config,
+            )
+            
+            # The response content is a JSON string in a special 'text' field.
+            json_string = response.text.strip()
+            
+            # Parse the JSON string
+            json_output = json.loads(json_string)
+            
+            # Validate that dialogue_list is not empty
+            if json_output.get("dialogue_list") and len(json_output["dialogue_list"]) > 0:
+                return json_output
+            else:
+                print(f"   ⚠️  Empty dialogue received, retrying... ({attempt + 1}/{max_retries})")
+                if attempt < max_retries - 1:
+                    import time
+                    time.sleep(retry_delay * (attempt + 1))
+                continue
+
+        except APIError as e:
+            print(f"   ⚠️  API error: {e}, retrying... ({attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(retry_delay * (attempt + 1))
+            continue
+        except json.JSONDecodeError:
+            print(f"   ⚠️  Invalid JSON response, retrying... ({attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(retry_delay * (attempt + 1))
+            continue
+    
+    print("❌ Error: Failed to generate dialogue after all retries.")
+    return {"dialogue_list": [], "error": "Failed after retries"}
 
 # --- NEW Function for Podcast Script Generation ---
 
@@ -189,32 +219,49 @@ def generate_podcast_script(idea, metadata):
         Generate the full podcast script in the specified JSON format.
     """
     
-    # --- Gemini API Call ---
-    try:
-        config = types.GenerateContentConfig(
-            temperature=0.8,
-            response_mime_type="application/json",
-            system_instruction="You are an expert Finnish language podcast scriptwriter who writes instructional, engaging dialogue and strictly outputs only valid JSON."
-        )
-
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-            config=config,
-        )
-
-    except APIError as e:
-        print(f"❌ Error during Gemini API call: {e}")
-        return {"dialogue_list": [], "error": f"API Error: {e}"}
-
-    json_string = response.text.strip()
+    # --- Gemini API Call with Retry Logic ---
+    max_retries = 3
+    retry_delay = 2  # seconds
     
-    try:
-        json_output = json.loads(json_string)
-        return json_output
-    except json.JSONDecodeError:
-        print("❌ Error: Gemini did not return valid JSON for the podcast script.")
-        return {"dialogue_list": [], "error": json_string}
+    for attempt in range(max_retries):
+        try:
+            config = types.GenerateContentConfig(
+                temperature=0.8,
+                response_mime_type="application/json",
+                system_instruction="You are an expert Finnish language podcast scriptwriter who writes instructional, engaging dialogue and strictly outputs only valid JSON."
+            )
+
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=config,
+            )
+            
+            json_string = response.text.strip()
+            json_output = json.loads(json_string)
+            
+            # Validate that dialogue_list is not empty
+            if json_output.get("dialogue_list") and len(json_output["dialogue_list"]) > 0:
+                return json_output
+            else:
+                print(f"   ⚠️  Empty dialogue received, retrying... ({attempt + 1}/{max_retries})")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))
+                continue
+
+        except APIError as e:
+            print(f"   ⚠️  API error: {e}, retrying... ({attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (attempt + 1))
+            continue
+        except json.JSONDecodeError:
+            print(f"   ⚠️  Invalid JSON response, retrying... ({attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (attempt + 1))
+            continue
+    
+    print("❌ Error: Failed to generate podcast script after all retries.")
+    return {"dialogue_list": [], "error": "Failed after retries"}
 
 
 # --- Remaining Functions (Modified for flexibility) ---

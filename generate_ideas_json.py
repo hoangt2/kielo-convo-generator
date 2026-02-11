@@ -19,7 +19,7 @@ except Exception as e:
 # ---- SHARED CONFIGURATION ----
 MODEL_NAME_CONVERSATION = "gemini-2.5-pro"  # Robust for strict, complex output
 MODEL_NAME_PODCAST = "gemini-2.5-pro"      # Good for instructional, fast output
-NUM_CONVERSATION_IDEAS = 10
+NUM_CONVERSATION_IDEAS = 1
 NUM_PODCAST_IDEAS = 3
 
 # Consolidated Voice Pool (Used for CONVERSATIONS only)
@@ -70,7 +70,7 @@ VOICES = [
         "gender": "female",
         "age": "adult",
         "description": "A conversational, soft-spoken, sultry, and romantic voice with a vocal fry.",
-        "voice_id": "1SM7GgM6IMuvQlz2BwM3",
+        "voice_id": "OYTbf65OHHFELVut7v2H",
     },
     {
         "name": "Grandma Rachel",
@@ -113,21 +113,50 @@ ALLOWED_PODCAST_CHARACTERS = [
 
 # --- VOICE ASSIGNMENT HELPERS ---
 
+def normalize_age(age_str):
+    """Normalize age strings to match VOICES age categories."""
+    age = age_str.lower().strip()
+    
+    # Kid/child patterns
+    if any(term in age for term in ["kid", "child", "5", "6", "7", "8", "9", "10", "11", "12"]):
+        return "kid"
+    
+    # Teenager patterns
+    if any(term in age for term in ["teen", "13", "14", "15", "16", "17", "18", "19"]):
+        return "teenager"
+    
+    # Young adult patterns
+    if any(term in age for term in ["young adult", "young", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "20s"]):
+        return "young adult"
+    
+    # Adult/middle-aged patterns
+    if any(term in age for term in ["adult", "30", "40", "30s", "40s", "middle"]):
+        return "adult"
+    
+    # Senior/elderly patterns
+    if any(term in age for term in ["senior", "elderly", "old", "grandma", "grandpa", "50", "60", "70", "80", "50s", "60s", "70s", "80s"]):
+        return "senior"
+    
+    return age  # Return as-is if no match
+
 def assign_voice_ids(ideas_list, key="characters"):
     """
-    Assigns a voice_id from the *full* VOICES pool based on gender.
+    Assigns a voice_id from the *full* VOICES pool based on gender and age.
     Used for Conversation Ideas.
     """
     for idea in ideas_list:
         for char in idea.get(key, []):
             gender = char.get("gender", "unknown").lower()
-            age = char.get("age", "").lower()
-            # Prefer voices that match both gender and age, then gender only, then any voice
-            matching = []
-            if age:
-                matching = [v for v in VOICES if v.get("gender", "").lower() == gender and v.get("age", "").lower() == age]
+            age = normalize_age(char.get("age", ""))
+            
+            # Prefer voices that match both gender and age
+            matching = [v for v in VOICES if v.get("gender", "").lower() == gender and normalize_age(v.get("age", "")) == age]
+            
+            # Fallback to gender only
             if not matching:
                 matching = [v for v in VOICES if v.get("gender", "").lower() == gender]
+            
+            # Fallback to any voice
             voice = random.choice(matching) if matching else random.choice(VOICES)
             char["voice_id"] = voice["voice_id"]
     return ideas_list
@@ -218,8 +247,11 @@ Rules:
 - Only fill in the string values.
 """
 
-def generate_conversation_ideas():
-    print(f"🪄 Generating {NUM_CONVERSATION_IDEAS} general conversation ideas...")
+def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None):
+    if topic:
+        print(f"🪄 Generating {num_ideas} general conversation ideas about '{topic}'...")
+    else:
+        print(f"🪄 Generating {num_ideas} general conversation ideas...")
     if not client: return None
 
     config = types.GenerateContentConfig(
@@ -228,8 +260,13 @@ def generate_conversation_ideas():
         response_schema=CONVERSATION_SCHEMA
     )
 
+    prompt_text = f"Generate {num_ideas} unique ideas for short Finnish conversations"
+    if topic:
+        prompt_text += f" about the topic '{topic}'"
+    prompt_text += ", following the specified JSON structure exactly."
+
     full_prompt = (
-        f"Generate {NUM_CONVERSATION_IDEAS} unique ideas for short Finnish conversations, following the specified JSON structure exactly."
+        prompt_text
     )
 
     response = client.models.generate_content(
@@ -303,8 +340,11 @@ Rules:
 - Only fill in the string values.
 """
 
-def generate_podcast_ideas():
-    print(f"🪄 Generating {NUM_PODCAST_IDEAS} podcast lesson ideas...")
+def generate_podcast_ideas(num_ideas=NUM_PODCAST_IDEAS, topic=None):
+    if topic:
+        print(f"🪄 Generating {num_ideas} podcast lesson ideas about '{topic}'...")
+    else:
+        print(f"🪄 Generating {num_ideas} podcast lesson ideas...")
     if not client: return None
 
     config = types.GenerateContentConfig(
@@ -313,8 +353,13 @@ def generate_podcast_ideas():
         response_schema=PODCAST_SCHEMA
     )
 
+    prompt_text = f"Generate {num_ideas} unique, creative, and highly useful podcast ideas for Finnish beginners"
+    if topic:
+        prompt_text += f" about the topic '{topic}'"
+    prompt_text += ", following the specified JSON structure exactly. Remember to use only the allowed character names."
+
     full_prompt = (
-        f"Generate {NUM_PODCAST_IDEAS} unique, creative, and highly useful podcast ideas for Finnish beginners, following the specified JSON structure exactly. Remember to use only the allowed character names."
+        prompt_text
     )
 
     response = client.models.generate_content(
@@ -335,14 +380,31 @@ def main():
         print("🛑 Cannot run generation. Please ensure 'google-genai' is installed and 'GEMINI_API_KEY' is set in your .env file.")
         return
 
-    # Check for command-line argument
-    if len(sys.argv) > 1 and sys.argv[1].lower() == 'podcast':
-        result, output_file = generate_podcast_ideas()
-        idea_count = NUM_PODCAST_IDEAS
+    # Check for command-line arguments
+    # Usage: python generate_ideas_json.py [podcast|conversation] [number_of_ideas] [topic]
+    
+    mode = 'conversation'
+    num_ideas = None
+    topic = None
+    
+    # Simple argument parsing
+    for arg in sys.argv[1:]:
+        if arg.lower() == 'podcast':
+            mode = 'podcast'
+        elif arg.isdigit():
+            num_ideas = int(arg)
+        else:
+            topic = arg
+            
+    if mode == 'podcast':
+        count = num_ideas if num_ideas else NUM_PODCAST_IDEAS
+        result, output_file = generate_podcast_ideas(count, topic)
+        idea_count = count
     else:
         # Default behavior: generate conversations
-        result, output_file = generate_conversation_ideas()
-        idea_count = NUM_CONVERSATION_IDEAS
+        count = num_ideas if num_ideas else NUM_CONVERSATION_IDEAS
+        result, output_file = generate_conversation_ideas(count, topic)
+        idea_count = count
 
     if result:
         try:

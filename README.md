@@ -1,35 +1,44 @@
 # Convo Generator
 
-A Python tool for generating Finnish conversation scripts and podcast episodes using Google Gemini AI, with support for TTS, video generation, and subtitle embedding.
+A Python tool for generating Finnish conversation scripts and podcast episodes using Google Gemini AI, with support for TTS, video generation, and background music.
 
 ## Setup
 
-1. **Create a virtual environment and install dependencies (if any):**
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
+### 1. Create a virtual environment
 
-   # Mac
-   source ./venv/bin/activate
+**Mac/Linux:**
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-   # If you have a requirements.txt, run:
-   pip install -r requirements.txt
-   ```
+**Windows (PowerShell):**
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
 
-2. **Configure environment:**
-   - Create a `.env` file in the project root
-   - Add your API keys (example):
-     ```
-     GEMINI_API_KEY=your_gemini_api_key
-     ELEVENLABS_API_KEY=your_elevenlabs_api_key
-     ```
+> **Note:** Python 3.11 is recommended. Python 3.14 may have compatibility issues with some dependencies.
+
+### 2. Configure environment
+
+Create a `.env` file in the project root with your API keys:
+```
+GEMINI_API_KEY=your_gemini_api_key
+ELEVENLABS_API_KEY=your_elevenlabs_api_key
+```
 
 ## Quick Start
 
 ### 1. Generate Ideas
 ```bash
-python generate_ideas_json.py                # Conversation ideas
-python generate_ideas_json.py podcast        # Podcast ideas
+python generate_ideas_json.py                      # 1 conversation idea (default)
+python generate_ideas_json.py 5                    # 5 conversation ideas
+python generate_ideas_json.py 3 "at the café"     # 3 ideas about a specific topic
+python generate_ideas_json.py podcast              # Podcast ideas
+python generate_ideas_json.py podcast 5 "greetings"  # 5 podcast ideas about greetings
 ```
 Output: `ideas.json` or `podcast_ideas.json`
 
@@ -40,72 +49,93 @@ python generate_scripts.py podcast           # Podcast scripts
 ```
 Output: JSON dialogue files in `scripts/` or `podcast_scripts/`
 
-### 3. Generate Illustrations
+### 3. Check Finnish Grammar
 ```bash
-python generate_illustrations.py              # Generate visual assets for videos
+python check_finnish_grammar.py              # Fix grammar & make Finnish natural
+```
+This step reviews all scripts and fixes unnatural phrasing to sound like spoken Finnish.
+
+### 4. Generate Illustrations
+```bash
+python generate_illustrations.py             # Generate visual assets for videos
 ```
 Output: Illustration files in `illustrations/`
 
-### 4. Generate Audio
+### 5. Generate Audio
 ```bash
 python tts_generator.py                      # Convert scripts to MP3
 ```
 Output: Audio files in `mp3/`
 
-### 5. Generate Videos
+### 6. Generate Videos
 ```bash
 python generate_videos.py                    # Create video from audio + illustrations
 ```
 Output: Videos in `output_videos/`
 
-### 5. Add Music & Subtitles
-```powershell
-# Add background music to videos
-python music_mixer.py
-
-# Auto-generate and embed subtitles
-python generate_subtitled_videos.py
+### 7. Add Music
+```bash
+python music_mixer.py                        # Add background music (randomly selected from presets/)
 ```
-These steps typically:
-- Add background music to videos in `output_videos/`
-- Auto-generate subtitles (e.g. Whisper) and optionally translate them
-- Embed subtitles into videos and archive subtitle files
-
-Output: Final videos in `final_subtitled_videos/`
+Output: Final videos with music in `output_videos/`
 
 ## Full Pipeline
 
-For complete automation from ideas to final videos (example):
-```powershell
+Run the complete pipeline with a single command:
+```bash
+python run.py                         # Run with defaults
+python run.py 5                       # Generate 5 conversation ideas
+python run.py 3 "ordering food"       # Generate 3 ideas about a topic
+```
+
+This runs all 7 steps in sequence:
+1. Generate ideas → 2. Generate scripts → 3. Check Finnish → 4. Generate illustrations → 5. TTS audio → 6. Create videos → 7. Add music
+
+**Or run each step manually:**
+```bash
 python generate_ideas_json.py
 python generate_scripts.py
+python check_finnish_grammar.py
+python generate_illustrations.py
 python tts_generator.py
 python generate_videos.py
 python music_mixer.py
-python generate_subtitled_videos.py
 ```
+
+## Cleanup
+
+Reset the project by removing all generated files:
+```bash
+python cleanup.py
+```
+This removes generated ideas, scripts, audio, and video files while preserving `output_videos/prod/`.
 
 ## Project Structure
 
+### Pipeline Scripts
+- `run.py` - **Full pipeline runner** (runs all steps in sequence)
 - `generate_ideas_json.py` - Generate conversation/podcast ideas via Gemini
 - `generate_scripts.py` - Convert ideas into dialogue scripts
+- `check_finnish_grammar.py` - Check & fix Finnish grammar and naturalness
+- `generate_illustrations.py` - Generate visual assets
 - `tts_generator.py` - Generate audio from scripts (ElevenLabs TTS)
 - `generate_videos.py` - Create videos from audio + illustrations
-- `generate_illustrations.py` - Generate visual assets
--- `subtitle_generator.py` - Auto-generate subtitles (helper functions)
--- `music_mixer.py` - Add background music to videos
--- `generate_subtitled_videos.py` - Create subtitled/final videos
+- `music_mixer.py` - Add background music to videos
+
+### Utility Scripts
+- `cleanup.py` - Reset project by removing generated files
+- `subtitle_generator.py` - Subtitle generation helper functions
+- `generate_subtitled_videos.py` - Create subtitled videos (optional, run manually)
+- `audio_mixer.py` - Audio mixing utilities
 
 ## Output Folders
 
 - `scripts/` - Conversation dialogue files
 - `podcast_scripts/` - Podcast script files
 - `mp3/` - Generated audio files
-- `output_videos/` - Raw generated videos
-- `final_subtitled_videos/` - Finished videos with music and subtitles
 - `illustrations/` - Generated visual assets
--- `subtitles/` - Subtitle files (current)
--- `subtitles_archived/` - Archived subtitle files
+- `output_videos/` - Final videos with music
+- `presets/` - Background music files
 
 ## Requirements
 
