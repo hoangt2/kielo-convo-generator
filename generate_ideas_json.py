@@ -117,25 +117,49 @@ def normalize_age(age_str):
     """Normalize age strings to match VOICES age categories."""
     age = age_str.lower().strip()
     
-    # Kid/child patterns
-    if any(term in age for term in ["kid", "child", "5", "6", "7", "8", "9", "10", "11", "12"]):
-        return "kid"
+    # Check broader categories FIRST (decades/descriptive) before single digits
+    # to prevent "70s" matching "7" in kids, etc.
     
-    # Teenager patterns
-    if any(term in age for term in ["teen", "13", "14", "15", "16", "17", "18", "19"]):
-        return "teenager"
-    
-    # Young adult patterns
-    if any(term in age for term in ["young adult", "young", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "20s"]):
-        return "young adult"
+    # Senior/elderly patterns (check FIRST — most specific decade matches)
+    if any(term in age for term in ["senior", "elderly", "old", "grandma", "grandpa", "retired", "eläkeläinen",
+                                     "50s", "60s", "70s", "80s", "90s"]):
+        return "senior"
     
     # Adult/middle-aged patterns
-    if any(term in age for term in ["adult", "30", "40", "30s", "40s", "middle"]):
+    if any(term in age for term in ["middle-aged", "middle aged", "30s", "40s"]):
         return "adult"
     
-    # Senior/elderly patterns
-    if any(term in age for term in ["senior", "elderly", "old", "grandma", "grandpa", "50", "60", "70", "80", "50s", "60s", "70s", "80s"]):
-        return "senior"
+    # Young adult patterns
+    if any(term in age for term in ["young adult", "20s"]):
+        return "young adult"
+    
+    # Teenager patterns
+    if any(term in age for term in ["teen", "teens"]):
+        return "teenager"
+    
+    # Now try specific number matching (extract numeric age)
+    import re
+    numbers = re.findall(r'\d+', age)
+    if numbers:
+        num_age = int(numbers[0])
+        if num_age <= 12:
+            return "kid"
+        elif num_age <= 19:
+            return "teenager"
+        elif num_age <= 29:
+            return "young adult"
+        elif num_age <= 49:
+            return "adult"
+        else:
+            return "senior"
+    
+    # Descriptive fallbacks
+    if any(term in age for term in ["kid", "child", "boy", "girl"]):
+        return "kid"
+    if "young" in age:
+        return "young adult"
+    if "adult" in age:
+        return "adult"
     
     return age  # Return as-is if no match
 
@@ -211,6 +235,7 @@ CONVERSATION_SCHEMA = types.Schema(
                 properties={
                     "title": types.Schema(type="string"),
                     "description": types.Schema(type="string"),
+                    "ambient_setting": types.Schema(type="string", description="Short ambient sound description for the setting, e.g. 'busy café with clinking cups and chatter' or 'city bus interior with engine humming'. Leave empty for quiet/neutral settings."),
                     "characters": types.Schema(
                         type="array",
                         min_items=2,
@@ -227,7 +252,7 @@ CONVERSATION_SCHEMA = types.Schema(
                         ),
                     ),
                 },
-                required=["title", "description", "characters"],
+                required=["title", "description", "ambient_setting", "characters"],
             ),
         ),
     },
@@ -244,6 +269,7 @@ Rules:
 - Each idea must be creative, fun, and immediately useful for a beginner.
 - Use realistic Finnish names and situations (e.g., cafés, trams, offices, home).
 - The gender and age of each character must be specified and matched to a voice.
+- For 'ambient_setting': provide a short, descriptive ambient sound for the setting (e.g., 'busy café with clinking cups and background chatter', 'city bus interior with engine humming', 'park with birds chirping and wind'). If the setting is quiet or neutral (e.g., a phone call, a quiet room), leave it as an empty string.
 - Only fill in the string values.
 """
 

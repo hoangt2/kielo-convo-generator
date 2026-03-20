@@ -20,7 +20,13 @@ def load_dialogue_data(file_path):
         if not dialogue_list:
             raise ValueError(f"Missing 'dialogue_list' key in {os.path.basename(file_path)}")
 
-        return dialogue_list
+        # Filter out SFX entries — only keep dialogue entries for TTS
+        dialogue_only = [item for item in dialogue_list if item.get("type") != "sfx"]
+        
+        if not dialogue_only:
+            raise ValueError(f"No dialogue entries found in {os.path.basename(file_path)}")
+
+        return dialogue_only
 
     except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
         print(f"❌ Skipping {file_path}: {e}")

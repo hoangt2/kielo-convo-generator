@@ -13,7 +13,8 @@ def cleanup():
         "illustrations",
         "mp3",
         "output_videos",
-        "scripts"
+        "scripts",
+        "sfx"
     ]
 
     # Files to remove

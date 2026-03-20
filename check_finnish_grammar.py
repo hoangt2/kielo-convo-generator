@@ -194,9 +194,16 @@ def check_and_fix_finnish(dialogue_list: list) -> tuple[list, bool]:
     Pass 1: Check and fix issues with specific anti-patterns.
     Pass 2: Verify the fixes themselves are natural.
     Returns (fixed_dialogue_list, was_modified).
+    Skips SFX entries (type: "sfx") — only checks dialogue lines.
     """
     
-    dialogue_texts = [item.get("text", "") for item in dialogue_list]
+    # Separate dialogue entries from SFX entries, preserving positions
+    dialogue_indices = []  # indices of dialogue items in the original list
+    for i, item in enumerate(dialogue_list):
+        if item.get("type") != "sfx":
+            dialogue_indices.append(i)
+    
+    dialogue_texts = [dialogue_list[i].get("text", "") for i in dialogue_indices]
     
     try:
         # --- PASS 1: Check and fix ---
@@ -210,8 +217,8 @@ def check_and_fix_finnish(dialogue_list: list) -> tuple[list, bool]:
         fixed_lines = result.get("fixed_lines", [])
         changes = result.get("changes_made", [])
         
-        if len(fixed_lines) != len(dialogue_list):
-            print(f"   ⚠️  Warning: Fixed lines count mismatch ({len(fixed_lines)} vs {len(dialogue_list)}), keeping original")
+        if len(fixed_lines) != len(dialogue_indices):
+            print(f"   ⚠️  Warning: Fixed lines count mismatch ({len(fixed_lines)} vs {len(dialogue_indices)} dialogue lines), keeping original")
             return dialogue_list, False
         
         # Print Pass 1 changes
@@ -251,8 +258,8 @@ def check_and_fix_finnish(dialogue_list: list) -> tuple[list, bool]:
         any_changed = any(fixed_lines[i] != dialogue_texts[i] for i in range(len(fixed_lines)))
         
         if any_changed:
-            for i, item in enumerate(dialogue_list):
-                item["text"] = fixed_lines[i]
+            for fix_pos, orig_idx in enumerate(dialogue_indices):
+                dialogue_list[orig_idx]["text"] = fixed_lines[fix_pos]
             return dialogue_list, True
         else:
             return dialogue_list, False

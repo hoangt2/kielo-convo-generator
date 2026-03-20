@@ -54,6 +54,11 @@ def generate_conversation(idea, metadata):
     
     # 2. Build the detailed prompt instructing for JSON output (Unchanged)
     # The system instruction for strictly valid JSON is crucial for models that support it.
+    ambient_setting = idea.get('ambient_setting', '')
+    ambient_note = ""
+    if ambient_setting:
+        ambient_note = f"\n        Ambient Setting: {ambient_setting} (This describes the environment — use it to inspire contextually appropriate sound effects.)"
+    
     prompt = f"""
         You are a Finnish dialogue writer specializing in NATURAL SPOKEN FINNISH (puhekieli).
         Your task is to generate a short (1–2 minutes) realistic conversation based on the provided idea.
@@ -66,26 +71,44 @@ def generate_conversation(idea, metadata):
         - Natural filler words and interjections
 
         The output MUST be a single JSON object containing a key called 'dialogue_list'.
-        The 'dialogue_list' must be a JSON array of objects, where each object represents a dialogue line 
-        formatted exactly for the ElevenLabs text-to-dialogue API.
+        The 'dialogue_list' must be a JSON array of objects. There are TWO types of entries:
+
+        1. **Dialogue entries** (spoken lines):
+        {{
+            "text": "[emotion] Dialogue line in spoken Finnish, including sound cues like [sigh] or [laugh].",
+            "voice_id": "The specific voice_id for this character from the list above."
+        }}
+
+        2. **Sound effect entries** (environmental/action sounds placed between dialogue lines):
+        {{
+            "type": "sfx",
+            "text": "Short description of the sound effect, e.g. 'door opening and closing', 'phone ringing', 'bag zipper opening'",
+            "duration": 2.0,
+            "timing": "before"
+        }}
 
         Characters:
         {char_info_text}
 
-        JSON Output Format Specification:
-        The final output must be a JSON object like this:
-        {{
-        "dialogue_list": [
-            {{
-            "text": "[emotion] Dialogue line in spoken Finnish, including sound cues like [sigh] or [laugh].",
-            "voice_id": "The specific voice_id for this character from the list above."
-            }},
-            // ... more dialogue objects
-        ]
-        }}
+        Sound Effects Instructions:
+        - Add 2–5 sound effect entries at NATURAL moments in the conversation.
+        - Place SFX entries BETWEEN dialogue lines, at points where an action or event happens.
+        - You can also place SFX at the very START (before any dialogue) or END (after last dialogue) of the conversation.
+        - SFX descriptions should be short (3-8 words) and specific for audio generation.
+        - Duration should be 0.5–5.0 seconds, appropriate for the sound.
+        - The "timing" field controls WHEN the sound plays relative to dialogue:
+          * "before" = sound plays BEFORE the next dialogue line (e.g., phone rings → person answers)
+          * "after" = sound plays AFTER the previous dialogue line (e.g., person hangs up → click sound)
+        - Choose timing carefully based on what makes sense narratively:
+          * Door opening/bell ringing/phone ringing → "before" (sound triggers the reaction)
+          * Hanging up phone/putting down cup/walking away → "after" (sound follows the action)
+          * At conversation start (scene-setting sounds) → "before"
+          * At conversation end (closing sounds) → "after"
+        - Examples of good SFX: "coffee cup placed on table", "bus doors opening with hiss", "phone notification sound", "keys jingling", "footsteps on pavement".
+        - Do NOT add SFX for every line — only at key action moments.
 
-        Instructions:
-        - Use the **exact** 'voice_id' provided in the Characters list for each line.
+        Dialogue Instructions:
+        - Use the **exact** 'voice_id' provided in the Characters list for each dialogue line.
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
         - Write ONLY in natural spoken Finnish - avoid formal/written language!
         - Keep the speech natural, expressive, and varied.
@@ -94,13 +117,13 @@ def generate_conversation(idea, metadata):
         Metadata:
         Language: Finnish (spoken/puhekieli)
         Tone: {metadata.get('tone', 'neutral')}
-        Length: {metadata.get('length', '1-2 minutes')}
+        Length: {metadata.get('length', '1-2 minutes')}{ambient_note}
 
         Idea:
         Title: {idea['title']}
         Description: {idea['description']}
 
-        Generate the full conversation in natural spoken Finnish.
+        Generate the full conversation in natural spoken Finnish with sound effects at appropriate moments.
     """
     
     # --- Gemini API Call with Retry Logic ---

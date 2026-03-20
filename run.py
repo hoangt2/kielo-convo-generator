@@ -60,13 +60,15 @@ def main():
         step1_args.append(topic)
 
     pipeline_steps = [
-        ("generate_ideas_json.py", "Step 1/7: Generating conversation ideas", step1_args),
-        ("generate_scripts.py", "Step 2/7: Generating dialogue scripts", []),
-        ("check_finnish_grammar.py", "Step 3/7: Checking Finnish grammar & naturalness", []),
-        ("generate_illustrations.py", "Step 4/7: Generating illustrations", []),
-        ("tts_generator.py", "Step 5/7: Generating audio (TTS)", []),
-        ("generate_videos.py", "Step 6/7: Creating videos", []),
-        ("music_mixer.py", "Step 7/7: Adding background music", []),
+        ("generate_ideas_json.py", "Step 1/9: Generating conversation ideas", step1_args),
+        ("generate_scripts.py", "Step 2/9: Generating dialogue scripts", []),
+        ("check_finnish_grammar.py", "Step 3/9: Checking Finnish grammar & naturalness", []),
+        ("generate_illustrations.py", "Step 4/9: Generating illustrations", []),
+        ("generate_sfx.py", "Step 5/9: Generating sound effects", []),
+        ("tts_generator.py", "Step 6/9: Generating audio (TTS)", []),
+        ("sfx_mixer.py", "Step 7/9: Mixing sound effects into audio", []),
+        ("generate_videos.py", "Step 8/9: Creating videos", []),
+        ("music_mixer.py", "Step 9/9: Adding background music", []),
     ]
     
     for script, description, args in pipeline_steps:
