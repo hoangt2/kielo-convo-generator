@@ -28,7 +28,7 @@ def load_dialogue_data(file_path):
 
 
 def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type):
-    """Generates and saves the conversation or podcast audio for one script."""
+    """Generates and saves the conversation or podcast audio for one script. Returns True on success."""
     try:
         print(f"⏳ Generating {script_type} audio for: {output_filename} ...")
 
@@ -46,27 +46,30 @@ def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, s
             f.write(audio_bytes)
 
         print(f"✅ Saved: {output_path}")
+        return True
 
     except Exception as e:
         print(f"❌ ElevenLabs API Error for {output_filename}: {e}")
+        return False
 
 
 def process_scripts_directory(elevenlabs_client, scripts_dir, script_type):
-    """Helper function to process all JSON files in a given directory."""
+    """Helper function to process all JSON files in a given directory. Returns True if all succeeded."""
     
     if not os.path.isdir(scripts_dir):
         print(f"❌ Folder not found: {scripts_dir}")
-        return
+        return False
 
     # Get all JSON files in the scripts folder
     script_files = [f for f in os.listdir(scripts_dir) if f.endswith(".json")]
 
     if not script_files:
         print(f"⚠️ No JSON files found in {scripts_dir}")
-        return
+        return False
 
     print(f"🎬 Found {len(script_files)} {script_type} script(s) in '{scripts_dir}'. Starting generation...\n")
 
+    had_errors = False
     for filename in script_files:
         file_path = os.path.join(scripts_dir, filename)
         base_name = os.path.splitext(filename)[0]
@@ -75,9 +78,14 @@ def process_scripts_directory(elevenlabs_client, scripts_dir, script_type):
 
         dialogue_list = load_dialogue_data(file_path)
         if dialogue_list:
-            generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type)
+            if not generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type):
+                had_errors = True
 
-    print(f"\n✅ Finished processing {script_type} scripts.")
+    if had_errors:
+        print(f"\n❌ Finished processing {script_type} scripts with errors.")
+    else:
+        print(f"\n✅ Finished processing {script_type} scripts.")
+    return not had_errors
 
 
 def main():
@@ -86,22 +94,28 @@ def main():
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not api_key:
         print("❌ ELEVENLABS_API_KEY not found. Please add it to your .env file.")
-        return
+        sys.exit(1)
 
     elevenlabs = ElevenLabs(api_key=api_key)
 
     # Determine which folder to process based on command-line argument
+    all_succeeded = True
     if len(sys.argv) > 1 and sys.argv[1].lower() == 'podcast':
         # Process podcast scripts only
-        process_scripts_directory(elevenlabs, PODCAST_SCRIPTS_DIR, "podcast")
+        all_succeeded = process_scripts_directory(elevenlabs, PODCAST_SCRIPTS_DIR, "podcast")
     elif len(sys.argv) > 1 and sys.argv[1].lower() == 'all':
         # Process both folders
         print("Processing ALL scripts (Conversation and Podcast)...")
-        process_scripts_directory(elevenlabs, CONVERSATION_SCRIPTS_DIR, "conversation")
-        process_scripts_directory(elevenlabs, PODCAST_SCRIPTS_DIR, "podcast")
+        conv_ok = process_scripts_directory(elevenlabs, CONVERSATION_SCRIPTS_DIR, "conversation")
+        pod_ok = process_scripts_directory(elevenlabs, PODCAST_SCRIPTS_DIR, "podcast")
+        all_succeeded = conv_ok and pod_ok
     else:
         # Default: Process conversation scripts only
-        process_scripts_directory(elevenlabs, CONVERSATION_SCRIPTS_DIR, "conversation")
+        all_succeeded = process_scripts_directory(elevenlabs, CONVERSATION_SCRIPTS_DIR, "conversation")
+
+    if not all_succeeded:
+        print("\n❌ Audio generation failed with errors!")
+        sys.exit(1)
 
     print("\n🏁 All specified audio generation complete!")
 

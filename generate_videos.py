@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from PIL import Image
 import subprocess
@@ -26,12 +27,14 @@ mp3_files = {f.stem: f for f in MP3_FOLDER.iterdir() if f.is_file() and f.suffix
 common_names = set(illustration_files.keys()) & set(mp3_files.keys())
 
 if not common_names:
-    print("No matching illustration and MP3 files found.")
+    print("❌ No matching illustration and MP3 files found.")
+    sys.exit(1)
 else:
     print(f"Found {len(common_names)} matching pairs.")
 
     temp_folder = Path("temp")
     temp_folder.mkdir(exist_ok=True)
+    had_errors = False
 
     for name in sorted(common_names):
         image_path = illustration_files[name]
@@ -65,10 +68,15 @@ else:
 
         except Exception as e:
             print(f"❌ Error processing {name}: {e}")
+            had_errors = True
 
     # Cleanup temp images
     for f in temp_folder.glob("*"):
         f.unlink()
     temp_folder.rmdir()
 
-print("All videos generated!")
+    if had_errors:
+        print("❌ Some videos failed to generate!")
+        sys.exit(1)
+
+    print("All videos generated!")

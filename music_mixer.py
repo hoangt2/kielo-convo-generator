@@ -200,8 +200,9 @@ def batch_process_videos():
         video_files.extend(SOURCE_DIR.glob(ext))
         
     if not video_files:
-        print(f"No video files found in the '{SOURCE_DIR.name}' folder.")
-        return
+        print(f"❌ No video files found in the '{SOURCE_DIR.name}' folder.")
+        import sys
+        sys.exit(1)
 
     print(f"\nFound {len(video_files)} video(s) for background music mixing.")
     
