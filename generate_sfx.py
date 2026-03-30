@@ -3,8 +3,10 @@
 Sound Effects Generator for Kielo Convo Generator
 
 Reads conversation scripts from scripts/ and generates SFX clips
-using ElevenLabs text-to-sound-effects API. Also generates ambient
-background sounds if the idea has an ambient_setting.
+using ElevenLabs text-to-sound-effects API.
+
+Ambient sounds are stored in a shared library (presets/ambience/) and reused
+across conversations. Only new ambient categories trigger API calls.
 """
 
 import json
@@ -17,6 +19,26 @@ from elevenlabs.client import ElevenLabs
 # --- Configuration ---
 SCRIPTS_DIR = Path("scripts")
 SFX_DIR = Path("sfx")
+AMBIENCE_DIR = Path("presets") / "ambience"
+
+# Mapping of ambient categories to detailed prompts for ElevenLabs SFX generation
+AMBIENT_PROMPTS = {
+    "bus": "City bus interior ambience with engine humming steadily, soft passenger chatter, occasional stop announcements, and muffled traffic outside",
+    "cafe": "Cozy café ambience with espresso machine steaming, cups and saucers clinking, soft background chatter, and gentle background music",
+    "street": "City street ambience with cars passing, distant traffic, pedestrian footsteps, occasional horn, and urban atmosphere",
+    "park": "Outdoor park ambience with birds chirping, gentle wind through trees, distant children playing, and natural atmosphere",
+    "office": "Office ambience with keyboard typing, muffled phone conversations, printer humming, and gentle air conditioning",
+    "supermarket": "Supermarket ambience with shopping carts rolling, checkout beeping, distant announcements, and soft background music",
+    "train": "Train interior ambience with rhythmic rail sounds, gentle swaying, muffled announcements, and quiet passenger murmur",
+    "restaurant": "Restaurant ambience with dishes clinking, cutlery sounds, conversation buzz, and kitchen activity in background",
+    "home_kitchen": "Home kitchen ambience with refrigerator humming, water running softly, pot on stove simmering, and domestic sounds",
+    "school": "School hallway ambience with distant student chatter, lockers closing, footsteps on hard floor, and occasional bell",
+    "gym": "Gym ambience with weight machines clanking, sneakers on floor, distant music, and exercise activity sounds",
+    "library": "Quiet library ambience with pages turning, soft whispers, chairs shifting, and deep silence",
+    "hospital": "Hospital ambience with soft beeping monitors, footsteps on linoleum, muffled PA announcements, and quiet atmosphere",
+    "airport": "Airport terminal ambience with rolling luggage, flight announcements, distant crowd murmur, and departure hall atmosphere",
+    "beach": "Beach ambience with ocean waves washing on shore, seagulls calling, gentle breeze, and distant beachgoers",
+}
 
 # --- Load environment variables ---
 load_dotenv()
@@ -63,24 +85,40 @@ def generate_sfx_clip(client: ElevenLabs, text: str, duration: float, output_pat
         return False
 
 
-def generate_ambient_clip(client: ElevenLabs, text: str, output_path: Path) -> bool:
-    """Generate a loopable ambient background sound."""
+def ensure_ambient_clip(client: ElevenLabs, category: str) -> bool:
+    """Ensure an ambient clip exists for the given category in the shared library.
+    
+    If the clip already exists, skips generation (reuses the existing one).
+    If not, generates a new 30s looped clip and saves it to presets/ambience/.
+    """
+    if category == "quiet" or not category:
+        return True  # No ambient needed
+    
+    ambient_path = AMBIENCE_DIR / f"{category}.mp3"
+    
+    if ambient_path.exists():
+        print(f"   🔄 Reusing existing ambient: {ambient_path}")
+        return True
+    
+    # Generate new ambient clip
+    prompt = AMBIENT_PROMPTS.get(category, f"Ambient background sounds of a {category}")
+    
     try:
-        print(f"   🌍 Generating ambient: \"{text}\" (30s, looped)")
+        print(f"   🌍 Generating NEW ambient [{category}]: \"{prompt[:60]}...\" (30s, looped)")
         
         audio_stream = client.text_to_sound_effects.convert(
-            text=text,
+            text=prompt,
             duration_seconds=30.0,
             loop=True,
             output_format="mp3_44100_128",
         )
         audio_bytes = b"".join(audio_stream)
         
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, "wb") as f:
+        AMBIENCE_DIR.mkdir(parents=True, exist_ok=True)
+        with open(ambient_path, "wb") as f:
             f.write(audio_bytes)
         
-        print(f"   ✅ Saved ambient: {output_path}")
+        print(f"   ✅ Saved to library: {ambient_path}")
         return True
         
     except Exception as e:
@@ -107,7 +145,7 @@ def process_script(client: ElevenLabs, script_path: Path) -> bool:
     # Extract SFX entries
     sfx_entries = extract_sfx_entries(dialogue_list)
     
-    if not sfx_entries and not ambient_setting:
+    if not sfx_entries and (not ambient_setting or ambient_setting == "quiet"):
         print(f"   ℹ️  No SFX entries or ambient setting in {script_path.name}, skipping")
         return True
     
@@ -121,10 +159,9 @@ def process_script(client: ElevenLabs, script_path: Path) -> bool:
             if not generate_sfx_clip(client, sfx["text"], sfx["duration"], output_path):
                 had_errors = True
     
-    # Generate ambient clip if ambient_setting is present
-    if ambient_setting:
-        ambient_path = sfx_folder / "ambient.mp3"
-        if not generate_ambient_clip(client, ambient_setting, ambient_path):
+    # Ensure ambient clip exists in the shared library
+    if ambient_setting and ambient_setting != "quiet":
+        if not ensure_ambient_clip(client, ambient_setting):
             had_errors = True
     
     return not had_errors

@@ -5,11 +5,11 @@ SFX Mixer for Kielo Convo Generator
 Mixes generated sound effects into the dialogue audio with precise timing.
 Uses faster-whisper for timestamp alignment and pydub for audio manipulation.
 
-Approach:
+Approach (overlay — never slices the original audio):
 1. Whisper detects where each dialogue segment is in the TTS audio
-2. Audio is split at segment boundaries
-3. Between segments, natural pauses (silence) are inserted
-4. SFX clips are placed before or after segments based on their "timing" field
+2. Gaps between segments are identified as SFX overlay positions
+3. SFX clips are overlaid at gap midpoints (never replacing speech)
+4. Pre/post-conversation SFX are prepended/appended
 5. Ambient audio is looped under the entire result
 
 Runs AFTER tts_generator.py and BEFORE generate_videos.py.
@@ -147,65 +147,81 @@ def build_mixed_audio(
     sfx_positions: dict,
     sfx_folder: Path,
 ) -> AudioSegment:
-    """Reconstruct audio with pauses between segments and SFX placed precisely."""
+    """Overlay SFX onto the original audio without slicing or rearranging speech.
     
-    new_audio = AudioSegment.empty()
+    The original TTS audio is kept completely intact. SFX clips are overlaid
+    at the midpoints of gaps between Whisper-detected segments. Pre/post
+    conversation SFX are prepended/appended as separate audio.
+    """
     
-    # --- Pre-conversation SFX ---
+    # --- Pre-conversation SFX (prepended before the original audio) ---
+    pre_audio = AudioSegment.empty()
     for sfx_info in sfx_positions.get("pre_conversation", []):
         clip = load_sfx_clip(sfx_folder, sfx_info)
         if len(clip) > 0:
             print(f"   🔊 [PRE] \"{sfx_info['text'][:40]}\"")
-            new_audio += clip
-            new_audio += AudioSegment.silent(duration=PAUSE_AFTER_SFX_MS)
+            pre_audio += clip
+            pre_audio += AudioSegment.silent(duration=PAUSE_AFTER_SFX_MS)
     
-    # --- Process each dialogue segment ---
-    for seg_idx, seg in enumerate(timestamps):
-        start_ms = int(seg["start"] * 1000)
-        end_ms = int(seg["end"] * 1000)
-        
-        # Clamp to audio bounds
-        start_ms = max(0, start_ms)
-        end_ms = min(len(original_audio), end_ms)
-        
-        segment_audio = original_audio[start_ms:end_ms]
-        
-        # --- SFX with timing "before" this segment ---
-        before_sfx = sfx_positions.get("before_segment", {}).get(seg_idx, [])
-        for sfx_info in before_sfx:
+    # --- Build a map of gap midpoints between dialogue segments ---
+    # gap_positions[seg_idx] = midpoint (ms) of the gap BEFORE segment seg_idx
+    gap_positions = {}
+    for seg_idx in range(1, len(timestamps)):
+        prev_end_ms = int(timestamps[seg_idx - 1]["end"] * 1000)
+        curr_start_ms = int(timestamps[seg_idx]["start"] * 1000)
+        midpoint = (prev_end_ms + curr_start_ms) // 2
+        gap_positions[seg_idx] = midpoint
+    
+    # --- Overlay SFX onto the original audio at gap positions ---
+    mixed = original_audio  # start with the intact original
+    
+    # "before" SFX: overlay at the gap before the target segment
+    for seg_idx, sfx_list in sfx_positions.get("before_segment", {}).items():
+        if seg_idx in gap_positions:
+            pos_ms = gap_positions[seg_idx]
+            for sfx_info in sfx_list:
+                clip = load_sfx_clip(sfx_folder, sfx_info)
+                if len(clip) > 0:
+                    # Center the SFX on the gap midpoint
+                    overlay_at = max(0, pos_ms - len(clip) // 2)
+                    print(f"   🔊 [BEFORE seg {seg_idx}] \"{sfx_info['text'][:40]}\" at {overlay_at}ms")
+                    mixed = mixed.overlay(clip, position=overlay_at)
+    
+    # "after" SFX: overlay at the gap after the target segment
+    for seg_idx, sfx_list in sfx_positions.get("after_segment", {}).items():
+        next_seg = seg_idx + 1
+        if next_seg in gap_positions:
+            pos_ms = gap_positions[next_seg]
+        else:
+            # SFX after the last segment — place at segment end
+            pos_ms = int(timestamps[seg_idx]["end"] * 1000)
+        for sfx_info in sfx_list:
             clip = load_sfx_clip(sfx_folder, sfx_info)
             if len(clip) > 0:
-                print(f"   🔊 [BEFORE seg {seg_idx}] \"{sfx_info['text'][:40]}\"")
-                new_audio += clip
-                new_audio += AudioSegment.silent(duration=PAUSE_AFTER_SFX_MS)
-        
-        # --- Add natural pause between segments (not before the first one) ---
-        if seg_idx > 0 and not before_sfx:
-            pause_ms = random.randint(PAUSE_MIN_MS, PAUSE_MAX_MS)
-            new_audio += AudioSegment.silent(duration=pause_ms)
-        
-        # --- Add the dialogue segment ---
-        new_audio += segment_audio
-        
-        # --- SFX with timing "after" this segment ---
-        after_sfx = sfx_positions.get("after_segment", {}).get(seg_idx, [])
-        for sfx_info in after_sfx:
-            # Small pause before the SFX
-            new_audio += AudioSegment.silent(duration=PAUSE_AFTER_SFX_MS)
-            clip = load_sfx_clip(sfx_folder, sfx_info)
-            if len(clip) > 0:
-                print(f"   🔊 [AFTER seg {seg_idx}] \"{sfx_info['text'][:40]}\"")
-                new_audio += clip
+                overlay_at = max(0, pos_ms - len(clip) // 2)
+                # Don't overlay past the audio length
+                overlay_at = min(overlay_at, max(0, len(mixed) - len(clip)))
+                print(f"   🔊 [AFTER seg {seg_idx}] \"{sfx_info['text'][:40]}\" at {overlay_at}ms")
+                mixed = mixed.overlay(clip, position=overlay_at)
     
-    # --- Post-conversation SFX ---
+    # --- Post-conversation SFX (appended after the original audio) ---
+    post_audio = AudioSegment.empty()
     for sfx_info in sfx_positions.get("post_conversation", []):
-        new_audio += AudioSegment.silent(duration=PAUSE_AFTER_SFX_MS)
+        post_audio += AudioSegment.silent(duration=PAUSE_AFTER_SFX_MS)
         clip = load_sfx_clip(sfx_folder, sfx_info)
         if len(clip) > 0:
             print(f"   🔊 [POST] \"{sfx_info['text'][:40]}\"")
-            new_audio += clip
+            post_audio += clip
     
-    return new_audio
+    # --- Assemble: pre + original (with overlays) + post ---
+    result = AudioSegment.empty()
+    if len(pre_audio) > 0:
+        result += pre_audio
+    result += mixed
+    if len(post_audio) > 0:
+        result += post_audio
+    
+    return result
 
 
 def mix_sfx_into_audio(mp3_path: Path, script_path: Path, sfx_folder: Path) -> bool:
@@ -246,20 +262,29 @@ def mix_sfx_into_audio(mp3_path: Path, script_path: Path, sfx_folder: Path) -> b
         mixed = original_audio
     
     # --- Overlay ambient background if available ---
-    ambient_path = sfx_folder / "ambient.mp3"
-    if ambient_setting and ambient_path.exists():
-        print(f"   🌍 Mixing ambient: \"{ambient_setting[:50]}...\"")
-        ambient_clip = AudioSegment.from_mp3(str(ambient_path))
-        
-        # Loop ambient to match mixed audio length
-        loops_needed = (len(mixed) // len(ambient_clip)) + 1
-        ambient_looped = ambient_clip * loops_needed
-        ambient_looped = ambient_looped[:len(mixed)]
-        
-        # Reduce volume and overlay
-        ambient_looped = ambient_looped + AMBIENT_VOLUME_DB
-        mixed = mixed.overlay(ambient_looped)
-        print(f"   ✅ Ambient mixed at {AMBIENT_VOLUME_DB}dB")
+    AMBIENCE_DIR = Path("presets") / "ambience"
+    if ambient_setting and ambient_setting != "quiet":
+        ambient_path = AMBIENCE_DIR / f"{ambient_setting}.mp3"
+        if ambient_path.exists():
+            print(f"   🌍 Mixing ambient [{ambient_setting}] from library")
+            ambient_clip = AudioSegment.from_mp3(str(ambient_path))
+            
+            # Loop ambient to match mixed audio length
+            loops_needed = (len(mixed) // len(ambient_clip)) + 1
+            ambient_looped = ambient_clip * loops_needed
+            ambient_looped = ambient_looped[:len(mixed)]
+            
+            # Normalize ambient relative to dialogue volume, then reduce
+            # This ensures ambient is always audible regardless of source clip volume
+            dialogue_dbfs = mixed.dBFS
+            ambient_dbfs = ambient_looped.dBFS
+            volume_adjustment = (dialogue_dbfs - ambient_dbfs) + AMBIENT_VOLUME_DB
+            ambient_looped = ambient_looped + volume_adjustment
+            
+            mixed = mixed.overlay(ambient_looped)
+            print(f"   ✅ Ambient mixed at {AMBIENT_VOLUME_DB}dB below dialogue (adjusted {volume_adjustment:+.1f}dB)")
+        else:
+            print(f"   ⚠️  Ambient clip not found: {ambient_path}")
     
     # --- Export ---
     mixed.export(str(mp3_path), format="mp3", bitrate="128k")

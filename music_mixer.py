@@ -190,8 +190,34 @@ def add_background_music(
         if temp_output_path.exists():
             os.remove(temp_output_path)
 
+def get_ambient_setting(video_path: Path) -> str:
+    """Look up the ambient_setting for a video from its corresponding script JSON."""
+    import json
+    
+    scripts_dir = Path("scripts")
+    # Video name is like "conversation_slug.mp4", script is "slug.json"
+    stem = video_path.stem
+    # Strip "conversation_" prefix if present
+    slug = stem.replace("conversation_", "", 1) if stem.startswith("conversation_") else stem
+    script_path = scripts_dir / f"{slug}.json"
+    
+    if not script_path.exists():
+        return ""  # No script found, treat as quiet
+    
+    try:
+        with open(script_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data.get("idea", {}).get("ambient_setting", "")
+    except Exception:
+        return ""
+
+
 def batch_process_videos():
-    """Batch process all videos in the source directory."""
+    """Batch process all videos in the source directory.
+    
+    Only adds background music to videos whose ambient_setting is "quiet" or unset.
+    Videos with ambient sounds (e.g. café, street) skip BGM entirely.
+    """
     setup_directories()
     
     video_extensions = ['*.mp4', '*.mov', '*.avi', '*.mkv']
@@ -209,6 +235,13 @@ def batch_process_videos():
     for i, video_file_path in enumerate(video_files):
         print("\n" + "-"*40)
         print(f"Video {i+1}/{len(video_files)}: {video_file_path.name}")
+        
+        # Check ambient setting — only add BGM for quiet/unset ambients
+        ambient = get_ambient_setting(video_file_path)
+        if ambient and ambient != "quiet":
+            print(f"   ⏭️  Skipping BGM — video has ambient sound [{ambient}]")
+            continue
+        
         # Process in-place (the function handles the temp file)
         add_background_music(
             input_video_path=video_file_path, 

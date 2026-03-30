@@ -235,7 +235,12 @@ CONVERSATION_SCHEMA = types.Schema(
                 properties={
                     "title": types.Schema(type="string"),
                     "description": types.Schema(type="string"),
-                    "ambient_setting": types.Schema(type="string", description="Short ambient sound description for the setting, e.g. 'busy café with clinking cups and chatter' or 'city bus interior with engine humming'. Leave empty for quiet/neutral settings."),
+                    "ambient_setting": types.Schema(type="string", enum=[
+                        "bus", "cafe", "street", "park", "office", "supermarket",
+                        "train", "restaurant", "home_kitchen", "school",
+                        "gym", "library", "hospital", "airport", "beach",
+                        "quiet"
+                    ], description="The ambient sound category for the conversation setting. Use 'quiet' for neutral/silent settings."),
                     "characters": types.Schema(
                         type="array",
                         min_items=2,
@@ -269,7 +274,23 @@ Rules:
 - Each idea must be creative, fun, and immediately useful for a beginner.
 - Use realistic Finnish names and situations (e.g., cafés, trams, offices, home).
 - The gender and age of each character must be specified and matched to a voice.
-- For 'ambient_setting': provide a short, descriptive ambient sound for the setting (e.g., 'busy café with clinking cups and background chatter', 'city bus interior with engine humming', 'park with birds chirping and wind'). If the setting is quiet or neutral (e.g., a phone call, a quiet room), leave it as an empty string.
+- For 'ambient_setting': choose the most appropriate ambient sound category for where the conversation takes place. Available categories:
+  * "bus" — city bus interior (engine, announcements, passengers)
+  * "cafe" — café/coffee shop (clinking cups, espresso machine, soft chatter)
+  * "street" — city street (traffic, pedestrians, urban sounds)
+  * "park" — outdoor park (birds, wind, nature)
+  * "office" — office environment (keyboard typing, printer, muffled conversations)
+  * "supermarket" — grocery store (carts, beeping, announcements)
+  * "train" — train/metro (rails, announcements, doors)
+  * "restaurant" — restaurant (dishes, conversation buzz, cutlery)
+  * "home_kitchen" — home kitchen (cooking sounds, fridge, water)
+  * "school" — school/classroom (hallway noise, bell)
+  * "gym" — gym/sports (equipment, sneakers, music)
+  * "library" — quiet library (pages turning, whispers)
+  * "hospital" — hospital/clinic (beeping, footsteps, PA system)
+  * "airport" — airport (announcements, rolling luggage, crowd)
+  * "beach" — beach/waterfront (waves, seagulls, wind)
+  * "quiet" — for phone calls, quiet rooms, or settings with no distinct ambient sound
 - Only fill in the string values.
 """
 
