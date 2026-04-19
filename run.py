@@ -8,6 +8,7 @@ Runs the complete video generation pipeline from ideas to final subtitled videos
 import subprocess
 import sys
 from pathlib import Path
+from cleanup import cleanup
 
 
 def run_step(script_name: str, description: str, args: list = None) -> bool:
@@ -39,6 +40,9 @@ def main():
     print("\n" + "="*60)
     print("🎬 KIELO CONVO GENERATOR - FULL PIPELINE")
     print("="*60)
+    
+    # Clean up previous run for a fresh start
+    cleanup()
     
     # Parse optional arguments: number of outputs (int) or topic (string)
     num_outputs = None

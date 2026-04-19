@@ -274,6 +274,7 @@ Rules:
 - Each idea must be creative, fun, and immediately useful for a beginner.
 - Use realistic Finnish names and situations (e.g., cafés, trams, offices, home).
 - The gender and age of each character must be specified and matched to a voice.
+- In the 'description' field, clearly indicate the relationship between characters (e.g., "asiakas ja postivirkailija" for strangers, or "kaksi ystävää" for friends). This helps the dialogue writer know whether characters should use each other's names.
 - For 'ambient_setting': choose the most appropriate ambient sound category for where the conversation takes place. Available categories:
   * "bus" — city bus interior (engine, announcements, passengers)
   * "cafe" — café/coffee shop (clinking cups, espresso machine, soft chatter)

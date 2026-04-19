@@ -113,6 +113,7 @@ def generate_conversation(idea, metadata):
         - Write ONLY in natural spoken Finnish - avoid formal/written language!
         - Keep the speech natural, expressive, and varied.
         - Match each character's tone and personality.
+        - **IMPORTANT — Name usage:** Determine whether the characters know each other based on the scenario description. If they are strangers (e.g., customer and clerk, patient and receptionist, passenger and driver, someone asking directions from a passerby), they must NOT call each other by name. Use generic forms of address instead (e.g., "hei", "anteeks", "moi"). Only use character names in dialogue if the scenario clearly implies a personal relationship (e.g., friends, family, colleagues who know each other).
 
         Metadata:
         Language: Finnish (spoken/puhekieli)
