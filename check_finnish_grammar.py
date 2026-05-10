@@ -265,30 +265,35 @@ def check_and_fix_finnish(dialogue_list: list) -> tuple[list, bool]:
             return dialogue_list, False
             
     except APIError as e:
-        print(f"   ❌ API Error during grammar check: {e}")
-        return dialogue_list, False
+        raise RuntimeError(f"API Error during grammar check: {e}") from e
     except json.JSONDecodeError as e:
-        print(f"   ❌ JSON decode error: {e}")
-        return dialogue_list, False
+        raise RuntimeError(f"JSON decode error from Gemini response: {e}") from e
 
 
-def process_script_file(file_path: Path) -> bool:
-    """Process a single script file, checking and fixing Finnish."""
+def process_script_file(file_path: Path) -> tuple[bool, bool]:
+    """Process a single script file, checking and fixing Finnish.
+    
+    Returns (was_modified, success) tuple.
+    """
     
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
     except (json.JSONDecodeError, FileNotFoundError) as e:
         print(f"   ❌ Error reading {file_path.name}: {e}")
-        return False
+        return False, False
     
     dialogue_list = data.get("dialogue_list", [])
     if not dialogue_list:
         print(f"   ⚠️  No dialogue found in {file_path.name}")
-        return False
+        return False, False
     
     # Check and fix
-    fixed_dialogue, was_modified = check_and_fix_finnish(dialogue_list)
+    try:
+        fixed_dialogue, was_modified = check_and_fix_finnish(dialogue_list)
+    except RuntimeError as e:
+        print(f"   ❌ {e}")
+        return False, False
     
     if was_modified:
         # Save the fixed version
@@ -296,10 +301,10 @@ def process_script_file(file_path: Path) -> bool:
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         print(f"   ✅ Fixed and saved: {file_path.name}")
-        return True
+        return True, True
     else:
         print(f"   ✓ Finnish looks natural: {file_path.name}")
-        return False
+        return False, True
 
 
 def main():
@@ -329,13 +334,21 @@ def main():
     print(f"\n📂 Found {len(script_files)} script(s) in '{scripts_folder}/'")
     
     fixed_count = 0
+    error_count = 0
     for script_file in script_files:
         print(f"\n🔍 Checking: {script_file.name}")
-        if process_script_file(script_file):
+        was_modified, success = process_script_file(script_file)
+        if was_modified:
             fixed_count += 1
+        if not success:
+            error_count += 1
     
     print("\n" + "="*60)
-    if fixed_count > 0:
+    if error_count > 0:
+        print(f"❌ {error_count}/{len(script_files)} script(s) had errors!")
+        print("="*60 + "\n")
+        sys.exit(1)
+    elif fixed_count > 0:
         print(f"🎉 Done! Fixed {fixed_count}/{len(script_files)} script(s)")
     else:
         print("✅ All scripts already have natural Finnish!")
