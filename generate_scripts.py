@@ -6,8 +6,9 @@ import time
 from dotenv import load_dotenv
 # --- Import the new Google GenAI SDK components ---
 from google import genai
-from google.genai import types 
+from google.genai import types
 from google.genai.errors import APIError
+from cefr_levels import conversation_level_block, podcast_level_block
 
 # --- Load environment variables ---
 load_dotenv()
@@ -58,7 +59,9 @@ def generate_conversation(idea, metadata):
     ambient_note = ""
     if ambient_setting:
         ambient_note = f"\n        Ambient Setting: {ambient_setting} (This describes the environment — use it to inspire contextually appropriate sound effects.)"
-    
+
+    level_block = conversation_level_block(metadata.get('language_level'))
+
     prompt = f"""
         You are a Finnish dialogue writer specializing in NATURAL SPOKEN FINNISH (puhekieli).
         Your task is to generate a short (1–2 minutes) realistic conversation based on the provided idea.
@@ -118,7 +121,7 @@ def generate_conversation(idea, metadata):
         Metadata:
         Language: Finnish (spoken/puhekieli)
         Tone: {metadata.get('tone', 'neutral')}
-        Length: {metadata.get('length', '1-2 minutes')}{ambient_note}
+        Length: {metadata.get('length', '1-2 minutes')}{ambient_note}{level_block}
 
         Idea:
         Title: {idea['title']}
@@ -195,7 +198,9 @@ def generate_podcast_script(idea, metadata):
     char_info_text = "\n".join(
         [f"- {c['name']} (Role: {c['role']}, Tone: {c['default_tone']}, Voice ID: {c['voice_id']})" for c in characters]
     )
-    
+
+    level_block = podcast_level_block(metadata.get('language_level'))
+
     # 2. Build the detailed prompt for a podcast script
     prompt = f"""
         You are an expert Finnish language podcast scriptwriter. Your task is to generate an engaging, 
@@ -234,7 +239,7 @@ def generate_podcast_script(idea, metadata):
         Metadata:
         Target Audience: {metadata['target_audience']}
         Duration: {metadata['duration']}
-        Format: {metadata['format']}
+        Format: {metadata['format']}{level_block}
 
         Podcast Idea:
         Title: {idea['title']}

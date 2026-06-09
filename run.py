@@ -9,6 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 from cleanup import cleanup
+from cefr_levels import is_cefr_level, normalize_level
 
 
 def run_step(script_name: str, description: str, args: list = None) -> bool:
@@ -44,14 +45,18 @@ def main():
     # Clean up previous run for a fresh start
     cleanup()
     
-    # Parse optional arguments: number of outputs (int) or topic (string)
+    # Parse optional arguments: number of outputs (int), CEFR level (A1–C2), or topic (string)
     num_outputs = None
     topic = None
-    
+    level = None
+
     for arg in sys.argv[1:]:
         if arg.isdigit():
             num_outputs = arg
             print(f"ℹ️  Overriding default output count to: {num_outputs}")
+        elif is_cefr_level(arg):
+            level = normalize_level(arg)
+            print(f"ℹ️  Targeting CEFR level: {level}")
         else:
             topic = arg
             print(f"ℹ️  Setting topic to: {topic}")
@@ -60,6 +65,8 @@ def main():
     step1_args = []
     if num_outputs:
         step1_args.append(str(num_outputs))
+    if level:
+        step1_args.append(level)
     if topic:
         step1_args.append(topic)
 

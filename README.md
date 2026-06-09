@@ -1,6 +1,6 @@
 # Convo Generator
 
-A Python tool for generating Finnish conversation scripts and podcast episodes using Google Gemini AI, with support for TTS, sound effects, video generation, and background music.
+A Python tool for generating Finnish conversation scripts and podcast episodes using Google Gemini AI, with support for TTS, sound effects, video generation, and background music. Scripts can be targeted to a CEFR language level (A1–C2).
 
 ## Setup
 
@@ -37,10 +37,14 @@ ELEVENLABS_API_KEY=your_elevenlabs_api_key
 python generate_ideas_json.py                      # 1 conversation idea (default)
 python generate_ideas_json.py 5                    # 5 conversation ideas
 python generate_ideas_json.py 3 "at the café"     # 3 ideas about a specific topic
+python generate_ideas_json.py 3 A1 "at the café"  # 3 A1-level ideas about a topic
 python generate_ideas_json.py podcast              # Podcast ideas
 python generate_ideas_json.py podcast 5 "greetings"  # 5 podcast ideas about greetings
+python generate_ideas_json.py podcast 5 B1 "greetings"  # 5 B1-level podcast ideas
 ```
 Output: `ideas.json` or `podcast_ideas.json`
+
+> **CEFR language level (optional):** Pass a level — `A1`, `A2`, `B1`, `B2`, `C1`, or `C2` (case-insensitive) — as any argument to target a learner level. The level is recorded in the ideas file's `metadata.language_level` and automatically applied when generating scripts. Lower levels use simpler vocabulary and grammar, shorter sentences, and slower delivery; higher levels grow progressively more natural and complex. If omitted, behavior is unchanged.
 
 ### 2. Generate Scripts
 ```bash
@@ -48,6 +52,8 @@ python generate_scripts.py                   # Conversation scripts
 python generate_scripts.py podcast           # Podcast scripts
 ```
 Output: JSON dialogue files in `scripts/` or `podcast_scripts/`
+
+> The CEFR level is read automatically from the ideas file's `metadata.language_level` (set in step 1) — no extra argument needed here.
 
 ### 3. Check Finnish Grammar
 ```bash
@@ -104,7 +110,10 @@ Run the complete pipeline with a single command:
 python run.py                         # Run with defaults
 python run.py 5                       # Generate 5 conversation ideas
 python run.py 3 "ordering food"       # Generate 3 ideas about a topic
+python run.py 3 A1 "ordering food"    # Generate 3 A1-level ideas about a topic
 ```
+
+Arguments are auto-detected by shape: a number sets the count, an `A1`–`C2` token sets the CEFR level, and any other string is the topic — order doesn't matter.
 
 This runs all 9 steps in sequence:
 1. Generate ideas → 2. Generate scripts → 3. Check Finnish → 4. Generate illustrations → 5. Generate SFX → 6. TTS audio → 7. Mix SFX → 8. Create videos → 9. Add music
@@ -145,6 +154,7 @@ This removes generated ideas, scripts, audio, and video files while preserving `
 - `music_mixer.py` - Add background music to videos
 
 ### Utility Scripts
+- `cefr_levels.py` - CEFR level (A1–C2) definitions and per-level prompt guidance
 - `cleanup.py` - Reset project by removing generated files
 - `subtitle_generator.py` - Subtitle generation helper functions
 - `generate_subtitled_videos.py` - Create subtitled videos (optional, run manually)

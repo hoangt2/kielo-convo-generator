@@ -5,6 +5,7 @@ import sys
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
+from cefr_levels import is_cefr_level, normalize_level
 
 # Load environment variables
 load_dotenv()
@@ -295,7 +296,7 @@ Rules:
 - Only fill in the string values.
 """
 
-def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None):
+def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, level=None):
     if topic:
         print(f"🪄 Generating {num_ideas} general conversation ideas about '{topic}'...")
     else:
@@ -311,6 +312,11 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None):
     prompt_text = f"Generate {num_ideas} unique ideas for short Finnish conversations"
     if topic:
         prompt_text += f" about the topic '{topic}'"
+    if level:
+        prompt_text += (
+            f". The conversations are for CEFR level {level} learners — choose scenarios "
+            f"whose vocabulary and situations suit that level"
+        )
     prompt_text += ", following the specified JSON structure exactly."
 
     full_prompt = (
@@ -325,6 +331,8 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None):
 
     data = json.loads(response.text)
     data["ideas"] = assign_voice_ids(data.get("ideas", []))
+    if level:
+        data.setdefault("metadata", {})["language_level"] = level
     return data, "ideas.json"
 
 # --- 2. PODCAST IDEAS LOGIC (Minor Changes to System Prompt and Function) ---
@@ -388,7 +396,7 @@ Rules:
 - Only fill in the string values.
 """
 
-def generate_podcast_ideas(num_ideas=NUM_PODCAST_IDEAS, topic=None):
+def generate_podcast_ideas(num_ideas=NUM_PODCAST_IDEAS, topic=None, level=None):
     if topic:
         print(f"🪄 Generating {num_ideas} podcast lesson ideas about '{topic}'...")
     else:
@@ -404,6 +412,11 @@ def generate_podcast_ideas(num_ideas=NUM_PODCAST_IDEAS, topic=None):
     prompt_text = f"Generate {num_ideas} unique, creative, and highly useful podcast ideas for Finnish beginners"
     if topic:
         prompt_text += f" about the topic '{topic}'"
+    if level:
+        prompt_text += (
+            f". The lessons target CEFR level {level} learners — pick tips and phrases "
+            f"whose Finnish content suits that level"
+        )
     prompt_text += ", following the specified JSON structure exactly. Remember to use only the allowed character names."
 
     full_prompt = (
@@ -418,7 +431,9 @@ def generate_podcast_ideas(num_ideas=NUM_PODCAST_IDEAS, topic=None):
 
     data = json.loads(response.text)
     # **MODIFICATION HERE**: Use the new specific voice assignment function
-    data["podcast_ideas"] = assign_podcast_voice_ids(data.get("podcast_ideas", [])) 
+    data["podcast_ideas"] = assign_podcast_voice_ids(data.get("podcast_ideas", []))
+    if level:
+        data.setdefault("metadata", {})["language_level"] = level
     return data, "podcast_ideas.json"
 
 # --- MAIN EXECUTION (No Change) ---
@@ -429,29 +444,35 @@ def main():
         return
 
     # Check for command-line arguments
-    # Usage: python generate_ideas_json.py [podcast|conversation] [number_of_ideas] [topic]
-    
+    # Usage: python generate_ideas_json.py [podcast|conversation] [number_of_ideas] [CEFR level] [topic]
+
     mode = 'conversation'
     num_ideas = None
     topic = None
-    
+    level = None
+
     # Simple argument parsing
     for arg in sys.argv[1:]:
         if arg.lower() == 'podcast':
             mode = 'podcast'
         elif arg.isdigit():
             num_ideas = int(arg)
+        elif is_cefr_level(arg):
+            level = normalize_level(arg)
         else:
             topic = arg
-            
+
+    if level:
+        print(f"ℹ️  Targeting CEFR level: {level}")
+
     if mode == 'podcast':
         count = num_ideas if num_ideas else NUM_PODCAST_IDEAS
-        result, output_file = generate_podcast_ideas(count, topic)
+        result, output_file = generate_podcast_ideas(count, topic, level)
         idea_count = count
     else:
         # Default behavior: generate conversations
         count = num_ideas if num_ideas else NUM_CONVERSATION_IDEAS
-        result, output_file = generate_conversation_ideas(count, topic)
+        result, output_file = generate_conversation_ideas(count, topic, level)
         idea_count = count
 
     if result:
