@@ -275,6 +275,11 @@ Rules:
 - Each idea must be creative, fun, and immediately useful for a beginner.
 - Use realistic Finnish names and situations (e.g., cafés, trams, offices, home).
 - The gender and age of each character must be specified and matched to a voice.
+- **CRITICAL — Choosing the right character relationship for the topic:**
+  Think carefully about WHO would realistically have this conversation. Match the character relationship to the topic:
+  * For SERVICE or INSTITUTIONAL topics (e.g., enrolling in a course, getting a driver's license, buying a ticket, visiting a doctor, checking into a hotel, opening a bank account, returning an item, asking for directions), the characters MUST be strangers in a professional context — such as a customer and a clerk, a student and an advisor, a patient and a receptionist, a passenger and a driver. Do NOT use friends or family for these topics.
+  * For SOCIAL or EVERYDAY topics (e.g., weekend plans, hobbies, cooking, complaining about weather, catching up), use friends, colleagues, classmates, or family members.
+  * For MIXED topics, use your best judgment — but always prefer the most realistic and natural pairing.
 - In the 'description' field, clearly indicate the relationship between characters (e.g., "asiakas ja postivirkailija" for strangers, or "kaksi ystävää" for friends). This helps the dialogue writer know whether characters should use each other's names.
 - For 'ambient_setting': choose the most appropriate ambient sound category for where the conversation takes place. Available categories:
   * "bus" — city bus interior (engine, announcements, passengers)
