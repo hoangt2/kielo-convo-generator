@@ -131,6 +131,65 @@ python generate_videos.py
 python music_mixer.py
 ```
 
+## Series Mode (recurring cast & episodes)
+
+The default pipeline is **idea-driven** — `generate_ideas_json.py` invents random characters and scenarios each run. **Series Mode** is the opposite: a fixed cast and a fixed episode list, so the same characters (with the same voices and faces) recur across every video. It lives in the `series/` folder and feeds into the existing pipeline.
+
+### Files
+
+| File | What it is |
+|------|------------|
+| `series/cast.json` | **Character bible** — one canonical entry per character (`voice_id`, personality, `speech_style`, `appearance`, reference-image path). The `id` keys (e.g. `aisha`) are what episodes reference. |
+| `series/episodes.json` | **The episode list** — each scenario as data (title, description, which cast appears, key phrases, ambient setting, CEFR level). Edit/add/reorder freely. |
+| `series/characters/` | One reference portrait per character (anchors the visual look). |
+| `series_compile.py` | Bridge — turns a chosen episode into the `ideas.json` the pipeline already consumes. |
+| `generate_character_refs.py` | Generates the reference portraits from `cast.json`. |
+
+### Workflow
+
+```bash
+# 0. (once) lock each character's look — reads appearance from cast.json
+python generate_character_refs.py
+python generate_character_refs.py --force      # regenerate all
+python generate_character_refs.py aisha mikko  # only specific characters
+
+# 1. pick episode(s) -> writes ideas.json  (REPLACES generate_ideas_json.py)
+python series_compile.py            # list the episode menu
+python series_compile.py list       # same — list episodes
+python series_compile.py 1          # compile episode 1
+python series_compile.py 1 4 6      # compile several
+python series_compile.py all        # compile every episode
+
+# 2. run the rest of the pipeline, SKIPPING step 1 (idea generation)
+python generate_scripts.py
+python check_finnish_grammar.py
+python generate_illustrations.py
+python generate_sfx.py
+python tts_generator.py
+python sfx_mixer.py
+python generate_videos.py
+python music_mixer.py
+```
+
+> **Do not run `generate_ideas_json.py` (or `run.py`) in Series Mode** — `series_compile.py` produces `ideas.json` for you. Running idea generation would overwrite it with random content.
+
+> **CEFR level:** compile **one episode at a time** for accurate per-episode level (the pipeline applies a single level per `ideas.json`). Compiling several uses the series default level from `episodes.json`.
+
+### What keeps it consistent
+
+- **Voice** — each character has one `voice_id` in `cast.json`; every episode reuses it (the pipeline keys TTS on `voice_id`). Fill in the `REPLACE_WITH_ELEVENLABS_VOICE_ID` placeholders with your ElevenLabs voice IDs.
+- **Personality / register** — each character's `speech_style` (e.g. careful `Minä/Sinä` vs. spoken `Mä/Sä`) is folded into the script prompt automatically.
+- **Face** — one reference portrait per character in `series/characters/`, reused as an image reference per episode.
+
+### Managing episodes
+
+- **Add an episode:** append an object to `series/episodes.json` → `episodes` and set `characters` to a list of cast ids.
+- **New recurring character:** add an entry to `series/cast.json` → `characters` (with `voice_id` + `appearance`), then `python generate_character_refs.py <id>`.
+- **One-off character:** inline a full character object directly in an episode's `characters` list instead of an id.
+- **Change a voice or look:** edit `voice_id` / `appearance` in `cast.json` (re-run `generate_character_refs.py --force` for the look).
+
+See `series/README.md` for the full design notes, including the one optional edit to wire the reference portraits into episode illustrations.
+
 ## Cleanup
 
 Reset the project by removing all generated files:

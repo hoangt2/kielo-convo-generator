@@ -29,16 +29,15 @@ MODEL_NAME = "gemini-2.5-flash-image"
 
 # --- Fixed illustration style description ---
 ILLUSTRATION_STYLE = (
-    "Illustration style: Playful, modern doodle style. "
-    "Bold, thick black outlines with variable line weight. "
-    "Use a vibrant and conventional color palette. "
-    "Solid, warm off-white background. "
-    "High contrast, clean, and quirky aesthetic. "
-    "Animals and people should have natural faces. "
-    "No face, no smiley, no anthropomorphism on inanimate objects. "
-    "No text, no labels, no words, no letters. "
-    "No extra decorations, no stars, no sparkles, no background doodles. "
-    "Minimal detail, keep it clean and uncluttered."
+    "A playful, modern doodle-style 2D illustration. "
+    "The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. "
+    "Do not use gradients, 3D rendering, or complex shading. "
+    "Characters should have friendly, exaggerated proportions with simple, clean features. "
+    "Any inanimate objects in the scene must remain strictly as normal objects without any faces, "
+    "smiles, or anthropomorphic details. "
+    "Use a soft, cohesive pastel-leaning color palette. "
+    "High quality vector-art style. "
+    "No text, no labels, no words, no letters."
 )
 
 ## 🏗️ Core Functions
@@ -54,6 +53,7 @@ def create_generic_prompt(data: dict) -> str:
 
     title = idea.get("title", "Untitled Scene")
     description = idea.get("description", "")
+    ambient_setting = idea.get("ambient_setting", "")
     language = metadata.get("language", "Unknown language")
     tone = metadata.get("tone", "neutral")
     length = metadata.get("length", "short")
@@ -68,20 +68,34 @@ def create_generic_prompt(data: dict) -> str:
         character_descriptions.append(f"{name} ({gender}, {age}, {tone})")
     character_info = ", ".join(character_descriptions) if character_descriptions else "unspecified characters"
 
-    # Sample dialogue preview
-    all_lines = " ".join([d.get("text", "") for d in dialogues])
-    sample_dialogue_words = all_lines.split()[:40]
-    sample_dialogue = " ".join(sample_dialogue_words) + ("..." if len(all_lines.split()) > 40 else "")
+    # Use ONLY the scene narrative for the image — never the dialogue or any quoted phrases.
+    # In series mode the description has extra blocks (target phrases, speech styles, direction)
+    # appended after a blank line; those are for the scriptwriter, NOT the illustrator. Keeping
+    # them would make the model render speech bubbles with that text, so we take the first block.
+    scene = (description or "").split("\n\n")[0].strip()
+
+    # Environment guidance — give the model a real location to build, not an empty backdrop.
+    setting_clause = (
+        f"Setting: a detailed {ambient_setting} environment. " if ambient_setting else ""
+    )
 
     # Build generic illustration prompt
     prompt = (
-        f"Create a single illustration that closely depicts the following conversation scenario. "
+        f"Create a single, wordless illustration of the following scene. "
         f"{ILLUSTRATION_STYLE} "
-        f"Do not include any text or captions in the image. "
-        f"Scene: {description or 'No explicit description provided.'} "
+        f"CRITICAL — this must be a TEXT-FREE image: do NOT draw any text, letters, words, "
+        f"numbers, captions, signs, or labels of any kind. Do NOT draw speech bubbles, dialogue "
+        f"balloons, or thought bubbles. Do NOT make a comic strip or multiple panels — produce ONE "
+        f"single illustration of one moment. "
+        f"Scene: {scene or 'No explicit description provided.'} "
         f"Characters: {character_info}. "
-        f"Show the characters naturally interacting in a setting that fits this scenario. "
-        f"The tone is {tone} and the mood should reflect this sample dialogue: '{sample_dialogue}'. "
+        f"Convey the interaction through facial expression, gesture, and body language. "
+        f"{setting_clause}"
+        f"Render a rich, fully-illustrated background that clearly establishes the location: include "
+        f"contextual environmental elements — furniture, décor, windows, plants, and props that fit "
+        f"the setting — drawn in the same flat 2D doodle style. Place the characters within this "
+        f"environment so it feels like a real place, not a blank backdrop. Keep the composition "
+        f"visually balanced and readable, not cluttered. The overall tone is {tone}. "
     )
 
     return prompt
@@ -106,6 +120,18 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
 
     prompt = create_generic_prompt(data)
     print(f"\n🎨 Generating illustration for: {os.path.basename(json_path)}")
+
+    # Collect character reference portraits (series mode) so faces/clothing stay consistent
+    # across episodes. Characters carry `reference_image` paths via series_compile.py.
+    ref_images = []
+    for c in data.get("idea", {}).get("characters", []):
+        ref_path = c.get("reference_image")
+        if ref_path and os.path.exists(ref_path):
+            try:
+                ref_images.append(Image.open(ref_path))
+                print(f"   🧍 Using reference: {ref_path}")
+            except Exception as e:
+                print(f"   ⚠️  Could not open reference {ref_path}: {e}")
 
     # --- GenerateContentConfig ---
     # Configure the response to request an image modality and set the aspect ratio.
@@ -134,10 +160,21 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
         ]
     )
 
+    # Build request contents — prepend reference portraits as identity anchors when present.
+    if ref_images:
+        contents = [
+            "Use the following reference portrait(s) for the characters' appearance — keep each "
+            "character's face, hair, and clothing consistent with them:",
+            *ref_images,
+            prompt,
+        ]
+    else:
+        contents = [prompt]
+
     try:
         response = client.models.generate_content(
             model=MODEL_NAME,
-            contents=[prompt],
+            contents=contents,
             config=config
         )
     except Exception as e:
