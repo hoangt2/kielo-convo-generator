@@ -51,6 +51,30 @@ python music_mixer.py
 > a single level per `ideas.json`). You can compile several at once for a batch at the series
 > default level.
 
+## Series Run (one-command episode builder)
+
+Instead of running each step manually, `series_run.py` builds a **single episode end-to-end** with one command:
+
+```bash
+python series_run.py 1            # build episode 1 all the way to a final video
+python series_run.py 4 --keep     # don't clean previous outputs first
+python series_run.py 1 --no-refs  # skip character-portrait generation
+```
+
+Pipeline executed automatically:
+
+0. **Cleanup** — removes previous outputs (safe — never touches `series/characters/`)
+1. **Character refs** — generates any missing portraits for this episode's cast
+2. **Compile episode** — `series_compile.py` → `ideas.json`
+3. **Full pipeline** — scripts → check Finnish → illustrations → SFX → TTS → mix SFX → video → music
+
+| Flag | Effect |
+|------|--------|
+| `--keep` | Skip the cleanup step (keep previous outputs) |
+| `--no-refs` | Skip character-portrait generation |
+
+Final video lands in `output_videos/`.
+
 ## Managing & modifying episodes
 
 - **Add an episode:** append an object to `episodes.json` → `episodes`. Set `characters` to a
