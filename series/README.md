@@ -1,4 +1,4 @@
-# Series system — "Aisha at the Office"
+# Series system
 
 A thin layer on top of the existing pipeline for producing a **recurring-cast** Finnish
 conversation series. Same characters, same voices, same faces across every episode.
@@ -12,9 +12,16 @@ This folder provides that, and `series_compile.py` feeds it into the pipeline yo
 | File | What it is |
 |------|------------|
 | `cast.json` | **Character bible.** One canonical entry per character: `voice_id`, personality, `speech_style`, `appearance`, `reference_image`. The `id` keys (e.g. `aisha`) are what episodes reference. |
-| `episodes.json` | **The episode list.** Your 9 scenarios as data — title, description, which cast members appear, target phrases, ambient setting, CEFR level. Edit/add/reorder freely. |
+| `episodes.json` | **The episode list** — title, description, which cast members appear, target phrases, ambient setting, CEFR level. Hand-written or generated from a curriculum. Edit/add/reorder freely. |
+| `curriculum.txt` | Raw pasted curriculum (tracks → levels → chapters → lessons). Input to `series_plan.py`. |
+| `curriculum.json` | Structured/normalized curriculum produced by `series_plan.py parse` — reviewable before building episodes. |
 | `characters/` | One reference portrait per character (see its README). |
+| `../series_plan.py` | **Curriculum → episodes** generator (parse + build). One lesson → one episode. |
+| `../series_new.py` | Scaffold a brand-new series under `series/<slug>/`. |
+| `../generate_cast.py` | AI-generate a cast (with real voice IDs) fitting the series' curriculum. |
+| `../series_use.py` | Show or switch the active series. |
 | `../series_compile.py` | Bridge: resolves an episode's cast and writes a standard `ideas.json`. |
+| `../series_run.py` | One-command end-to-end builder for a single episode. |
 | `../generate_character_refs.py` | Generates the reference portraits from `cast.json`. |
 
 ## What makes the series consistent
@@ -75,6 +82,76 @@ Pipeline executed automatically:
 
 Final video lands in `output_videos/`.
 
+## Producing episodes from a curriculum
+
+Turn a curriculum outline (tracks → levels → chapters → lessons) into episodes. Rather than one
+episode per lesson, each chapter's lessons are grouped into a few combined episodes (2–3 per chapter
+by default) — giving the series natural spacing. Groups are **consecutive and follow the original
+curriculum order** (decided in code), and the AI authors one scene per group that weaves those
+lessons together.
+
+```bash
+# one-shot: normalize the pasted curriculum, then generate grouped episodes
+python series_plan.py all series/curriculum.txt
+python series_plan.py all series/curriculum.txt --force   # re-parse even if curriculum.json exists
+
+# or run the two stages separately (review curriculum.json in between)
+python series_plan.py parse series/curriculum.txt    # -> series/curriculum.json
+python series_plan.py build                           # -> series/episodes.json
+python series_plan.py build --append                  # add to existing episodes instead of replacing
+python series_plan.py build --per-chapter 2           # exactly 2 per chapter
+python series_plan.py build --per-chapter 2-4         # a wider range
+```
+
+1. **parse** — an LLM normalizes the (often messy/compact) curriculum text into structured
+   `curriculum.json`. Edit it if you want before building. **`all` reuses an existing
+   `curriculum.json` and skips parsing** (preserving your edits) — pass `--force` to re-parse.
+2. **build** — splits each chapter's lessons into 2–3 **contiguous, in-order** groups (configurable
+   with `--per-chapter`), covering **every** lesson with none reordered or duplicated. Each episode gets a Finnish
+   scene, the cast members that best fit (IT person for tech, the chatty friend for coffee, the
+   reserved senior for formal practice, the manager for scheduling…), combined target phrases, an
+   ambient setting, and the CEFR level from the level's `(A1)` tag. Each episode lists the lessons
+   it covers in `lessons_covered`, and the protagonist appears in every episode.
+
+`build` overwrites `episodes.json` (backing the old one up to `episodes.json.bak`) unless you pass
+`--append`. Then build videos as usual: `python series_run.py <id>`.
+
+## Creating a new series
+
+Each series lives in its own folder. Creating one makes it the **active series** (stored in
+`series/.active`), so the following commands target it automatically — no `--series` needed.
+Every command prints which series it's using (`📂 Series: …`).
+
+```bash
+python series_new.py doctor-visits "At the Doctor"               # fresh cast template (now active)
+python series_new.py doctor-visits "At the Doctor" --copy-cast   # reuse the current cast
+
+# define the cast — AI-generate it, or edit cast.json by hand, or use --copy-cast above:
+python generate_cast.py            # designs a cast from the curriculum + assigns real voice IDs
+
+# these now target the active series automatically:
+python series_plan.py all path/to/curriculum.txt
+python generate_character_refs.py
+python series_run.py 1
+```
+
+`generate_cast.py` reads the series' curriculum/theme and writes a `cast.json` with a learner
+protagonist plus recurring characters (personalities, speech styles, appearances) and real
+ElevenLabs voice IDs matched by gender/age. Options: `--count N`, a free-text theme hint,
+`--series <slug>`.
+
+Switch the active series anytime (or override per-command with `--series <slug>`):
+
+```bash
+python series_use.py                 # show active + list all series
+python series_use.py doctor-visits   # switch
+python series_use.py default         # back to the default flat series/
+```
+
+`series_new.py` creates `series/<slug>/` with a `cast.json` (template, or a copy of this series'
+cast via `--copy-cast`), an empty `episodes.json`, and a `characters/` folder. Fill in voice IDs
+and appearances, then generate.
+
 ## Managing & modifying episodes
 
 - **Add an episode:** append an object to `episodes.json` → `episodes`. Set `characters` to a
@@ -86,41 +163,14 @@ Final video lands in `output_videos/`.
 - **Change a voice / look:** edit `voice_id` or `appearance` in `cast.json`. Re-run
   `generate_character_refs.py --force` for the look.
 
-## Visual consistency — the one remaining wire-up
+## Visual consistency (wired in)
 
-`generate_illustrations.py` currently builds each image from a text prompt with **no reference
-image**, so faces drift between episodes. To anchor them, pass each present character's
-`reference_image` into the model alongside the prompt. `gemini-2.5-flash-image` accepts images
-in `contents` and will keep the characters on-model.
-
-Minimal change inside `generate_illustration_from_json(...)`, after the prompt is built:
-
-```python
-from PIL import Image
-
-# Collect reference portraits for the characters in this script
-ref_images = []
-for c in data.get("idea", {}).get("characters", []):
-    ref_path = c.get("reference_image")
-    if ref_path and os.path.exists(ref_path):
-        ref_images.append(Image.open(ref_path))
-
-# Prepend a short instruction so the model treats them as identity references
-contents = [prompt]
-if ref_images:
-    contents = [
-        "Use the following reference portrait(s) for the characters' appearance — "
-        "keep faces, hair, and clothing consistent with them:",
-        *ref_images,
-        prompt,
-    ]
-
-response = client.models.generate_content(model=MODEL_NAME, contents=contents, config=config)
-```
-
-`series_compile.py` already carries `reference_image` onto each character in `ideas.json`, so
-once the portraits exist this just works. (Left as an opt-in edit so the current illustrator
-keeps behaving exactly as before until you choose to switch it on.)
+`generate_illustrations.py` feeds each present character's `reference_image` into the image model
+as an identity anchor, so faces/hair/clothing stay consistent across episodes. `series_compile.py`
+carries the `reference_image` paths onto each character in `ideas.json`, and the illustrator opens
+any that exist and prepends them to the request. So: generate the portraits once
+(`generate_character_refs.py`) and every episode illustration stays on-model automatically. If a
+portrait is missing, that character is simply illustrated from its text description as before.
 
 ## Voices to fill in
 

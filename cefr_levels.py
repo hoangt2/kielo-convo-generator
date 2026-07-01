@@ -26,19 +26,27 @@ def normalize_level(arg: str) -> str:
 # Per-level guidance covering vocabulary, grammar, sentence length and pace.
 LEVEL_GUIDELINES = {
     "A1": (
-        "Vocabulary: ONLY the most common everyday words (greetings, numbers, family, "
-        "food, simple actions). No idioms, no rare words.\n"
-        "Grammar: present tense only. Avoid cases beyond the most basic; no conditional, "
-        "no past tense.\n"
-        "Sentences: very short — 3–6 words, one clause each. No subordinate clauses.\n"
+        "Vocabulary: ONLY the most common everyday words (greetings, small numbers, days, "
+        "simple food, family, basic actions). No idioms, no rare or abstract words.\n"
+        "Grammar: PRESENT TENSE ONLY. NO conditional — never use -isi- forms; say 'sopiiko' "
+        "(not 'sopisiko'), 'voitko' (not 'voisitko'), 'haluan' (not 'haluaisin'). NO past tense. "
+        "NO passive/impersonal except the set phrase 'mennään' (let's go); do NOT use forms like "
+        "'otetaan' or 'saadaan puhuttua'. Keep cases basic (nominative/partitive and simple "
+        "paikallissijat like -ssa/-lla).\n"
+        "Sentences: very short — 3–6 words, ONE clause each. NO subordinate clauses (no 'että', "
+        "'koska', 'jos', 'kun' clauses); use short separate sentences instead.\n"
+        "Numbers & time: keep numbers small; tell time only on the hour or half past "
+        "('kello kaksi', 'puoli kolme'). AVOID quarter-to/past, exact minutes, and years.\n"
         "Delivery & pace: speak SLOWLY and clearly. Keep utterances short, leave natural "
         "pauses between lines, and use a calm tone. Repeat key words when natural."
     ),
     "A2": (
         "Vocabulary: common everyday words for familiar topics (shopping, hobbies, daily "
         "routine, weather). A few very common idioms are okay.\n"
-        "Grammar: present and basic past (imperfekti). Simple connectors allowed "
-        "(ja, mutta, koska, sitten). No conditional.\n"
+        "Grammar: present and basic past (imperfekti). NO conditional (no -isi- forms). Simple "
+        "connectors allowed (ja, mutta, koska, sitten) and a single short subordinate clause is OK.\n"
+        "Numbers & time: on the hour, half past, and quarter past/to are fine; keep years and "
+        "large numbers rare and simple.\n"
         "Sentences: short to medium, mostly one or two clauses.\n"
         "Delivery & pace: still slow and clear, calm tone, with brief pauses between lines."
     ),
@@ -83,8 +91,12 @@ def conversation_level_block(level: str) -> str:
         return ""
     return (
         f"\n        CEFR LANGUAGE LEVEL: {level}\n"
-        f"        The dialogue MUST match this learner level. Follow these constraints "
-        f"strictly while still sounding like natural spoken Finnish (puhekieli):\n"
+        f"        The dialogue MUST match this learner level. Follow these constraints strictly.\n"
+        f"        IMPORTANT: when natural spoken Finnish would normally use a structure ABOVE this "
+        f"level (e.g. conditional politeness like 'sopisiko', a 'että/koska' clause, or an exact "
+        f"time like 'varttia vaille'), choose the simpler in-level form instead — even if it sounds "
+        f"a little plainer or less polite. Staying within the level is MORE important than sounding "
+        f"fully native. Keep it natural spoken Finnish (puhekieli: mä/sä/oon) within those limits.\n"
         f"        {guidance}\n"
     )
 

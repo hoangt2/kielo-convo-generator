@@ -38,10 +38,17 @@ def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, s
     try:
         print(f"⏳ Generating {script_type} audio for: {output_filename} ...")
 
+        # Force Finnish for conversations so the model doesn't mis-detect short/ambiguous
+        # words (e.g. the Finnish greeting "Moi" being read as French "moi"/moa).
+        # Podcasts are English-led, so leave their language auto-detected.
+        convert_kwargs = {"inputs": dialogue_list}
+        if script_type == "conversation":
+            convert_kwargs["language_code"] = "fi"
+
         # Generate audio using ElevenLabs
         # NOTE: elevenlabs_client.text_to_dialogue.convert is used for both
         # multi-character dialogue and solo/mixed scripts.
-        audio_stream = elevenlabs_client.text_to_dialogue.convert(inputs=dialogue_list)
+        audio_stream = elevenlabs_client.text_to_dialogue.convert(**convert_kwargs)
         audio_bytes = b"".join(audio_stream)
 
         # Save to file

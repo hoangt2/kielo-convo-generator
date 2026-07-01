@@ -1,262 +1,293 @@
 # Convo Generator
 
-A Python tool for generating Finnish conversation scripts and podcast episodes using Google Gemini AI, with support for TTS, sound effects, video generation, and background music. Scripts can be targeted to a CEFR language level (A1–C2).
+A Python toolkit for producing short Finnish conversation videos with Google Gemini and
+ElevenLabs — dialogue scripts, illustrations, text-to-speech, sound effects, and background
+music, assembled into finished videos. Content can be targeted to a CEFR level (A1–C2).
+
+There are **two ways to generate**, both feeding the same media pipeline:
+
+| Mode | Use it for | Driven by |
+|------|-----------|-----------|
+| **Series Mode** | A recurring cast with consistent voices & faces across many episodes, generated from a curriculum. | `series/` data + `series_*.py` |
+| **Idea Mode** | One-off conversations or podcast lessons with random characters/scenarios. | `generate_ideas_json.py` |
+
+---
 
 ## Setup
 
-### 1. Create a virtual environment
+### 1. Virtual environment
 
-**Mac/Linux:**
+**Mac/Linux**
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**Windows (PowerShell):**
+**Windows (PowerShell)**
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-> **Note:** Python 3.11 is recommended. Python 3.14 may have compatibility issues with some dependencies.
+> Python 3.11 is recommended. Python 3.14 may have dependency compatibility issues.
 
-### 2. Configure environment
+### 2. API keys
 
-Create a `.env` file in the project root with your API keys:
+Create a `.env` file in the project root:
 ```
 GEMINI_API_KEY=your_gemini_api_key
 ELEVENLABS_API_KEY=your_elevenlabs_api_key
 ```
 
-## Quick Start
+### 3. FFmpeg
 
-### 1. Generate Ideas
-```bash
-python generate_ideas_json.py                      # 1 conversation idea (default)
-python generate_ideas_json.py 5                    # 5 conversation ideas
-python generate_ideas_json.py 3 "at the café"     # 3 ideas about a specific topic
-python generate_ideas_json.py 3 A1 "at the café"  # 3 A1-level ideas about a topic
-python generate_ideas_json.py podcast              # Podcast ideas
-python generate_ideas_json.py podcast 5 "greetings"  # 5 podcast ideas about greetings
-python generate_ideas_json.py podcast 5 B1 "greetings"  # 5 B1-level podcast ideas
-```
-Output: `ideas.json` or `podcast_ideas.json`
+Required for audio/video processing. Install via your package manager (`brew install ffmpeg`,
+`apt install ffmpeg`, etc.).
 
-> **CEFR language level (optional):** Pass a level — `A1`, `A2`, `B1`, `B2`, `C1`, or `C2` (case-insensitive) — as any argument to target a learner level. The level is recorded in the ideas file's `metadata.language_level` and automatically applied when generating scripts. Lower levels use simpler vocabulary and grammar, shorter sentences, and slower delivery; higher levels grow progressively more natural and complex. If omitted, behavior is unchanged.
+---
 
-### 2. Generate Scripts
-```bash
-python generate_scripts.py                   # Conversation scripts
-python generate_scripts.py podcast           # Podcast scripts
-```
-Output: JSON dialogue files in `scripts/` or `podcast_scripts/`
+## Series Mode
 
-> The CEFR level is read automatically from the ideas file's `metadata.language_level` (set in step 1) — no extra argument needed here.
+A thin layer over the pipeline for producing a **recurring-cast** series. The same characters
+keep the same voice and the same face from one episode to the next, and episodes are generated
+from a curriculum outline. Everything lives in `series/`.
 
-### 3. Check Finnish Grammar
-```bash
-python check_finnish_grammar.py              # Fix grammar & make Finnish natural
-```
-This step reviews all scripts and fixes unnatural phrasing to sound like spoken Finnish.
+### How consistency works
 
-### 4. Generate Illustrations
-```bash
-python generate_illustrations.py             # Generate visual assets for videos
-```
-Output: Illustration files in `illustrations/`
+- **Voice** — each character has one `voice_id` in `series/cast.json`; every episode reuses it
+  (the pipeline keys TTS on `voice_id`). Replace the `REPLACE_WITH_ELEVENLABS_VOICE_ID`
+  placeholders with your ElevenLabs voice IDs.
+- **Personality / register** — each character's `speech_style` (e.g. careful `Minä/Sinä` vs.
+  spoken `Mä/Sä`) is folded into the script prompt automatically.
+- **Face** — one reference portrait per character in `series/characters/`, fed into the
+  illustrator as an identity anchor so faces/hair/clothing stay on-model every episode.
 
-### 5. Generate Sound Effects
-```bash
-python generate_sfx.py                       # Generate SFX clips from script cues
-```
-Reads SFX entries from dialogue scripts and generates audio clips via ElevenLabs. Also generates ambient background loops (stored in `presets/ambience/` for reuse).
-
-Output: SFX clips in `sfx/<script-slug>/`
-
-### 6. Generate Audio
-```bash
-python tts_generator.py                      # Convert scripts to MP3
-```
-Output: Audio files in `mp3/`
-
-### 7. Mix Sound Effects
-```bash
-python sfx_mixer.py                          # Mix SFX & ambient into dialogue audio
-```
-Uses Whisper for timestamp alignment, inserts natural pauses between dialogue segments, places SFX clips at their scripted positions, and overlays ambient backgrounds.
-
-Output: Updated audio files in `mp3/` (in-place)
-
-### 8. Generate Videos
-```bash
-python generate_videos.py                    # Create video from audio + illustrations
-```
-Output: Videos in `output_videos/`
-
-### 9. Add Music
-```bash
-python music_mixer.py                        # Add background music (randomly selected from presets/)
-```
-Only adds BGM to videos whose ambient setting is "quiet" or unset. Videos with ambient sounds (e.g. café, street) are skipped.
-
-Output: Final videos with music in `output_videos/`
-
-## Full Pipeline
-
-Run the complete pipeline with a single command:
-```bash
-python run.py                         # Run with defaults
-python run.py 5                       # Generate 5 conversation ideas
-python run.py 3 "ordering food"       # Generate 3 ideas about a topic
-python run.py 3 A1 "ordering food"    # Generate 3 A1-level ideas about a topic
-```
-
-Arguments are auto-detected by shape: a number sets the count, an `A1`–`C2` token sets the CEFR level, and any other string is the topic — order doesn't matter.
-
-This runs all 9 steps in sequence:
-1. Generate ideas → 2. Generate scripts → 3. Check Finnish → 4. Generate illustrations → 5. Generate SFX → 6. TTS audio → 7. Mix SFX → 8. Create videos → 9. Add music
-
-**Or run each step manually:**
-```bash
-python generate_ideas_json.py
-python generate_scripts.py
-python check_finnish_grammar.py
-python generate_illustrations.py
-python generate_sfx.py
-python tts_generator.py
-python sfx_mixer.py
-python generate_videos.py
-python music_mixer.py
-```
-
-## Series Mode (recurring cast & episodes)
-
-The default pipeline is **idea-driven** — `generate_ideas_json.py` invents random characters and scenarios each run. **Series Mode** is the opposite: a fixed cast and a fixed episode list, so the same characters (with the same voices and faces) recur across every video. It lives in the `series/` folder and feeds into the existing pipeline.
-
-### Files
-
-| File | What it is |
-|------|------------|
-| `series/cast.json` | **Character bible** — one canonical entry per character (`voice_id`, personality, `speech_style`, `appearance`, reference-image path). The `id` keys (e.g. `aisha`) are what episodes reference. |
-| `series/episodes.json` | **The episode list** — each scenario as data (title, description, which cast appears, key phrases, ambient setting, CEFR level). Edit/add/reorder freely. |
-| `series/characters/` | One reference portrait per character (anchors the visual look). |
-| `series_compile.py` | Bridge — turns a chosen episode into the `ideas.json` the pipeline already consumes. |
-| `generate_character_refs.py` | Generates the reference portraits from `cast.json`. |
-
-### Workflow
+### Quick start — build one episode end to end
 
 ```bash
-# 0. (once) lock each character's look — reads appearance from cast.json
-python generate_character_refs.py
-python generate_character_refs.py --force      # regenerate all
-python generate_character_refs.py aisha mikko  # only specific characters
-
-# 1. pick episode(s) -> writes ideas.json  (REPLACES generate_ideas_json.py)
-python series_compile.py            # list the episode menu
-python series_compile.py list       # same — list episodes
-python series_compile.py 1          # compile episode 1
-python series_compile.py 1 4 6      # compile several
-python series_compile.py all        # compile every episode
-
-# 2. run the rest of the pipeline, SKIPPING step 1 (idea generation)
-python generate_scripts.py
-python check_finnish_grammar.py
-python generate_illustrations.py
-python generate_sfx.py
-python tts_generator.py
-python sfx_mixer.py
-python generate_videos.py
-python music_mixer.py
+python series_compile.py list      # see the episode menu
+python series_run.py 1             # build episode 1 → final video in output_videos/
 ```
 
-> **Do not run `generate_ideas_json.py` (or `run.py`) in Series Mode** — `series_compile.py` produces `ideas.json` for you. Running idea generation would overwrite it with random content.
+`series_run.py` runs the whole chain for a single episode:
 
-> **CEFR level:** compile **one episode at a time** for accurate per-episode level (the pipeline applies a single level per `ideas.json`). Compiling several uses the series default level from `episodes.json`.
-
-### What keeps it consistent
-
-- **Voice** — each character has one `voice_id` in `cast.json`; every episode reuses it (the pipeline keys TTS on `voice_id`). Fill in the `REPLACE_WITH_ELEVENLABS_VOICE_ID` placeholders with your ElevenLabs voice IDs.
-- **Personality / register** — each character's `speech_style` (e.g. careful `Minä/Sinä` vs. spoken `Mä/Sä`) is folded into the script prompt automatically.
-- **Face** — one reference portrait per character in `series/characters/`, reused as an image reference per episode.
-
-### Managing episodes
-
-- **Add an episode:** append an object to `series/episodes.json` → `episodes` and set `characters` to a list of cast ids.
-- **New recurring character:** add an entry to `series/cast.json` → `characters` (with `voice_id` + `appearance`), then `python generate_character_refs.py <id>`.
-- **One-off character:** inline a full character object directly in an episode's `characters` list instead of an id.
-- **Change a voice or look:** edit `voice_id` / `appearance` in `cast.json` (re-run `generate_character_refs.py --force` for the look).
-
-### Series Run (one-command episode builder)
-
-Instead of running each step manually, `series_run.py` builds a single episode end-to-end with one command:
-
-```bash
-python series_run.py 1            # build episode 1 all the way to a final video
-python series_run.py 4 --keep     # don't clean previous outputs first
-python series_run.py 1 --no-refs  # skip character-portrait generation
-```
-
-Pipeline executed by `series_run.py`:
-
-0. **Cleanup** — removes previous outputs (safe — never touches `series/characters/`)
-1. **Character refs** — generates any missing portraits for this episode's cast
-2. **Compile episode** — `series_compile.py` → `ideas.json`
-3. **Full pipeline** — scripts → check Finnish → illustrations → SFX → TTS → mix SFX → video → music
+0. **Cleanup** — clears previous outputs (never touches `series/characters/` or `output_videos/prod/`)
+1. **Character refs** — generates any missing portraits for that episode's cast
+2. **Compile** — writes `ideas.json` for that episode
+3. **Pipeline** — scripts → Finnish check → illustrations → SFX → TTS → mix SFX → video → music
 
 | Flag | Effect |
 |------|--------|
-| `--keep` | Skip the cleanup step (keep previous outputs) |
+| `--keep` | Skip cleanup (keep previous outputs) |
 | `--no-refs` | Skip character-portrait generation |
+| `--series <slug>` | Operate on `series/<slug>/` instead of the default series |
 
-Final video lands in `output_videos/`.
+### Generate episodes from a curriculum
 
-See `series/README.md` for the full design notes, including the one optional edit to wire the reference portraits into episode illustrations.
+Turn a curriculum outline (tracks → levels → chapters → lessons) into episodes. Each chapter's
+lessons are combined into a few episodes (2–3 per chapter by default), kept in their **original
+consecutive order**, each authored as one believable scene using the fixed cast.
+
+```bash
+python series_plan.py all series/curriculum.txt     # parse outline + build episodes.json
+python series_plan.py all series/curriculum.txt --force   # re-parse even if curriculum.json exists
+python series_plan.py parse series/curriculum.txt   # stage 1 only → series/curriculum.json
+python series_plan.py build                          # stage 2 only → series/episodes.json
+python series_plan.py build --append                 # add to existing episodes instead of replacing
+python series_plan.py build --per-chapter 2          # exactly 2 per chapter (or a range like 2-4)
+```
+
+1. **parse** — an LLM normalizes the (often messy/compact) curriculum text into structured
+   `series/curriculum.json`, which you can review/edit before building. **`all` reuses an existing
+   `curriculum.json` and skips parsing** (so your edits survive) — pass `--force` to re-parse.
+2. **build** — splits each chapter's lessons into contiguous, in-order groups and writes one
+   episode per group into `series/episodes.json`: a Finnish scene, the best-fitting cast members,
+   combined target phrases, an ambient setting, and the CEFR level from the level's `(A1)` tag.
+   Each episode records the lessons it covers in `lessons_covered`. `build` overwrites
+   `episodes.json` (backing up to `episodes.json.bak`) unless you pass `--append`.
+
+The curriculum format uses `(TRK)` / `(LVL)` / `(CH)` markers and `•` bullets for lessons — see
+`series/curriculum.txt` for the working example.
+
+### Creating a new series
+
+Each series lives in its own folder. Creating one makes it the **active series**, so the
+following commands target it automatically — no `--series` needed.
+
+```bash
+python series_new.py doctor-visits "At the Doctor"               # fresh cast template (now active)
+python series_new.py doctor-visits "At the Doctor" --copy-cast   # reuse the current cast
+
+# define the cast — three options:
+python generate_cast.py                            # AI-design a cast from the curriculum/theme
+#   ...or edit series/<slug>/cast.json by hand, or use --copy-cast above
+
+python series_plan.py all path/to/curriculum.txt   # targets the active series
+python generate_character_refs.py
+python series_run.py 1
+```
+
+`generate_cast.py` reads the series' curriculum/theme, designs a learner protagonist plus a few
+recurring characters (personalities, speech styles, appearances), and assigns real ElevenLabs
+voice IDs from the project's voice pool by gender/age. Options: `--count N`, a free-text theme
+hint, `--series <slug>`. It backs up any existing `cast.json`.
+
+**Switching series.** The active series is remembered in `series/.active`. Every command prints
+which series it's using (`📂 Series: …`).
+
+```bash
+python series_use.py                       # show the active series + list all
+python series_use.py everyday-spoken-finnish-a1   # switch to a named series
+python series_use.py default               # back to the default flat series/
+```
+
+You can still override per-command with `--series <slug>` (it wins over the active series).
+
+### Managing the cast & episodes
+
+- **Add an episode:** append an object to `series/episodes.json` → `episodes`; set `characters`
+  to a list of cast ids.
+- **New recurring character:** add an entry to `series/cast.json` → `characters` (with `voice_id`
+  + `appearance`), then `python generate_character_refs.py <id>`.
+- **One-off character:** inline a full character object directly in an episode's `characters`
+  list instead of an id.
+- **Change a voice or look:** edit `voice_id` / `appearance` in `cast.json` (re-run
+  `generate_character_refs.py --force` for the look).
+- **Lock character looks (once):** `python generate_character_refs.py` generates a portrait per
+  character from its `appearance`; `--force` regenerates, or pass specific ids.
+
+### Advanced: run series steps manually
+
+`series_run.py` is just a wrapper. To run steps individually, compile an episode and then run the
+pipeline stages, **skipping idea generation**:
+
+```bash
+python series_compile.py 1          # episode 1 → ideas.json (also: list | all | "1 4 6")
+python generate_scripts.py
+python check_finnish_grammar.py
+python generate_illustrations.py
+python generate_sfx.py
+python tts_generator.py
+python sfx_mixer.py
+python generate_videos.py
+python music_mixer.py
+```
+
+> **Don't run `generate_ideas_json.py` or `run.py` in Series Mode** — `series_compile.py`
+> produces `ideas.json` for you; idea generation would overwrite it with random content.
+
+> **CEFR:** compile **one episode at a time** for accurate per-episode level (the pipeline applies
+> a single level per `ideas.json`). Compiling several uses the series default level.
+
+See `series/README.md` for the full design notes.
+
+---
+
+## Idea Mode (one-off)
+
+Generate random conversation or podcast ideas, then run the pipeline.
+
+### 1. Generate ideas
+```bash
+python generate_ideas_json.py                       # 1 conversation idea (default)
+python generate_ideas_json.py 5                     # 5 conversation ideas
+python generate_ideas_json.py 3 "at the café"       # 3 ideas about a topic
+python generate_ideas_json.py 3 A1 "at the café"    # 3 A1-level ideas about a topic
+python generate_ideas_json.py podcast               # podcast ideas
+python generate_ideas_json.py podcast 5 B1 "greetings"  # 5 B1-level podcast ideas
+```
+Output: `ideas.json` or `podcast_ideas.json`.
+
+> **CEFR (optional):** pass `A1`–`C2` (case-insensitive) as any argument. It's recorded in the
+> ideas file's `metadata.language_level` and applied automatically during script generation. Lower
+> levels use simpler vocabulary/grammar, shorter sentences, and slower delivery.
+
+### 2. Full pipeline in one command
+```bash
+python run.py                       # defaults
+python run.py 5                     # 5 conversation ideas
+python run.py 3 A1 "ordering food"  # 3 A1-level ideas about a topic
+```
+Arguments are auto-detected by shape: a number sets the count, an `A1`–`C2` token sets the level,
+any other string is the topic — order doesn't matter. This runs all stages below in sequence.
+
+---
+
+## The media pipeline (shared by both modes)
+
+Both modes produce an `ideas.json` (Series Mode via `series_compile.py`, Idea Mode via
+`generate_ideas_json.py`), then run these stages. They can be run individually for debugging.
+
+| # | Command | Does | Output |
+|---|---------|------|--------|
+| 1 | `python generate_scripts.py` | Convert ideas → spoken-Finnish dialogue (add `podcast` for podcasts). CEFR read from ideas metadata. | `scripts/` (or `podcast_scripts/`) |
+| 2 | `python check_finnish_grammar.py` | Fix grammar & make phrasing sound like natural spoken Finnish. | `scripts/` (in place) |
+| 3 | `python generate_illustrations.py` | One illustration per script. In Series Mode, uses character reference portraits for consistency. | `illustrations/` |
+| 4 | `python generate_sfx.py` | Generate SFX clips from script cues + ambient loops. | `sfx/<slug>/`, `presets/ambience/` |
+| 5 | `python tts_generator.py` | Text-to-speech per dialogue line via ElevenLabs (`podcast` / `all` modes available). | `mp3/` |
+| 6 | `python sfx_mixer.py` | Whisper-align timestamps, insert pauses, place SFX, overlay ambience. | `mp3/` (in place) |
+| 7 | `python generate_videos.py` | Combine audio + illustration into video. | `output_videos/` |
+| 8 | `python music_mixer.py` | Add background music — only to videos whose ambient is `quiet`/unset (others keep their ambience). | `output_videos/` |
+
+Optional subtitles: `python generate_subtitled_videos.py` (run manually).
+
+---
+
+## Project structure
+
+### Series scripts
+- `series_plan.py` — curriculum → episodes (parse + build, order-preserving grouping)
+- `series_new.py` — scaffold a new series under `series/<slug>/` (and make it active)
+- `generate_cast.py` — AI-generate a cast (with real voice IDs) fitting the series' curriculum
+- `series_use.py` — show or switch the active series
+- `series_compile.py` — compile a chosen episode into `ideas.json`
+- `series_run.py` — one-command end-to-end builder for a single episode
+- `generate_character_refs.py` — generate character reference portraits from `cast.json`
+- `series_paths.py` — shared `--series` path resolution
+
+### Pipeline scripts
+- `run.py` — full Idea-Mode pipeline runner
+- `generate_ideas_json.py` — generate conversation/podcast ideas
+- `generate_scripts.py` — ideas → dialogue scripts
+- `check_finnish_grammar.py` — fix Finnish grammar & naturalness
+- `generate_illustrations.py` — generate illustrations
+- `generate_sfx.py` — generate sound effects & ambience (ElevenLabs)
+- `tts_generator.py` — text-to-speech (ElevenLabs)
+- `sfx_mixer.py` — mix SFX, pauses & ambience (Whisper + pydub)
+- `generate_videos.py` — build videos from audio + illustrations
+- `music_mixer.py` — add background music
+
+### Utility scripts
+- `cefr_levels.py` — CEFR (A1–C2) definitions and per-level prompt guidance
+- `cleanup.py` — reset the project by removing generated files
+- `subtitle_generator.py` / `generate_subtitled_videos.py` — optional subtitles
+- `audio_mixer.py` — audio mixing helpers
+
+### Series data (`series/`)
+- `cast.json` — character bible (voice, personality, speech style, appearance, portrait path)
+- `episodes.json` — the episode list (generated or hand-written)
+- `curriculum.txt` / `curriculum.json` — curriculum input and its normalized form
+- `characters/` — one reference portrait per character
+
+## Output folders
+- `scripts/`, `podcast_scripts/` — dialogue scripts
+- `mp3/` — generated audio
+- `illustrations/` — generated illustrations
+- `sfx/` — sound effects (per-script subfolders)
+- `presets/` — background music; `presets/ambience/` — shared ambient loops (auto-generated)
+- `output_videos/` — finished videos (`output_videos/prod/` is preserved by cleanup)
 
 ## Cleanup
-
-Reset the project by removing all generated files:
 ```bash
 python cleanup.py
 ```
-This removes generated ideas, scripts, audio, and video files while preserving `output_videos/prod/`.
-
-## Project Structure
-
-### Pipeline Scripts
-- `run.py` - **Full pipeline runner** (runs all steps in sequence)
-- `generate_ideas_json.py` - Generate conversation/podcast ideas via Gemini
-- `generate_scripts.py` - Convert ideas into dialogue scripts
-- `check_finnish_grammar.py` - Check & fix Finnish grammar and naturalness
-- `generate_illustrations.py` - Generate visual assets
-- `generate_sfx.py` - Generate sound effects & ambient clips (ElevenLabs SFX)
-- `tts_generator.py` - Generate audio from scripts (ElevenLabs TTS)
-- `sfx_mixer.py` - Mix SFX, pauses & ambient audio into dialogue (Whisper + pydub)
-- `generate_videos.py` - Create videos from audio + illustrations
-- `music_mixer.py` - Add background music to videos
-
-### Utility Scripts
-- `cefr_levels.py` - CEFR level (A1–C2) definitions and per-level prompt guidance
-- `cleanup.py` - Reset project by removing generated files
-- `subtitle_generator.py` - Subtitle generation helper functions
-- `generate_subtitled_videos.py` - Create subtitled videos (optional, run manually)
-- `audio_mixer.py` - Audio mixing utilities
-
-## Output Folders
-
-- `scripts/` - Conversation dialogue files
-- `podcast_scripts/` - Podcast script files
-- `mp3/` - Generated audio files
-- `illustrations/` - Generated visual assets
-- `sfx/` - Generated sound effects (per-script subfolders)
-- `presets/` - Background music files
-- `presets/ambience/` - Ambient background loops (shared library, auto-generated)
-- `output_videos/` - Final videos with music
+Removes generated ideas, scripts, audio, illustrations, SFX and videos, preserving
+`output_videos/prod/` and the series character portraits.
 
 ## Requirements
-
 - Python 3.11+
 - Google Gemini API key
-- ElevenLabs API key (for TTS and SFX)
-- FFmpeg (for video/audio processing)
+- ElevenLabs API key (TTS + SFX)
+- FFmpeg

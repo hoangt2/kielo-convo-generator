@@ -66,6 +66,22 @@ def generate_conversation(idea, metadata):
         You are a Finnish dialogue writer specializing in NATURAL SPOKEN FINNISH (puhekieli).
         Your task is to generate a short (1–2 minutes) realistic conversation based on the provided idea.
 
+        #1 PRIORITY — A LOGICAL, ENGAGING, REALISTIC CONVERSATION.
+        This is a real scene between people, NOT a vocabulary drill. A coherent, believable, engaging
+        exchange matters far MORE than covering teaching phrases or vocab. Specifically:
+        - Internal consistency is mandatory. Track the facts: if they agree on a day/time/place,
+          every later line must match it (don't agree on Wednesday then say "see you Thursday").
+          Don't contradict what was just said (don't claim "I have a meeting" then "no hurry").
+        - Every line must logically follow from the previous one — real cause and effect, real
+          reactions. People respond to what was actually said.
+        - Characters say only what's natural in the moment; they don't recite. It's fine to leave a
+          teaching phrase out. Quality and realism beat completeness, always.
+        - Give it a natural arc: a reason the conversation starts, a little middle, and a natural
+          close once the goal is met. Don't pad.
+        - Keep each speaker in character (their tone, register and personality).
+        - Stay within the CEFR level given below — that limit is also mandatory. If natural or
+          polite phrasing would exceed it, use the simpler in-level form (it's fine to sound plainer).
+
         CRITICAL: Write in SPOKEN Finnish, NOT formal written Finnish. Use:
         - Colloquial pronouns: "mä/mun/mua" instead of "minä/minun/minua", "sä/sun/sua" instead of "sinä/sinun/sinua"
         - Spoken contractions: "oon" (olen), "oot" (olet), "ei oo" (ei ole), "meen" (menen), "tuun" (tulen)
@@ -116,6 +132,9 @@ def generate_conversation(idea, metadata):
         - Write ONLY in natural spoken Finnish - avoid formal/written language!
         - Keep the speech natural, expressive, and varied.
         - Match each character's tone and personality.
+        - If the Description lists "Teaching ideas"/example phrases, treat them as OPTIONAL inspiration
+          only — weave in just the few that fit naturally, adapt them, and DROP the rest. A coherent
+          scene always wins over using more phrases. Never include a phrase if it breaks the logic.
         - **IMPORTANT — Name usage:** Determine whether the characters know each other based on the scenario description. If they are strangers (e.g., customer and clerk, patient and receptionist, passenger and driver, someone asking directions from a passerby), they must NOT call each other by name. Use generic forms of address instead (e.g., "hei", "anteeks", "moi"). Only use character names in dialogue if the scenario clearly implies a personal relationship (e.g., friends, family, colleagues who know each other).
 
         Metadata:
@@ -143,12 +162,13 @@ def generate_conversation(idea, metadata):
                 # Enforce JSON output!
                 response_mime_type="application/json",
                 # Pass the system instruction for model behavior
-                system_instruction="You are a creative Finnish dialogue writer who writes natural SPOKEN Finnish (puhekieli), not formal written Finnish. Use colloquial forms like 'mä', 'sä', 'oon', 'ei oo'. You strictly output only valid JSON."
+                system_instruction="You are a creative Finnish dialogue writer who writes natural SPOKEN Finnish (puhekieli), not formal written Finnish. Use colloquial forms like 'mä', 'sä', 'oon', 'ei oo'. Above all, write a LOGICAL, internally consistent, engaging conversation — a real scene, never a vocabulary list; coherence beats covering teaching phrases. You strictly output only valid JSON."
             )
 
-            # Call the Gemini API. Use a model supporting JSON output, like gemini-2.5-flash.
+            # Use the pro model — better at keeping the conversation logical and internally
+            # consistent (flash tended to cram in phrases and contradict itself).
             response = client.models.generate_content(
-                model='gemini-2.5-flash', # A powerful model supporting JSON mode
+                model='gemini-2.5-pro',
                 contents=prompt,
                 config=config,
             )

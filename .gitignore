@@ -15,6 +15,9 @@ venv*/
 # environment files
 .env
 
+# active-series pointer (local state)
+series/.active
+
 *.json
 
 # Folders to ignore

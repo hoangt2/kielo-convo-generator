@@ -26,11 +26,10 @@ from google.genai import types
 load_dotenv()
 
 BASE = Path(__file__).parent
-CAST_PATH = BASE / "series" / "cast.json"
-OUT_DIR = BASE / "series" / "characters"
 MODEL_NAME = "gemini-2.5-flash-image"
 
 import json
+import series_paths
 
 # Use the EXACT same art style as the episode illustrator (single source of truth),
 # so reference portraits match the videos. Falls back to cast.json `style_lock`.
@@ -58,7 +57,7 @@ def build_prompt(char, style):
     )
 
 
-def generate_portrait(client, char_id, char, style):
+def generate_portrait(client, char_id, char, style, out_dir):
     prompt = build_prompt(char, style)
     print(f"\n🎨 {char_id} ({char['name']})")
     config = types.GenerateContentConfig(
@@ -78,8 +77,8 @@ def generate_portrait(client, char_id, char, style):
 
     for part in response.candidates[0].content.parts:
         if part.inline_data is not None:
-            OUT_DIR.mkdir(parents=True, exist_ok=True)
-            out_path = OUT_DIR / f"{char_id}.png"
+            out_dir.mkdir(parents=True, exist_ok=True)
+            out_path = out_dir / f"{char_id}.png"
             Image.open(BytesIO(part.inline_data.data)).save(out_path)
             print(f"   ✅ Saved {out_path.relative_to(BASE)}")
             return True
@@ -89,12 +88,18 @@ def generate_portrait(client, char_id, char, style):
 
 
 def main():
-    with open(CAST_PATH, "r", encoding="utf-8") as f:
+    slug, args = series_paths.parse_series_arg(sys.argv[1:])
+    paths = series_paths.resolve(slug)
+    series_paths.announce(paths.slug)
+    if not paths.cast.exists():
+        sys.exit(f"❌ {paths.cast} not found.")
+
+    with open(paths.cast, "r", encoding="utf-8") as f:
         cast = json.load(f)
     style = ART_STYLE or cast.get("style_lock", "")
     characters = cast["characters"]
+    out_dir = paths.characters
 
-    args = [a for a in sys.argv[1:]]
     force = "--force" in args
     ids = [a for a in args if not a.startswith("--")]
     if not ids:
@@ -107,13 +112,13 @@ def main():
         if char_id not in characters:
             print(f"⚠️  Skipping unknown id '{char_id}'.")
             continue
-        out_path = OUT_DIR / f"{char_id}.png"
+        out_path = out_dir / f"{char_id}.png"
         if out_path.exists() and not force:
             print(f"\n⏭️  {char_id}: already exists (use --force to regenerate).")
             continue
-        generate_portrait(client, char_id, characters[char_id], style)
+        generate_portrait(client, char_id, characters[char_id], style, out_dir)
 
-    print("\n🏁 Done. Reference portraits are in series/characters/.")
+    print(f"\n🏁 Done. Reference portraits are in {out_dir.relative_to(BASE)}/.")
 
 
 if __name__ == "__main__":

@@ -30,9 +30,9 @@ import json
 import sys
 from pathlib import Path
 
+import series_paths
+
 BASE = Path(__file__).parent
-CAST_PATH = BASE / "series" / "cast.json"
-EPISODES_PATH = BASE / "series" / "episodes.json"
 IDEAS_OUT = BASE / "ideas.json"
 
 
@@ -76,7 +76,12 @@ def build_idea(episode, cast):
     # so the existing script-generation prompt honours them without code changes.
     extra = []
     if episode.get("key_phrases"):
-        extra.append("Target phrases to weave in naturally: " + ", ".join(episode["key_phrases"]) + ".")
+        extra.append(
+            "Teaching ideas (OPTIONAL — these are example phrases for the lesson, NOT a checklist). "
+            "A logical, natural, engaging conversation comes FIRST; only use the few of these that "
+            "fit organically, adapt them, and skip the rest. Never sacrifice coherence to include a "
+            "phrase: " + "; ".join(episode["key_phrases"])
+        )
     styles = [f"- {c['name']}: {c.get('speech_style', '')}".rstrip() for c in chars if c.get("speech_style")]
     if styles:
         extra.append("Character speech styles:\n" + "\n".join(styles))
@@ -116,12 +121,13 @@ def list_episodes(episodes_data):
 
 
 def main():
-    cast = load_json(CAST_PATH)
-    episodes_data = load_json(EPISODES_PATH)
+    slug, args = series_paths.parse_series_arg(sys.argv[1:])
+    paths = series_paths.resolve(slug)
+    series_paths.announce(paths.slug)
+    cast = load_json(paths.cast)
+    episodes_data = load_json(paths.episodes)
     episodes = {ep["id"]: ep for ep in episodes_data["episodes"]}
     series = episodes_data.get("series", {})
-
-    args = [a for a in sys.argv[1:]]
 
     if not args or args[0].lower() == "list":
         list_episodes(episodes_data)
