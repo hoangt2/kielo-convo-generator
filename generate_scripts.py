@@ -26,8 +26,18 @@ client = genai.Client(api_key=api_key)
 # --- Helper Functions (unchanged) ---
 
 def slugify(title):
-    """Convert a title into a safe filename."""
-    return re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')
+    """Convert a title into a safe ASCII filename.
+
+    Finnish/accented letters are transliterated (ä->a, ö->o, å->a, ...) so words are
+    preserved instead of dropped ("Mitä kello on?" -> "mita-kello-on", not "mit-kello-on").
+    """
+    text = title.lower().translate(str.maketrans({
+        "ä": "a", "ö": "o", "å": "a", "š": "s", "ž": "z",
+        "ü": "u", "é": "e", "è": "e", "ê": "e", "á": "a", "à": "a", "â": "a",
+        "í": "i", "ì": "i", "ó": "o", "ò": "o", "ô": "o", "ú": "u", "ù": "u",
+        "ñ": "n", "ç": "c",
+    }))
+    return re.sub(r'[^a-z0-9]+', '-', text).strip('-')
 
 
 # --- Core Logic: Updated to use Gemini API ---

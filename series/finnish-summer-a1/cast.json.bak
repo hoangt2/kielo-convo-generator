@@ -1,0 +1,71 @@
+{
+  "_comment": "AI-generated cast. Keep voice_id and appearance STABLE for consistency. `id` keys are referenced by episodes and series_plan.py.",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "alex": {
+      "name": "Alex",
+      "role": "The foreign learner visiting Finland for the summer.",
+      "voice_id": "dlbXHgJnwobU5JdZ8F5M",
+      "gender": "Male",
+      "age": "Young Adult",
+      "default_tone": "Curious, polite, slightly hesitant.",
+      "finnish_level": "A1",
+      "speech_style": "Careful, slow, grammatically correct Finnish (Minä/Sinä). Often asks for clarification.",
+      "personality": "Eager to learn and experience everything. Observant and friendly, but sometimes overwhelmed by fast spoken Finnish.",
+      "appearance": "Slender build, light brown messy hair, fair skin. Wears practical, casual clothes like a hoodie, t-shirt, and jeans. Often carries a small backpack.",
+      "reference_image": "series/finnish-summer-a1/characters/alex.png"
+    },
+    "lumi": {
+      "name": "Lumi",
+      "role": "Alex's friendly local guide, a university student.",
+      "voice_id": "YSabzCJMvEHDduIDMdwV",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Enthusiastic, encouraging, cheerful.",
+      "finnish_level": "Native",
+      "speech_style": "Fast, natural spoken puhekieli (Mä/Sä, contractions like 'ooksä' for 'oletko sinä'). Will slow down and simplify when she notices Alex is lost.",
+      "personality": "Outgoing, patient, and sociable. Enjoys showing Alex around and introducing him to Finnish customs and friends.",
+      "appearance": "Athletic build with long, straight blonde hair often in a high ponytail. Light skin. Favors bright, sporty, and comfortable clothing.",
+      "reference_image": "series/finnish-summer-a1/characters/lumi.png"
+    },
+    "eila": {
+      "name": "Eila",
+      "role": "A kind, grandmotherly figure at a summer cottage.",
+      "voice_id": "0rEo3eAjssGDUCXHYENf",
+      "gender": "Female",
+      "age": "Senior",
+      "default_tone": "Warm, calm, and patient.",
+      "finnish_level": "Native",
+      "speech_style": "Clear, gentle puhekieli (Mä/Sä), but speaks more slowly than younger characters. Uses classic sayings.",
+      "personality": "Nurturing, wise, and enjoys simple pleasures like gardening, baking, and knitting. Represents traditional Finnish summer life.",
+      "appearance": "Soft, rounded build with a kind face and smile lines. Short, wavy silver-white hair. Wears comfortable floral blouses, cardigans, and practical skirts. Often seen in an apron.",
+      "reference_image": "series/finnish-summer-a1/characters/eila.png"
+    },
+    "jari": {
+      "name": "Jari",
+      "role": "The owner and barista of a local café.",
+      "voice_id": "1SM7GgM6IMuvQlz2BwM3",
+      "gender": "Male",
+      "age": "Adult",
+      "default_tone": "Direct, efficient, with a dry sense of humor.",
+      "finnish_level": "Native",
+      "speech_style": "Standard, sometimes clipped puhekieli (Mä/Sä). Not very talkative, especially when busy, but speaks clearly.",
+      "personality": "A man of few words, but observant and appreciates effort. Takes great pride in his coffee and pastries. Seems gruff but has a good heart.",
+      "appearance": "Sturdy build, bald on top with short dark hair on the sides and a neatly trimmed beard. Wears a black polo shirt under a brown barista apron.",
+      "reference_image": "series/finnish-summer-a1/characters/jari.png"
+    },
+    "pekka": {
+      "name": "Pekka",
+      "role": "An outdoorsy neighbor at the summer cottage area.",
+      "voice_id": "u7bRcYbD7visSINTyAT8",
+      "gender": "Male",
+      "age": "Adult",
+      "default_tone": "Relaxed, matter-of-fact, calm.",
+      "finnish_level": "Native",
+      "speech_style": "Casual puhekieli (Mä/Sä) with vocabulary related to nature, fishing, and sauna. Speaks in a laid-back manner.",
+      "personality": "Self-sufficient, practical, and deeply connected to nature. Enjoys quiet and solitude but is happy to share his knowledge of the outdoors.",
+      "appearance": "Lean and wiry build with tanned skin from being outside. Short, practical brown haircut and a few days of stubble. Wears functional outdoor clothing like fleece vests and cargo pants.",
+      "reference_image": "series/finnish-summer-a1/characters/pekka.png"
+    }
+  }
+}

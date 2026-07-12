@@ -101,7 +101,17 @@ python series_plan.py build                           # -> series/episodes.json
 python series_plan.py build --append                  # add to existing episodes instead of replacing
 python series_plan.py build --per-chapter 2           # exactly 2 per chapter
 python series_plan.py build --per-chapter 2-4         # a wider range
+python series_plan.py split 10                        # AI decides where to split (or not)
+python series_plan.py split 10 2 1                    # force a manual split: [first 2] + [last 1]
+python series_plan.py split all                       # AI reviews every episode, splits mashups
 ```
+
+**Splitting an episode** when it fuses lessons that shouldn't share a scene (e.g. a café lunch and
+grocery shopping): `split <id>` lets the **AI find the split points** (contiguous, order-preserving)
+and re-authors each part as its own single-location scene with its own setting/cast. It won't split a
+genuinely coherent episode. Pass explicit sizes to force a partition (they must sum to the lesson
+count), or `split all` to auto-scan the whole series. IDs are resequenced (files are slug-named, so
+unaffected).
 
 1. **parse** — an LLM normalizes the (often messy/compact) curriculum text into structured
    `curriculum.json`. Edit it if you want before building. **`all` reuses an existing

@@ -17,6 +17,7 @@ Final video lands in output_videos/.
 """
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -103,8 +104,22 @@ def main():
             print(f"\n❌ Pipeline stopped at {script}.")
             sys.exit(1)
 
+    # Copy result video(s) into the series output folder
+    series_output = paths.base / "output"
+    series_output.mkdir(exist_ok=True)
+    output_videos = BASE / "output_videos"
+    copied = []
+    for vid in output_videos.glob("*.mp4"):
+        dest = series_output / vid.name
+        shutil.copy2(vid, dest)
+        copied.append(dest)
+        print(f"📦 Copied to series: {dest.relative_to(BASE)}")
+
     print("\n" + "=" * 60)
-    print(f"🎉 EPISODE {ep_id} COMPLETE — see output_videos/")
+    if copied:
+        print(f"🎉 EPISODE {ep_id} COMPLETE — see {series_output.relative_to(BASE)}/")
+    else:
+        print(f"🎉 EPISODE {ep_id} COMPLETE — see output_videos/")
     print("=" * 60 + "\n")
 
 

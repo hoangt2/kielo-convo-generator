@@ -26,6 +26,25 @@ illustration_files = {f.stem: f for f in ILLUSTRATION_FOLDER.iterdir() if f.is_f
 mp3_files = {f.stem: f for f in MP3_FOLDER.iterdir() if f.is_file() and f.suffix.lower() == ".mp3"}
 common_names = set(illustration_files.keys()) & set(mp3_files.keys())
 
+# Optional targeting: `python generate_videos.py <slug> [<slug> ...]` re-renders only those
+# videos (reusing existing audio + illustration). No args = all matching pairs.
+def _to_stem(arg):
+    name = Path(arg).name
+    for suf in (".mp4", ".png", ".mp3", ".json"):
+        if name.endswith(suf):
+            name = name[: -len(suf)]
+    return name if name.startswith("conversation_") else f"conversation_{name}"
+
+targets = [a for a in sys.argv[1:] if not a.startswith("--")]
+if targets:
+    wanted = {_to_stem(a) for a in targets}
+    missing = wanted - common_names
+    if missing:
+        print(f"❌ No matching illustration+MP3 for: {', '.join(sorted(missing))}")
+        sys.exit(1)
+    common_names = common_names & wanted
+    print(f"🎯 Re-rendering {len(common_names)} video(s).")
+
 if not common_names:
     print("❌ No matching illustration and MP3 files found.")
     sys.exit(1)

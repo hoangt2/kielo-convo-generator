@@ -212,19 +212,36 @@ def get_ambient_setting(video_path: Path) -> str:
         return ""
 
 
-def batch_process_videos():
-    """Batch process all videos in the source directory.
-    
+def batch_process_videos(targets=None):
+    """Batch process videos in the source directory.
+
     Only adds background music to videos whose ambient_setting is "quiet" or unset.
     Videos with ambient sounds (e.g. café, street) skip BGM entirely.
+
+    If `targets` (a list of slugs/filenames) is given, only those videos are processed.
     """
     setup_directories()
-    
+
     video_extensions = ['*.mp4', '*.mov', '*.avi', '*.mkv']
     video_files = []
     for ext in video_extensions:
         video_files.extend(SOURCE_DIR.glob(ext))
-        
+
+    if targets:
+        def _to_stem(arg):
+            name = Path(arg).name
+            for suf in ('.mp4', '.mov', '.avi', '.mkv', '.png', '.mp3', '.json'):
+                if name.endswith(suf):
+                    name = name[: -len(suf)]
+            return name if name.startswith('conversation_') else f'conversation_{name}'
+        wanted = {_to_stem(a) for a in targets}
+        video_files = [v for v in video_files if v.stem in wanted]
+        if not video_files:
+            print(f"❌ No videos in '{SOURCE_DIR.name}' match: {', '.join(sorted(wanted))}")
+            import sys
+            sys.exit(1)
+        print(f"🎯 Adding music to {len(video_files)} target video(s).")
+
     if not video_files:
         print(f"❌ No video files found in the '{SOURCE_DIR.name}' folder.")
         import sys
@@ -249,4 +266,6 @@ def batch_process_videos():
         )
 
 if __name__ == "__main__":
-    batch_process_videos()
+    import sys
+    targets = [a for a in sys.argv[1:] if not a.startswith("--")]
+    batch_process_videos(targets=targets or None)

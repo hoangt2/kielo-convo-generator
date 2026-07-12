@@ -24,6 +24,11 @@ Usage:
     python series_plan.py build
     python series_plan.py build --append          # add to existing episodes.json
 
+    # split an episode whose lessons don't belong in one scene (e.g. lunch + grocery shopping)
+    python series_plan.py split 10               # AI decides WHERE to split (or that it shouldn't)
+    python series_plan.py split 10 2 1           # force a manual split: [first 2] + [last 1]
+    python series_plan.py split all              # AI reviews every episode and splits mashups
+
 Options:
     --series <slug>     operate on series/<slug>/ instead of the default series/
     --append            append to existing episodes.json (else overwrite, backing up to .bak)
@@ -213,20 +218,14 @@ def chunk_contiguous(items, k):
     return groups
 
 
-def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=2, max_eps=3):
-    """Combine a chapter's lessons into a few episodes, preserving the ORIGINAL ORDER.
+def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups, cast):
+    """Author ONE episode per pre-decided lesson group (LLM writes the scene; grouping is fixed).
 
-    Groupings are decided in code (contiguous, ordered) so episodes always follow the
-    curriculum sequence; the model only authors the scene for each pre-set group.
+    `groups` is a list of lesson lists (each lesson a dict with 'title' and optional 'desc').
+    Returns cleaned episode dicts, in group order.
     """
     summary, protagonist = cast_summary(cast)
     valid_ids = set(cast["characters"].keys())
-    lessons = chapter.get("lessons", [])
-    n_lessons = len(lessons)
-    lo = min(min_eps, n_lessons) or 1
-    hi = min(max_eps, n_lessons) or 1
-
-    groups = chunk_contiguous(lessons, choose_k(n_lessons, lo, hi))
 
     groups_block = "\n\n".join(
         f"GROUP {gi+1} (episode {gi+1}):\n" + "\n".join(
@@ -241,10 +240,11 @@ def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=2, max_eps=3)
 
     system = f"""You design short Finnish conversation video episodes for a fixed cast.
 
-The lessons have ALREADY been grouped for you, in curriculum order. Write EXACTLY ONE episode per
-group, in the SAME ORDER as the groups. Each episode must teach exactly the lessons of its group —
-do not reorder, merge across groups, split, add, or drop lessons. Each episode is one believable
-1-2 minute scene that naturally brings its group's lessons together.
+The lessons have ALREADY been grouped for you, in order. Write EXACTLY ONE episode per group, in
+the SAME ORDER as the groups. Each episode must teach exactly the lessons of its group — do not
+reorder, merge across groups, split, add, or drop lessons. Each episode is ONE believable 1-2
+minute scene in ONE place that naturally brings its group's lessons together (do not stitch two
+different locations into one scene).
 
 THE CAST (use ONLY these ids in `characters`):
 {summary}
@@ -257,7 +257,7 @@ Rules:
 - `lessons_covered`: the exact lesson titles of that group, in order.
 - `description`: IN FINNISH (spoken style), 3-5 sentences, one concrete scene tying the group together.
 - `key_phrases`: 4-8 natural Finnish phrases spanning the group's lessons.
-- `ambient_setting`: best fit from the allowed list for a workplace setting.
+- `ambient_setting`: best fit from the allowed list for the scene's single location.
 - `notes`: one line on register (formal Minä/Sinä vs spoken Mä/Sä) and who mirrors whom.
 - `title` is a short Finnish title; `title_en` is a short descriptive English title.
 Return the episodes array in group order. Output only the JSON."""
@@ -270,7 +270,7 @@ Return the episodes array in group order. Output only the JSON."""
     )
     prompt = (
         f"Track: {track}\nLevel: {level_name} (CEFR {cefr or 'A1'})\n"
-        f"Chapter: {chapter['name']} — {chapter.get('desc','')}\n\n"
+        f"Chapter: {chapter_name} — {chapter_desc}\n\n"
         f"Write one episode per group, in order:\n\n{groups_block}"
     )
 
@@ -295,18 +295,29 @@ Return the episodes array in group order. Output only the JSON."""
                 ep["characters"] = ids
                 # Force exact, order-preserving lesson coverage from the code-side grouping.
                 ep["lessons_covered"] = [l["title"] for l in groups[gi]]
-                ep["track"] = chapter["name"]
-                ep["chapter"] = chapter["name"]
+                ep["track"] = track
+                ep["chapter"] = chapter_name
                 ep["level"] = level_name
                 ep["language_level"] = normalize_level(cefr) if cefr and is_cefr_level(cefr) else "A1"
                 cleaned.append(ep)
             return cleaned
         except Exception as e:
             last_err = e
-            print(f"   ⚠️  chapter '{chapter['name']}' attempt {attempt+1}/3 failed: {e}")
+            print(f"   ⚠️  '{chapter_name}' attempt {attempt+1}/3 failed: {e}")
             time.sleep(2 * (attempt + 1))
-    print(f"   ❌ Skipping chapter '{chapter['name']}' after retries. ({last_err})")
+    print(f"   ❌ Giving up on '{chapter_name}' after retries. ({last_err})")
     return []
+
+
+def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=2, max_eps=3):
+    """Combine a chapter's lessons into a few episodes, preserving the ORIGINAL ORDER."""
+    lessons = chapter.get("lessons", [])
+    n_lessons = len(lessons)
+    lo = min(min_eps, n_lessons) or 1
+    hi = min(max_eps, n_lessons) or 1
+    groups = chunk_contiguous(lessons, choose_k(n_lessons, lo, hi))
+    return _author_episodes(track, chapter["name"], chapter.get("desc", ""),
+                            level_name, cefr, groups, cast)
 
 
 def build_episodes(curriculum, cast, start_id=1, min_eps=2, max_eps=3):
@@ -392,6 +403,198 @@ def cmd_build(paths, append=False, min_eps=2, max_eps=3):
     print(f"   Next:  python series_run.py <id>" + (f" --series {paths.slug}" if paths.slug else ""))
 
 
+def _lesson_desc_lookup(curriculum):
+    """Map lesson title -> description from curriculum.json (best effort)."""
+    m = {}
+    for lv in (curriculum or {}).get("levels", []):
+        for ch in lv.get("chapters", []):
+            for l in ch.get("lessons", []):
+                m[l.get("title", "")] = l.get("desc", "")
+    return m
+
+
+SPLIT_SCHEMA = types.Schema(
+    type="object",
+    properties={
+        "needs_split": types.Schema(type="boolean"),
+        "reason": types.Schema(type="string", description="Brief reason (one line)."),
+        "group_sizes": types.Schema(
+            type="array", items=types.Schema(type="integer"),
+            description="Contiguous group sizes covering the lessons in order; must sum to the "
+                        "number of lessons. A single value (the total) means no split.",
+        ),
+    },
+    required=["needs_split", "reason", "group_sizes"],
+)
+
+
+def plan_split(level_name, cefr, lessons):
+    """Ask the model where (if anywhere) an episode should be split. Returns (sizes, reason).
+
+    `sizes` is a contiguous partition summing to len(lessons); [len(lessons)] means no split.
+    """
+    n = len(lessons)
+    block = "\n".join(f"{i+1}. {l['title']} — {l.get('desc','')}" for i, l in enumerate(lessons))
+    system = (
+        "You decide how to split a language-learning video episode into coherent scenes. "
+        "An episode must be ONE believable conversation happening in ONE location and continuous "
+        "moment. If the lessons would force different locations or clearly separate interactions "
+        "(e.g. a café lunch AND grocery shopping; or a phone call AND a face-to-face chat), split "
+        "them into separate CONTIGUOUS groups, each of which is a single coherent scene. Keep the "
+        "lessons in their given order; groups must be contiguous and together cover every lesson "
+        "exactly once. If they all fit one natural scene, do NOT split (return one group). Prefer "
+        "the FEWEST splits that keep each scene believable — do not over-split closely related lessons."
+    )
+    prompt = f"Level {level_name} {cefr}. Episode lessons, in order:\n{block}\n\nDecide the contiguous group sizes."
+    config = types.GenerateContentConfig(
+        system_instruction=system,
+        response_mime_type="application/json",
+        response_schema=SPLIT_SCHEMA,
+        temperature=0.2,
+    )
+    for attempt in range(3):
+        try:
+            resp = client.models.generate_content(model=MODEL, contents=[prompt], config=config)
+            out = json.loads(resp.text)
+            sizes = [int(s) for s in out.get("group_sizes", []) if int(s) > 0]
+            if sizes and sum(sizes) == n:
+                return sizes, out.get("reason", "")
+        except Exception as e:
+            print(f"   ⚠️  split-planning attempt {attempt+1}/3 failed: {e}")
+            time.sleep(2 * (attempt + 1))
+    return [n], "planner failed — no split"
+
+
+def _partition(lessons, sizes):
+    groups, idx = [], 0
+    for sz in sizes:
+        groups.append(lessons[idx:idx + sz])
+        idx += sz
+    return groups
+
+
+def _episode_lessons(ep, desc_map):
+    return [{"title": t, "desc": desc_map.get(t, "")} for t in ep.get("lessons_covered", [])]
+
+
+def _author_split(ep, groups, cast):
+    return _author_episodes(
+        ep.get("track", ""), ep.get("chapter", ep.get("track", "")), "",
+        ep.get("level", ""), ep.get("language_level", ""), groups, cast,
+    )
+
+
+def cmd_split(paths, ep_id, sizes):
+    """Split one episode's lessons into new episodes. With no sizes, the AI decides where to split."""
+    if not paths.episodes.exists():
+        sys.exit(f"❌ {paths.episodes} not found.")
+    if not paths.cast.exists():
+        sys.exit(f"❌ {paths.cast} not found.")
+    data = load_json(paths.episodes)
+    cast = load_json(paths.cast)
+    episodes = data.get("episodes", [])
+
+    pos = next((i for i, e in enumerate(episodes) if e.get("id") == ep_id), None)
+    if pos is None:
+        sys.exit(f"❌ Episode {ep_id} not found. Run: python series_compile.py list")
+    ep = episodes[pos]
+    titles = ep.get("lessons_covered", [])
+    if len(titles) < 2:
+        sys.exit(f"❌ Episode {ep_id} covers <2 lessons — nothing to split.\n   Lessons: {titles}")
+
+    desc_map = _lesson_desc_lookup(load_json(paths.curriculum_json) if paths.curriculum_json.exists() else {})
+    lessons = _episode_lessons(ep, desc_map)
+
+    # Decide the partition: manual sizes if given, otherwise let the AI find the split points.
+    if sizes:
+        if sum(sizes) != len(titles):
+            sys.exit(f"❌ Sizes {sizes} sum to {sum(sizes)}, but episode {ep_id} has "
+                     f"{len(titles)} lessons: {titles}")
+        cut_sizes = sizes
+    else:
+        print(f"🤖 Asking the AI where to split episode {ep_id} ({ep.get('title_en','')})...")
+        cut_sizes, reason = plan_split(ep.get("level", ""), ep.get("language_level", ""), lessons)
+        print(f"   → {reason}")
+        if len(cut_sizes) <= 1:
+            print("✅ AI judged this is already one coherent scene — not splitting.\n"
+                  "   (Force a split with explicit sizes, e.g. `split "
+                  f"{ep_id} {' '.join(['1'] * len(titles))}`.)")
+            return
+
+    groups = _partition(lessons, cut_sizes)
+    print(f"✂️  Splitting episode {ep_id} ({ep.get('title_en','')}) into {len(groups)} episode(s):")
+    for gi, g in enumerate(groups):
+        print(f"   {gi+1}. {', '.join(l['title'] for l in g)}")
+
+    new_eps = _author_split(ep, groups, cast)
+    if len(new_eps) != len(groups):
+        sys.exit("❌ Authoring failed — no changes made.")
+
+    bak = paths.episodes.with_suffix(".json.bak")
+    paths.episodes.replace(bak)
+    print(f"💾 Backed up episodes -> {bak.name}")
+
+    episodes[pos:pos + 1] = new_eps
+    for i, e in enumerate(episodes, start=1):
+        e["id"] = i
+    data["episodes"] = episodes
+    with open(paths.episodes, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+    print(f"\n✅ Split done. Episodes renumbered; total now {len(episodes)}.")
+    print("   (ids were resequenced — check `python series_compile.py list`)")
+
+
+def cmd_split_all(paths):
+    """Scan every episode; let the AI split any that fuse multiple scenes."""
+    if not paths.episodes.exists():
+        sys.exit(f"❌ {paths.episodes} not found.")
+    if not paths.cast.exists():
+        sys.exit(f"❌ {paths.cast} not found.")
+    data = load_json(paths.episodes)
+    cast = load_json(paths.cast)
+    episodes = data.get("episodes", [])
+    desc_map = _lesson_desc_lookup(load_json(paths.curriculum_json) if paths.curriculum_json.exists() else {})
+
+    print(f"🤖 Reviewing {len(episodes)} episode(s) for scene splits...\n")
+    new_list = []
+    n_split = 0
+    for ep in episodes:
+        titles = ep.get("lessons_covered", [])
+        if len(titles) < 2:
+            new_list.append(ep)
+            continue
+        lessons = _episode_lessons(ep, desc_map)
+        sizes, reason = plan_split(ep.get("level", ""), ep.get("language_level", ""), lessons)
+        if len(sizes) <= 1:
+            print(f"   ✔  #{ep.get('id')} {ep.get('title_en','')}: keep as one scene.")
+            new_list.append(ep)
+            continue
+        print(f"   ✂️  #{ep.get('id')} {ep.get('title_en','')}: split into {len(sizes)} — {reason}")
+        groups = _partition(lessons, sizes)
+        authored = _author_split(ep, groups, cast)
+        if len(authored) == len(groups):
+            new_list.extend(authored)
+            n_split += 1
+        else:
+            print(f"      ⚠️  authoring failed — keeping original.")
+            new_list.append(ep)
+
+    if n_split == 0:
+        print("\n✅ No episodes needed splitting.")
+        return
+
+    bak = paths.episodes.with_suffix(".json.bak")
+    paths.episodes.replace(bak)
+    print(f"\n💾 Backed up episodes -> {bak.name}")
+    for i, e in enumerate(new_list, start=1):
+        e["id"] = i
+    data["episodes"] = new_list
+    with open(paths.episodes, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    print(f"✅ Split {n_split} episode(s); total now {len(new_list)}. IDs resequenced.")
+
+
 def main():
     if not client:
         sys.exit("🛑 GEMINI_API_KEY missing or client init failed.")
@@ -455,8 +658,21 @@ def main():
         else:
             cmd_parse(paths, args[1])
         cmd_build(paths, append=append, min_eps=min_eps, max_eps=max_eps)
+    elif cmd == "split":
+        if len(args) >= 2 and args[1].lower() == "all":
+            cmd_split_all(paths)
+        elif len(args) >= 2 and args[1].isdigit():
+            ep_id = int(args[1])
+            sizes = [int(a) for a in args[2:] if a.isdigit()]
+            cmd_split(paths, ep_id, sizes)
+        else:
+            sys.exit("Usage: python series_plan.py split <episode_id> [size1 size2 ...]\n"
+                     "       python series_plan.py split all\n"
+                     "  split <id>            AI decides where (if anywhere) to split.\n"
+                     "  split <id> 2 1        force a manual contiguous partition.\n"
+                     "  split all             AI reviews every episode and splits scene-mashups.")
     else:
-        sys.exit(f"Unknown command '{cmd}'. Use: parse | build | all")
+        sys.exit(f"Unknown command '{cmd}'. Use: parse | build | split | all")
 
 
 if __name__ == "__main__":

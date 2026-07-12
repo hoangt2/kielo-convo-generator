@@ -97,7 +97,17 @@ python series_plan.py parse series/curriculum.txt   # stage 1 only → series/cu
 python series_plan.py build                          # stage 2 only → series/episodes.json
 python series_plan.py build --append                 # add to existing episodes instead of replacing
 python series_plan.py build --per-chapter 2          # exactly 2 per chapter (or a range like 2-4)
+python series_plan.py split 10                       # AI decides WHERE to split (or that it shouldn't)
+python series_plan.py split 10 2 1                    # force a manual split: [first 2] + [last 1]
+python series_plan.py split all                       # AI reviews every episode, splits any mashups
 ```
+
+**Splitting an episode.** If a generated episode combines lessons that don't belong in one scene
+(e.g. a café lunch *and* grocery shopping), `split` divides its lessons — a contiguous,
+order-preserving partition — and re-authors each part as its own single-location scene (own setting
+and cast). By default **the AI decides the split points** (and won't split a genuinely coherent
+episode); pass explicit sizes to force a partition, or use `split all` to auto-scan the whole series.
+IDs are resequenced afterward (files are named by slug, so they're unaffected).
 
 1. **parse** — an LLM normalizes the (often messy/compact) curriculum text into structured
    `series/curriculum.json`, which you can review/edit before building. **`all` reuses an existing
@@ -224,7 +234,7 @@ Both modes produce an `ideas.json` (Series Mode via `series_compile.py`, Idea Mo
 |---|---------|------|--------|
 | 1 | `python generate_scripts.py` | Convert ideas → spoken-Finnish dialogue (add `podcast` for podcasts). CEFR read from ideas metadata. | `scripts/` (or `podcast_scripts/`) |
 | 2 | `python check_finnish_grammar.py` | Fix grammar & make phrasing sound like natural spoken Finnish. | `scripts/` (in place) |
-| 3 | `python generate_illustrations.py` | One illustration per script. In Series Mode, uses character reference portraits for consistency. | `illustrations/` |
+| 3 | `python generate_illustrations.py` | One illustration per script. In Series Mode, uses character reference portraits for consistency and **verifies the head-count with a vision check, retrying if a character was duplicated or extra people appeared**. Accepts slug(s) to target one. | `illustrations/` |
 | 4 | `python generate_sfx.py` | Generate SFX clips from script cues + ambient loops. | `sfx/<slug>/`, `presets/ambience/` |
 | 5 | `python tts_generator.py` | Text-to-speech per dialogue line via ElevenLabs (`podcast` / `all` modes available). | `mp3/` |
 | 6 | `python sfx_mixer.py` | Whisper-align timestamps, insert pauses, place SFX, overlay ambience. | `mp3/` (in place) |
@@ -232,6 +242,29 @@ Both modes produce an `ideas.json` (Series Mode via `series_compile.py`, Idea Mo
 | 8 | `python music_mixer.py` | Add background music — only to videos whose ambient is `quiet`/unset (others keep their ambience). | `output_videos/` |
 
 Optional subtitles: `python generate_subtitled_videos.py` (run manually).
+
+### Fixing a single episode
+
+Most steps accept a **script slug** (the filename stem, e.g. `mit-kello-on`, also shown as
+`conversation_<slug>.mp4`) to operate on just one episode instead of the whole batch — handy when
+one illustration or line is wrong and you don't want to regenerate everything.
+
+```bash
+# Bad illustration → regenerate just that image, then re-render only that video:
+python generate_illustrations.py mit-kello-on   # new image (reuses character refs in Series Mode)
+python generate_videos.py mit-kello-on          # re-render video: new image + existing audio
+python music_mixer.py mit-kello-on              # re-add BGM if the episode's ambient is "quiet"
+
+# Hand-edited a line in scripts/<slug>.json → re-voice and re-render only that video:
+python tts_generator.py                         # (regenerates audio for all scripts present)
+python sfx_mixer.py
+python generate_videos.py mit-kello-on
+python music_mixer.py mit-kello-on
+```
+
+Each illustration run produces a fresh variant, so if the first regeneration still has an artifact,
+just run it again. `generate_illustrations`, `generate_videos` and `music_mixer` all take one or
+more slugs; with no arguments they process everything.
 
 ---
 
