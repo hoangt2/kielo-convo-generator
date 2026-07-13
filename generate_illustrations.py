@@ -29,18 +29,12 @@ MODEL_NAME = "gemini-2.5-flash-image"
 
 # --- Fixed illustration style description ---
 ILLUSTRATION_STYLE = (
-    "A playful, modern doodle-style 2D illustration. "
-    "The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. "
-    "Do not use gradients, 3D rendering, or complex shading. "
-    "Characters should have friendly, slightly stylized but realistically proportioned bodies with simple, clean features. "
-    "IMPORTANT: All characters must be drawn at the SAME consistent scale — their heights and body sizes "
-    "must be proportionally correct relative to each other AND to surrounding objects (doors, furniture, trees, etc.). "
-    "No character should appear giant or tiny compared to the others or the environment. "
-    "Any inanimate objects in the scene must remain strictly as normal objects without any faces, "
-    "smiles, or anthropomorphic details. "
-    "Use a soft, cohesive pastel-leaning color palette. "
-    "High quality vector-art style. "
-    "No text, no labels, no words, no letters."
+    "A playful, modern doodle-style 2D illustration with bold, thick, uniform black outlines "
+    "and flat, naturalistic colors. No gradients, no 3D, no complex shading. "
+    "Characters have friendly, realistically proportioned bodies at a consistent scale "
+    "relative to each other and the environment. "
+    "Soft pastel-leaning color palette. High quality vector-art style. "
+    "No text, labels, words, letters, speech bubbles, or thought bubbles anywhere in the image."
 )
 
 ## 🏗️ Core Functions
@@ -62,25 +56,21 @@ def create_generic_prompt(data: dict) -> str:
     length = metadata.get("length", "short")
 
     characters = idea.get("characters", [])
-    character_descriptions = []
     names = []
+    char_lines = []
     for c in characters:
         name = c.get("name", "Unnamed")
         names.append(name)
         gender = c.get("gender", "")
         age = c.get("age", "")
-        tone = c.get("default_tone", "")
-        character_descriptions.append(f"{name} ({gender}, {age}, {tone})")
-    character_info = ", ".join(character_descriptions) if character_descriptions else "unspecified characters"
+        appearance = c.get("appearance", "")
+        line = f"  • {name}: {gender}, {age}"
+        if appearance:
+            line += f". {appearance}"
+        char_lines.append(line)
+    char_block = "\n".join(char_lines) if char_lines else "unspecified characters"
 
     n = len(names)
-    people_clause = (
-        f"PEOPLE — STRICT: the scene contains EXACTLY {n} {'person' if n == 1 else 'people'} "
-        f"and NO ONE ELSE: {', '.join(names)}. Draw each of them EXACTLY ONCE. Do NOT duplicate any "
-        f"character — the same person must never appear twice. Do NOT add any extra, background, or "
-        f"passer-by people, crowds, other staff, or other shoppers beyond these {n}. "
-        if names else ""
-    )
 
     # Use ONLY the scene narrative for the image — never the dialogue or any quoted phrases.
     # In series mode the description has extra blocks (target phrases, speech styles, direction)
@@ -88,35 +78,26 @@ def create_generic_prompt(data: dict) -> str:
     # them would make the model render speech bubbles with that text, so we take the first block.
     scene = (description or "").split("\n\n")[0].strip()
 
-    # Environment guidance — give the model a real location to build, not an empty backdrop.
+    # Environment guidance
     setting_clause = (
-        f"Setting: a detailed {ambient_setting} environment. " if ambient_setting else ""
+        f"Setting: {ambient_setting}. " if ambient_setting else ""
     )
 
-    # Build generic illustration prompt
+    # Build prompt — headcount is THE MOST IMPORTANT constraint, so it goes first and last.
     prompt = (
-        f"Create a single, wordless illustration of the following scene. "
-        f"{ILLUSTRATION_STYLE} "
-        f"CRITICAL — this must be a TEXT-FREE image: do NOT draw any text, letters, words, "
-        f"numbers, captions, signs, or labels of any kind. Do NOT draw speech bubbles, dialogue "
-        f"balloons, or thought bubbles. Do NOT make a comic strip or multiple panels — produce ONE "
-        f"single illustration of one moment. "
-        f"Scene: {scene or 'No explicit description provided.'} "
-        f"Characters: {character_info}. "
-        f"{people_clause}"
-        f"PROPORTION RULE: Draw ALL characters at a consistent, realistic human scale. Characters "
-        f"should occupy similar proportional height in the scene (accounting for age — children shorter, "
-        f"adults similar). No character should appear significantly larger or smaller than others. "
-        f"Characters must also be correctly sized relative to environmental objects like buildings, "
-        f"trees, doors, and furniture. "
-        f"Convey the interaction through facial expression, gesture, and body language. "
-        f"{setting_clause}"
-        f"Render a rich, fully-illustrated background that clearly establishes the location: include "
-        f"contextual environmental elements — furniture, décor, windows, plants, and props that fit "
-        f"the setting — drawn in the same flat 2D doodle style. The background sets the place through "
-        f"OBJECTS ONLY; it must contain NO additional people or figures. Place the named characters "
-        f"within this environment so it feels like a real place, not a blank backdrop. Keep the "
-        f"composition visually balanced and readable, not cluttered. The overall tone is {tone}. "
+        f"STRICT HEADCOUNT: Draw EXACTLY {n} {'person' if n == 1 else 'people'} — "
+        f"{', '.join(names)}. No more, no less. No extra people, no background crowd, "
+        f"no duplicated characters.\n\n"
+        f"{ILLUSTRATION_STYLE}\n\n"
+        f"Scene: {scene or 'A simple moment between the characters.'}\n"
+        f"{setting_clause}\n"
+        f"Characters (each must look visually DISTINCT — different hair, clothing, build):\n"
+        f"{char_block}\n\n"
+        f"Draw a single illustration of one moment. Rich background with environmental details "
+        f"(furniture, plants, props) in the same flat 2D style. Background contains OBJECTS ONLY, "
+        f"no additional people. Convey interaction through gesture and expression. "
+        f"Tone: {tone}.\n\n"
+        f"REMINDER: The image must contain EXACTLY {n} {'person' if n == 1 else 'people'}, not one more."
     )
 
     return prompt
@@ -259,11 +240,22 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
     # Expected head-count = number of named characters. Generate, verify the count with a vision
     # check, and retry if the model duplicated a character or added extra people.
     expected = len(data.get("idea", {}).get("characters", []))
-    MAX_ATTEMPTS = 4
+    MAX_ATTEMPTS = 6
     best_image, best_diff = None, None
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
-        image = _render_once(contents, config, label)
+        # On retries, prepend a correction hint to help the model self-correct
+        if attempt > 1 and best_diff is not None:
+            retry_hint = (
+                f"IMPORTANT: Your previous illustration had the WRONG number of people. "
+                f"Draw EXACTLY {expected} people, no more, no less. "
+                f"Only these {expected} characters: {', '.join(n for n in [c.get('name','') for c in data.get('idea',{}).get('characters',[])] if n)}."
+            )
+            retry_contents = [retry_hint] + contents if not isinstance(contents[0], Image.Image) else contents[:1] + [retry_hint] + contents[1:]
+        else:
+            retry_contents = contents
+
+        image = _render_once(retry_contents, config, label)
         if image is None:
             continue
         if expected <= 0:
