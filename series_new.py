@@ -109,17 +109,42 @@ def main():
     }
     paths.episodes.write_text(json.dumps(episodes, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    # curriculum.txt template
+    curriculum_template = f"""{title}
+
+Chapter 1 — CHAPTER_TITLE
+Focus: key grammar or vocabulary themes for this chapter.
+1. Lesson Title — Discovery
+   One-line description of what the learner discovers in this lesson.
+2. Lesson Title — Scenario
+   One-line description of the real-life scenario the learner practises.
+3. Lesson Title — Drill
+   One-line description of the drill (repetitive practice) in this lesson.
+
+Chapter 2 — CHAPTER_TITLE
+Focus: key grammar or vocabulary themes for this chapter.
+1. Lesson Title — Discovery
+   One-line description of what the learner discovers in this lesson.
+2. Lesson Title — Scenario
+   One-line description of the real-life scenario the learner practises.
+3. Lesson Title — Mixed
+   One-line description combining multiple skills from this chapter.
+"""
+    if not paths.curriculum_txt.exists():
+        paths.curriculum_txt.write_text(curriculum_template, encoding="utf-8")
+
     # Make the new series the active one so following commands target it automatically.
     series_paths.set_active(slug)
 
-    print(f"✅ Created series/{slug}/  (cast.json, episodes.json, characters/)")
+    print(f"✅ Created series/{slug}/  (cast.json, episodes.json, curriculum.txt, characters/)")
     print(f"⭐ This is now the ACTIVE series — other commands target it unless you pass --series.")
     print("\nNext:")
+    print(f"  1. Edit series/{slug}/curriculum.txt — define chapters and lessons")
     if not copy_cast:
-        print(f"  1. Edit series/{slug}/cast.json — define characters, voice_ids, appearance")
-    print(f"  2. python series_plan.py all <curriculum.txt>")
-    print(f"  3. python generate_character_refs.py")
-    print(f"  4. python series_run.py <id>")
+        print(f"  2. Edit series/{slug}/cast.json — define characters (or run: python generate_cast.py)")
+    print(f"  3. python series_plan.py all curriculum.txt")
+    print(f"  4. python generate_character_refs.py")
+    print(f"  5. python series_run.py <id>")
     print(f"\n  (switch series anytime: python series_use.py <slug> | default)")
 
 
