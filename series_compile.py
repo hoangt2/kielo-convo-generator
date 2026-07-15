@@ -99,6 +99,7 @@ def build_idea(episode, cast):
         "title_en": episode.get("title_en", ""),
         "description": description,
         "ambient_setting": episode.get("ambient_setting", ""),
+        "illustration_layout": episode.get("illustration_layout", "single"),
         "language_level": episode.get("language_level", ""),
         "characters": idea_characters,
     }

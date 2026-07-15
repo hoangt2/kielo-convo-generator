@@ -1,0 +1,32 @@
+{
+  "_comment": "Character bible. Keep voice_id and appearance STABLE for consistency. `id` keys are referenced by episodes and series_plan.py.",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "protagonist": {
+      "name": "REPLACE_ME",
+      "role": "Protagonist",
+      "voice_id": "REPLACE_WITH_ELEVENLABS_VOICE_ID",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Eager, polite",
+      "finnish_level": "A1",
+      "speech_style": "A1 learner. Careful Minä/Sinä, asks for clarification.",
+      "personality": "The learner the audience follows.",
+      "appearance": "Describe height, build, hair, skin tone, clothing — be specific and stable.",
+      "reference_image": "series/everyday-finnish-a2/characters/protagonist.png"
+    },
+    "counterpart": {
+      "name": "REPLACE_ME",
+      "role": "Counterpart",
+      "voice_id": "REPLACE_WITH_ELEVENLABS_VOICE_ID",
+      "gender": "Male",
+      "age": "Adult",
+      "default_tone": "Friendly",
+      "finnish_level": "Native",
+      "speech_style": "Natural spoken Finnish (puhekieli).",
+      "personality": "The other recurring speaker.",
+      "appearance": "Describe appearance specifically and keep it stable.",
+      "reference_image": "series/everyday-finnish-a2/characters/counterpart.png"
+    }
+  }
+}

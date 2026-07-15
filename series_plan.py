@@ -174,9 +174,13 @@ EPISODES_SCHEMA = types.Schema(
                         description="4-8 target Finnish phrases covering the combined lessons.",
                     ),
                     "notes": types.Schema(type="string", description="Register/direction note for the scriptwriter."),
+                    "illustration_layout": types.Schema(
+                        type="string", enum=["single", "split"],
+                        description="'single' = all characters together in one scene (default). 'split' = characters in separate locations (e.g. phone call) — each gets their own panel.",
+                    ),
                 },
                 required=["lessons_covered", "title", "title_en", "description", "characters",
-                          "ambient_setting", "tone", "key_phrases", "notes"],
+                          "ambient_setting", "tone", "key_phrases", "notes", "illustration_layout"],
             ),
         ),
     },
@@ -259,6 +263,8 @@ Rules:
 - `key_phrases`: 4-8 natural Finnish phrases spanning the group's lessons.
 - `ambient_setting`: best fit from the allowed list for the scene's single location.
 - `notes`: one line on register (formal Minä/Sinä vs spoken Mä/Sä) and who mirrors whom.
+- `illustration_layout`: set to 'split' when characters are NOT in the same physical location
+  (e.g. phone calls, video calls, texting, customer service calls). Otherwise 'single' (default).
 - `title` is a short Finnish title; `title_en` is a short descriptive English title.
 Return the episodes array in group order. Output only the JSON."""
 

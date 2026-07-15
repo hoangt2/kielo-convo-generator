@@ -78,27 +78,67 @@ def create_generic_prompt(data: dict) -> str:
     # them would make the model render speech bubbles with that text, so we take the first block.
     scene = (description or "").split("\n\n")[0].strip()
 
+    # Detect whether characters are in separate locations (phone call, video call, etc.).
+    # 1) Explicit field from episodes.json (set by series_plan.py AI) — most reliable.
+    # 2) Keyword fallback for older episodes that lack the field.
+    layout = idea.get("illustration_layout", "")
+    if layout == "split":
+        is_remote = True
+    elif layout == "single":
+        is_remote = False
+    else:
+        # Fallback: keyword detection for episodes without the field
+        remote_keywords = [
+            "soittaa", "puhelimeen", "puhelimessa", "puhelun", "puhelin",
+            "phone", "calling", "call", "video call", "videocall",
+            "asiakaspalvelu", "customer service",
+        ]
+        scene_lower = scene.lower()
+        is_remote = any(kw in scene_lower for kw in remote_keywords)
+
     # Environment guidance
     setting_clause = (
         f"Setting: {ambient_setting}. " if ambient_setting else ""
     )
 
-    # Build prompt — headcount is THE MOST IMPORTANT constraint, so it goes first and last.
-    prompt = (
-        f"STRICT HEADCOUNT: Draw EXACTLY {n} {'person' if n == 1 else 'people'} — "
-        f"{', '.join(names)}. No more, no less. No extra people, no background crowd, "
-        f"no duplicated characters.\n\n"
-        f"{ILLUSTRATION_STYLE}\n\n"
-        f"Scene: {scene or 'A simple moment between the characters.'}\n"
-        f"{setting_clause}\n"
-        f"Characters (each must look visually DISTINCT — different hair, clothing, build):\n"
-        f"{char_block}\n\n"
-        f"Draw a single illustration of one moment. Rich background with environmental details "
-        f"(furniture, plants, props) in the same flat 2D style. Background contains OBJECTS ONLY, "
-        f"no additional people. Convey interaction through gesture and expression. "
-        f"Tone: {tone}.\n\n"
-        f"REMINDER: The image must contain EXACTLY {n} {'person' if n == 1 else 'people'}, not one more."
-    )
+    if is_remote and n >= 2:
+        # Split-panel layout for phone/remote conversations
+        print(f"   📞 Detected remote/phone conversation — using split-panel layout")
+        prompt = (
+            f"STRICT HEADCOUNT: Draw EXACTLY {n} {'person' if n == 1 else 'people'} — "
+            f"{', '.join(names)}. No more, no less. No extra people, no background crowd, "
+            f"no duplicated characters.\n\n"
+            f"{ILLUSTRATION_STYLE}\n\n"
+            f"LAYOUT: These characters are NOT in the same location — this is a phone call or "
+            f"remote conversation. Use a SPLIT-PANEL composition: divide the image into {n} "
+            f"separate panels (use a clean diagonal or vertical dividing line). Each character "
+            f"appears in their OWN panel with their OWN background/environment. "
+            f"Do NOT place them in the same room or scene.\n\n"
+            f"Scene context: {scene or 'A remote conversation between the characters.'}\n"
+            f"Characters (each must look visually DISTINCT — different hair, clothing, build):\n"
+            f"{char_block}\n\n"
+            f"Each panel should have a rich, detailed background that fits THAT character's location. "
+            f"Convey interaction through gesture and expression (e.g. holding a phone, looking at a screen). "
+            f"Tone: {tone}.\n\n"
+            f"REMINDER: EXACTLY {n} {'person' if n == 1 else 'people'}, each in their OWN separate panel."
+        )
+    else:
+        # Standard single-scene layout
+        prompt = (
+            f"STRICT HEADCOUNT: Draw EXACTLY {n} {'person' if n == 1 else 'people'} — "
+            f"{', '.join(names)}. No more, no less. No extra people, no background crowd, "
+            f"no duplicated characters.\n\n"
+            f"{ILLUSTRATION_STYLE}\n\n"
+            f"Scene: {scene or 'A simple moment between the characters.'}\n"
+            f"{setting_clause}\n"
+            f"Characters (each must look visually DISTINCT — different hair, clothing, build):\n"
+            f"{char_block}\n\n"
+            f"Draw a single illustration of one moment. Rich background with environmental details "
+            f"(furniture, plants, props) in the same flat 2D style. Background contains OBJECTS ONLY, "
+            f"no additional people. Convey interaction through gesture and expression. "
+            f"Tone: {tone}.\n\n"
+            f"REMINDER: The image must contain EXACTLY {n} {'person' if n == 1 else 'people'}, not one more."
+        )
 
     return prompt
 
