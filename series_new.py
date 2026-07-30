@@ -31,7 +31,7 @@ STYLE_LOCK = (
 )
 
 
-def cast_template(rel_characters):
+def cast_template(rel_characters, language="Finnish"):
     return {
         "_comment": "Character bible. Keep voice_id and appearance STABLE for consistency. "
                     "`id` keys are referenced by episodes and series_plan.py.",
@@ -44,8 +44,8 @@ def cast_template(rel_characters):
                 "gender": "Female",
                 "age": "Young Adult",
                 "default_tone": "Eager, polite",
-                "finnish_level": "A1",
-                "speech_style": "A1 learner. Careful Minä/Sinä, asks for clarification.",
+                "language_level": "A1",
+                "speech_style": f"A1 learner. Careful standard {language}, asks for clarification.",
                 "personality": "The learner the audience follows.",
                 "appearance": "Describe height, build, hair, skin tone, clothing — be specific and stable.",
                 "reference_image": f"{rel_characters}/protagonist.png",
@@ -57,8 +57,8 @@ def cast_template(rel_characters):
                 "gender": "Male",
                 "age": "Adult",
                 "default_tone": "Friendly",
-                "finnish_level": "Native",
-                "speech_style": "Natural spoken Finnish (puhekieli).",
+                "language_level": "Native",
+                "speech_style": f"Natural spoken {language}.",
                 "personality": "The other recurring speaker.",
                 "appearance": "Describe appearance specifically and keep it stable.",
                 "reference_image": f"{rel_characters}/counterpart.png",
@@ -72,12 +72,35 @@ def main():
     copy_cast = "--copy-cast" in args
     args = [a for a in args if a != "--copy-cast"]
 
+    # Parse --language flag
+    language = None
+    if "--language" in args:
+        idx = args.index("--language")
+        if idx + 1 < len(args):
+            language = args[idx + 1]
+            args = args[:idx] + args[idx + 2:]
+        else:
+            sys.exit("❌ --language requires a value (e.g. --language Swedish)")
+
     # Allow either positional slug or --series slug
     if not slug:
         if not args:
-            sys.exit('Usage: python series_new.py <slug> "<Title>" [--copy-cast]')
+            sys.exit('Usage: python series_new.py <slug> "<Title>" [--language Swedish] [--copy-cast]')
         slug = args.pop(0)
     title = args[0] if args else slug
+
+    # Auto-detect language from slug/title if not explicitly set
+    if not language:
+        from language_config import supported_languages
+        combined = f"{slug} {title}".lower()
+        for lang in supported_languages():
+            if lang.lower() in combined:
+                language = lang
+                print(f"🌐 Auto-detected language: {language} (from slug/title)")
+                break
+        if not language:
+            language = "Finnish"
+            print(f"🌐 No language detected — defaulting to {language}. Use --language to override.")
 
     paths = series_paths.resolve(slug)
     if paths.base.exists():
@@ -96,14 +119,14 @@ def main():
             c["reference_image"] = f"{paths.rel_characters}/{cid}.png"
         print(f"📋 Copied cast from default series ({len(cast.get('characters', {}))} characters).")
     else:
-        cast = cast_template(paths.rel_characters)
+        cast = cast_template(paths.rel_characters, language)
 
     paths.cast.write_text(json.dumps(cast, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # empty episodes.json
     episodes = {
         "_comment": "Run series_plan.py to populate from a curriculum, or add episodes by hand.",
-        "series": {"title": title, "language": "Finnish",
+        "series": {"title": title, "language": language,
                    "default_language_level": "A1", "default_length": "Short"},
         "episodes": [],
     }

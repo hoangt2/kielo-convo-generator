@@ -1,0 +1,71 @@
+{
+  "_comment": "AI-generated cast. Keep voice_id and appearance STABLE for consistency. `id` keys are referenced by episodes and series_plan.py.",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "alex": {
+      "name": "Mae",
+      "role": "Learner Practical Nurse",
+      "voice_id": "Lnvev73Hs1s5LVjBfOr9",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Earnest, careful, polite",
+      "finnish_level": "A1",
+      "speech_style": "Speaks slowly and clearly using careful, standard Finnish (yleiskieli) with 'Minä' and 'Sinä'. Often repeats phrases to check understanding and asks for clarification.",
+      "personality": "Kind, empathetic, and highly motivated to learn and care for people well. A bit anxious about making language mistakes but determined to connect with residents. Comes from the Philippines and brings a warm, family-oriented care ethic.",
+      "appearance": "Filipino. Petite build, warm brown skin, and long straight black hair usually tied in a neat ponytail. Wears a standard-issue light blue nurse's tunic and trousers. Has large, expressive dark brown eyes and a gentle smile.",
+      "reference_image": "series/finnish-for-practical-nurse-a1/characters/alex.png"
+    },
+    "hanna": {
+      "name": "Hanna",
+      "role": "Senior Practical Nurse / Mentor",
+      "voice_id": "OYTbf65OHHFELVut7v2H",
+      "gender": "Female",
+      "age": "Adult",
+      "default_tone": "Calm, patient, reassuring",
+      "finnish_level": "Native",
+      "speech_style": "Clear, warm spoken Finnish (puhekieli) using 'Mä' and 'Sä'. Naturally uses common contractions ('oon', 'tuut'). Patiently slows down and simplifies when explaining things to Alex.",
+      "personality": "Experienced, professional, and deeply compassionate. A natural teacher who is supportive of new staff. Has a quiet, warm sense of humor.",
+      "appearance": "Sturdy, competent build with a kind face. Fair skin with some smile lines. Shoulder-length blonde hair, usually tied back neatly. Wears a white nurse's tunic and dark trousers.",
+      "reference_image": "series/finnish-for-practical-nurse-a1/characters/hanna.png"
+    },
+    "eino": {
+      "name": "Eino",
+      "role": "Elderly Resident",
+      "voice_id": "NOpBlnGInO9m6vDvFkFC",
+      "gender": "Male",
+      "age": "Senior",
+      "default_tone": "Gruff, quiet, observant",
+      "finnish_level": "Native",
+      "speech_style": "Speaks in short, sometimes mumbled sentences. Uses older-style puhekieli. Prefers the polite 'Te' form from new people until he gets to know them.",
+      "personality": "A man of few words who values routine and his independence. Can seem grumpy, especially in the mornings, but shows his appreciation through small gestures. Has a very dry wit.",
+      "appearance": "Thin and frail with a slight stoop. Pale, wrinkled skin and a halo of fine white hair on an otherwise bald head. Wears large hearing aids. Typically dressed in a wool cardigan over a shirt and comfortable trousers.",
+      "reference_image": "series/finnish-for-practical-nurse-a1/characters/eino.png"
+    },
+    "sirkka": {
+      "name": "Sirkka",
+      "role": "Elderly Resident",
+      "voice_id": "0rEo3eAjssGDUCXHYENf",
+      "gender": "Female",
+      "age": "Senior",
+      "default_tone": "Cheerful, talkative, inquisitive",
+      "finnish_level": "Native",
+      "speech_style": "Lively, clear puhekieli, though she sometimes wanders off-topic. Enjoys chatting and asks many questions. Quickly switches to the familiar 'sä' with staff.",
+      "personality": "Sociable, curious, and loves company, especially over coffee. She finds joy in small things, like choosing her outfit for the day or commenting on the weather. Always kind and appreciative of care.",
+      "appearance": "Plump and grandmotherly with rosy cheeks and a ready smile. Short, fluffy white hair. Wears glasses on a beaded chain. Favors colorful, hand-knitted cardigans and comfortable skirts.",
+      "reference_image": "series/finnish-for-practical-nurse-a1/characters/sirkka.png"
+    },
+    "leo": {
+      "name": "Leo",
+      "role": "Practical Nurse",
+      "voice_id": "1SM7GgM6IMuvQlz2BwM3",
+      "gender": "Male",
+      "age": "Young Adult",
+      "default_tone": "Energetic, friendly, efficient",
+      "finnish_level": "Native",
+      "speech_style": "Fast, modern spoken Finnish (puhekieli) with plenty of slang and strong contractions ('ooksä', 'meen', 'se on -> se o'). He means well but often forgets to slow down for a learner.",
+      "personality": "Confident, good-humored, and always on the move. He is physically strong and efficient in his work. He is friendly towards Alex but provides an unintentional language challenge.",
+      "appearance": "Athletic build with broad shoulders. Tanned skin and short, dark, styled hair. Wears his blue tunic neatly and is always in motion. Has a quick, friendly grin.",
+      "reference_image": "series/finnish-for-practical-nurse-a1/characters/leo.png"
+    }
+  }
+}

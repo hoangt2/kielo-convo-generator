@@ -73,7 +73,7 @@ def main():
     pipeline_steps = [
         ("generate_ideas_json.py", "Step 1/9: Generating conversation ideas", step1_args),
         ("generate_scripts.py", "Step 2/9: Generating dialogue scripts", []),
-        ("check_finnish_grammar.py", "Step 3/9: Checking Finnish grammar & naturalness", []),
+        ("check_grammar.py", "Step 3/9: Checking grammar & naturalness", []),
         ("generate_illustrations.py", "Step 4/9: Generating illustrations", []),
         ("generate_sfx.py", "Step 5/9: Generating sound effects", []),
         ("tts_generator.py", "Step 6/9: Generating audio (TTS)", []),

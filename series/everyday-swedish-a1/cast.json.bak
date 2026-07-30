@@ -1,0 +1,58 @@
+{
+  "_comment": "AI-generated cast. Keep voice_id and appearance STABLE for consistency. `id` keys are referenced by episodes and series_plan.py.",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "alex": {
+      "name": "Alex",
+      "role": "The learner, an expat new to Sweden.",
+      "voice_id": "dlbXHgJnwobU5JdZ8F5M",
+      "gender": "Male",
+      "age": "Young Adult",
+      "default_tone": "Curious and earnest",
+      "language_level": "A1",
+      "speech_style": "Careful, by-the-book standard Swedish (rikssvenska). Pronounces words fully, uses 'jag' and 'du'. Often asks for clarification.",
+      "personality": "A friendly and observant newcomer, eager to learn and connect with people, but sometimes hesitant when speaking.",
+      "appearance": "Medium build with broad shoulders. Short, dark curly hair, olive skin tone. Typically wears practical, comfortable clothes like a hoodie, jeans, and a beanie.",
+      "reference_image": "series/everyday-swedish-a1/characters/alex.png"
+    },
+    "lina": {
+      "name": "Lina",
+      "role": "Alex's main friend and conversation partner.",
+      "voice_id": "YSabzCJMvEHDduIDMdwV",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Patient and encouraging",
+      "language_level": "Native",
+      "speech_style": "Clear, modern spoken Swedish (vardagssvenska) with a Stockholm accent. Speaks at a natural pace but is happy to slow down to help Alex.",
+      "personality": "Outgoing, cheerful, and very patient. Enjoys explaining her language and culture. Studies at the university.",
+      "appearance": "Slender, athletic build. Long, straight blonde hair, often worn in a high ponytail. Fair skin with freckles. Wears casual, trendy clothes like oversized sweaters and sneakers.",
+      "reference_image": "series/everyday-swedish-a1/characters/lina.png"
+    },
+    "erik": {
+      "name": "Erik",
+      "role": "The owner of a local café Alex frequents.",
+      "voice_id": "1SM7GgM6IMuvQlz2BwM3",
+      "gender": "Male",
+      "age": "Adult",
+      "default_tone": "Warm and efficient",
+      "language_level": "Native",
+      "speech_style": "Casual, friendly spoken Swedish. Uses common colloquialisms and contractions naturally. Speaks quickly but clearly.",
+      "personality": "A practical and good-humored business owner. He's always busy but makes time for a quick chat with his regulars.",
+      "appearance": "Stocky, solid build. Short, receding brown hair, light skin. Often has a bit of stubble. Typically wears a dark t-shirt or polo shirt under a work apron.",
+      "reference_image": "series/everyday-swedish-a1/characters/erik.png"
+    },
+    "gunnel": {
+      "name": "Gunnel",
+      "role": "Alex's kind, retired neighbor.",
+      "voice_id": "0rEo3eAjssGDUCXHYENf",
+      "gender": "Female",
+      "age": "Senior",
+      "default_tone": "Calm and gentle",
+      "language_level": "Native",
+      "speech_style": "Slightly formal but natural standard Swedish. Speaks more slowly and deliberately than the younger characters, enunciating clearly.",
+      "personality": "A sweet-natured woman who enjoys gardening and talking to her neighbors. She is motherly and encouraging towards Alex.",
+      "appearance": "Short and stout build. Short, neatly-styled silver hair. Pale skin with kind wrinkles. Often wears a knitted cardigan over a floral blouse and comfortable trousers.",
+      "reference_image": "series/everyday-swedish-a1/characters/gunnel.png"
+    }
+  }
+}

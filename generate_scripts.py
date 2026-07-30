@@ -9,6 +9,7 @@ from google import genai
 from google.genai import types
 from google.genai.errors import APIError
 from cefr_levels import conversation_level_block, podcast_level_block
+from language_config import get_language_config
 
 # --- Load environment variables ---
 load_dotenv()
@@ -45,7 +46,7 @@ def slugify(title):
 def generate_conversation(idea, metadata):
     """Call Gemini to generate a conversation script in the required JSON array format."""
     
-    # 1. Prepare the Character Map for the LLM (Unchanged)
+    # 1. Prepare the Character Map for the LLM
     characters = idea.get("characters", [])
     if not characters:
         raise ValueError("Idea must contain a 'characters' list with 'name' and 'voice_id'.")
@@ -53,7 +54,7 @@ def generate_conversation(idea, metadata):
     # Create a simple map for the LLM to reference voice IDs
     char_map = {
         c['name']: {
-            'voice_id': c.get('voice_id', f"VOICE_ID_PLACEHOLDER_{i}"), # Use real IDs if available
+            'voice_id': c.get('voice_id', f"VOICE_ID_PLACEHOLDER_{i}"),
             'gender': c.get('gender', 'unknown'),
             'tone': c.get('default_tone', 'neutral')
         } for i, c in enumerate(characters)
@@ -63,17 +64,24 @@ def generate_conversation(idea, metadata):
         [f"- {name} (Gender: {info['gender']}, Default Tone: {info['tone']}, Voice ID: {info['voice_id']})" for name, info in char_map.items()]
     )
     
-    # 2. Build the detailed prompt instructing for JSON output (Unchanged)
-    # The system instruction for strictly valid JSON is crucial for models that support it.
+    # 2. Language-aware prompt building
+    language = metadata.get("language", "Finnish")
+    lang_cfg = get_language_config(language)
+    spoken_label = lang_cfg["spoken_label"]
+    formal_label = lang_cfg["formal_label"]
+    spoken_features = lang_cfg["spoken_features"]
+    casual_particles = lang_cfg["casual_particles"]
+    generic_address = lang_cfg["generic_address"]
+
     ambient_setting = idea.get('ambient_setting', '')
     ambient_note = ""
     if ambient_setting:
         ambient_note = f"\n        Ambient Setting: {ambient_setting} (This describes the environment — use it to inspire contextually appropriate sound effects.)"
 
-    level_block = conversation_level_block(metadata.get('language_level'))
+    level_block = conversation_level_block(metadata.get('language_level'), language)
 
     prompt = f"""
-        You are a Finnish dialogue writer specializing in NATURAL SPOKEN FINNISH (puhekieli).
+        You are a {language} dialogue writer specializing in NATURAL {spoken_label.upper()}.
         Your task is to generate a short (1–2 minutes) realistic conversation based on the provided idea.
 
         #1 PRIORITY — A LOGICAL, ENGAGING, REALISTIC CONVERSATION.
@@ -92,11 +100,9 @@ def generate_conversation(idea, metadata):
         - Stay within the CEFR level given below — that limit is also mandatory. If natural or
           polite phrasing would exceed it, use the simpler in-level form (it's fine to sound plainer).
 
-        CRITICAL: Write in SPOKEN Finnish, NOT formal written Finnish. Use:
-        - Colloquial pronouns: "mä/mun/mua" instead of "minä/minun/minua", "sä/sun/sua" instead of "sinä/sinun/sinua"
-        - Spoken contractions: "oon" (olen), "oot" (olet), "ei oo" (ei ole), "meen" (menen), "tuun" (tulen)
-        - Casual expressions: "joo", "nii", "tota", "niinku", "eiku", "no", "hei"
-        - Dropped endings: "täs" (tässä), "siel" (siellä), "mis" (missä)
+        CRITICAL: Write in {spoken_label}, NOT {formal_label}. Use:
+        - {spoken_features}
+        - Casual expressions: {casual_particles}
         - Natural filler words and interjections
 
         The output MUST be a single JSON object containing a key called 'dialogue_list'.
@@ -104,7 +110,7 @@ def generate_conversation(idea, metadata):
 
         1. **Dialogue entries** (spoken lines):
         {{
-            "text": "[emotion] Dialogue line in spoken Finnish, including sound cues like [sigh] or [laugh].",
+            "text": "[emotion] Dialogue line in {spoken_label}, including sound cues like [sigh] or [laugh].",
             "voice_id": "The specific voice_id for this character from the list above."
         }}
 
@@ -139,16 +145,16 @@ def generate_conversation(idea, metadata):
         Dialogue Instructions:
         - Use the **exact** 'voice_id' provided in the Characters list for each dialogue line.
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
-        - Write ONLY in natural spoken Finnish - avoid formal/written language!
+        - Write ONLY in natural {spoken_label} — avoid formal/written language!
         - Keep the speech natural, expressive, and varied.
         - Match each character's tone and personality.
         - If the Description lists "Teaching ideas"/example phrases, treat them as OPTIONAL inspiration
           only — weave in just the few that fit naturally, adapt them, and DROP the rest. A coherent
           scene always wins over using more phrases. Never include a phrase if it breaks the logic.
-        - **IMPORTANT — Name usage:** Determine whether the characters know each other based on the scenario description. If they are strangers (e.g., customer and clerk, patient and receptionist, passenger and driver, someone asking directions from a passerby), they must NOT call each other by name. Use generic forms of address instead (e.g., "hei", "anteeks", "moi"). Only use character names in dialogue if the scenario clearly implies a personal relationship (e.g., friends, family, colleagues who know each other).
+        - **IMPORTANT — Name usage:** Determine whether the characters know each other based on the scenario description. If they are strangers (e.g., customer and clerk, patient and receptionist, passenger and driver, someone asking directions from a passerby), they must NOT call each other by name. Use generic forms of address instead (e.g., {generic_address}). Only use character names in dialogue if the scenario clearly implies a personal relationship (e.g., friends, family, colleagues who know each other).
 
         Metadata:
-        Language: Finnish (spoken/puhekieli)
+        Language: {language} ({spoken_label})
         Tone: {metadata.get('tone', 'neutral')}
         Length: {metadata.get('length', '1-2 minutes')}{ambient_note}{level_block}
 
@@ -156,7 +162,7 @@ def generate_conversation(idea, metadata):
         Title: {idea['title']}
         Description: {idea['description']}
 
-        Generate the full conversation in natural spoken Finnish with sound effects at appropriate moments.
+        Generate the full conversation in natural {spoken_label} with sound effects at appropriate moments.
     """
     
     # --- Gemini API Call with Retry Logic ---
@@ -167,12 +173,15 @@ def generate_conversation(idea, metadata):
         try:
             # Configuration for the API call
             config = types.GenerateContentConfig(
-                # Set the generation temperature
                 temperature=0.8,
-                # Enforce JSON output!
                 response_mime_type="application/json",
-                # Pass the system instruction for model behavior
-                system_instruction="You are a creative Finnish dialogue writer who writes natural SPOKEN Finnish (puhekieli), not formal written Finnish. Use colloquial forms like 'mä', 'sä', 'oon', 'ei oo'. Above all, write a LOGICAL, internally consistent, engaging conversation — a real scene, never a vocabulary list; coherence beats covering teaching phrases. You strictly output only valid JSON."
+                system_instruction=(
+                    f"You are a creative {language} dialogue writer who writes natural "
+                    f"{spoken_label}, not {formal_label}. "
+                    f"Above all, write a LOGICAL, internally consistent, engaging conversation "
+                    f"— a real scene, never a vocabulary list; coherence beats covering teaching "
+                    f"phrases. You strictly output only valid JSON."
+                )
             )
 
             # Use the pro model — better at keeping the conversation logical and internally
@@ -233,7 +242,7 @@ def generate_podcast_script(idea, metadata):
 
     # 2. Build the detailed prompt for a podcast script
     prompt = f"""
-        You are an expert Finnish language podcast scriptwriter. Your task is to generate an engaging, 
+        You are an expert {language} language podcast scriptwriter. Your task is to generate an engaging, 
         instructional podcast script based on the provided concept and characters.
 
         The output MUST be a single JSON object containing a key called 'dialogue_list'.
@@ -241,8 +250,8 @@ def generate_podcast_script(idea, metadata):
         formatted exactly for the ElevenLabs text-to-dialogue API.
 
         The script should be a **language lesson** and must include clear explanations and examples based on the concept.
-        The **main language** of the script must be **English**, with Finnish phrases and vocabulary introduced, 
-        explained, and repeated for the lesson. This is crucial as the target is a Finnish '{metadata['target_audience']}' (Beginner).
+        The **main language** of the script must be **English**, with {language} phrases and vocabulary introduced, 
+        explained, and repeated for the lesson. This is crucial as the target is a {language} '{metadata['target_audience']}' (Beginner).
 
         Characters:
         {char_info_text}
@@ -287,7 +296,7 @@ def generate_podcast_script(idea, metadata):
             config = types.GenerateContentConfig(
                 temperature=0.8,
                 response_mime_type="application/json",
-                system_instruction="You are an expert Finnish language podcast scriptwriter who writes instructional, engaging dialogue and strictly outputs only valid JSON."
+                system_instruction=f"You are an expert {language} language podcast scriptwriter who writes instructional, engaging dialogue and strictly outputs only valid JSON."
             )
 
             response = client.models.generate_content(

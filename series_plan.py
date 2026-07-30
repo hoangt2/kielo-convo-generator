@@ -158,9 +158,9 @@ EPISODES_SCHEMA = types.Schema(
                         type="array", items=types.Schema(type="string"), min_items=1,
                         description="The lesson titles (verbatim) this episode teaches — usually 2-3 combined.",
                     ),
-                    "title": types.Schema(type="string", description="Short Finnish episode title."),
+                    "title": types.Schema(type="string", description="Short episode title in the target language."),
                     "title_en": types.Schema(type="string", description="Short, descriptive English title for the combined episode."),
-                    "description": types.Schema(type="string", description="3-5 sentence scene description IN FINNISH that naturally covers the combined lessons."),
+                    "description": types.Schema(type="string", description="3-5 sentence scene description IN THE TARGET LANGUAGE that naturally covers the combined lessons."),
                     "characters": types.Schema(
                         type="array",
                         min_items=2,
@@ -171,7 +171,7 @@ EPISODES_SCHEMA = types.Schema(
                     "tone": types.Schema(type="string"),
                     "key_phrases": types.Schema(
                         type="array", items=types.Schema(type="string"),
-                        description="4-8 target Finnish phrases covering the combined lessons.",
+                        description="4-8 target phrases in the target language covering the combined lessons.",
                     ),
                     "notes": types.Schema(type="string", description="Register/direction note for the scriptwriter."),
                     "illustration_layout": types.Schema(
@@ -222,7 +222,7 @@ def chunk_contiguous(items, k):
     return groups
 
 
-def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups, cast):
+def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups, cast, language="Finnish"):
     """Author ONE episode per pre-decided lesson group (LLM writes the scene; grouping is fixed).
 
     `groups` is a list of lesson lists (each lesson a dict with 'title' and optional 'desc').
@@ -242,7 +242,7 @@ def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups
         if protagonist else "Include the main learner character in every episode."
     )
 
-    system = f"""You design short Finnish conversation video episodes for a fixed cast.
+    system = f"""You design short {language} conversation video episodes for a fixed cast.
 
 The lessons have ALREADY been grouped for you, in order. Write EXACTLY ONE episode per group, in
 the SAME ORDER as the groups. Each episode must teach exactly the lessons of its group — do not
@@ -259,13 +259,13 @@ Rules:
   tech, the chatty friend for coffee breaks, the reserved senior colleague for formal practice,
   the manager for scheduling). A one-off non-cast role is NOT allowed — map to the closest cast member.
 - `lessons_covered`: the exact lesson titles of that group, in order.
-- `description`: IN FINNISH (spoken style), 3-5 sentences, one concrete scene tying the group together.
-- `key_phrases`: 4-8 natural Finnish phrases spanning the group's lessons.
+- `description`: IN {language.upper()} (spoken style), 3-5 sentences, one concrete scene tying the group together.
+- `key_phrases`: 4-8 natural {language} phrases spanning the group's lessons.
 - `ambient_setting`: best fit from the allowed list for the scene's single location.
-- `notes`: one line on register (formal Minä/Sinä vs spoken Mä/Sä) and who mirrors whom.
+- `notes`: one line on register (formal vs casual) and who mirrors whom.
 - `illustration_layout`: set to 'split' when characters are NOT in the same physical location
   (e.g. phone calls, video calls, texting, customer service calls). Otherwise 'single' (default).
-- `title` is a short Finnish title; `title_en` is a short descriptive English title.
+- `title` is a short {language} title; `title_en` is a short descriptive English title.
 Return the episodes array in group order. Output only the JSON."""
 
     config = types.GenerateContentConfig(
@@ -315,18 +315,82 @@ Return the episodes array in group order. Output only the JSON."""
     return []
 
 
-def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=2, max_eps=3):
-    """Combine a chapter's lessons into a few episodes, preserving the ORIGINAL ORDER."""
+def plan_grouping(level_name, cefr, lessons):
+    """Ask the LLM which lessons naturally belong together in a single conversation scene.
+
+    Returns (sizes, reason) where sizes is a contiguous partition summing to len(lessons).
+    Each group becomes one episode. Closely related lessons are grouped; unrelated ones stay separate.
+    """
+    n = len(lessons)
+    if n <= 1:
+        return [1] * n, "single lesson"
+
+    block = "\n".join(f"{i+1}. {l['title']} — {l.get('desc','')}" for i, l in enumerate(lessons))
+    system = (
+        "You decide how to group lessons from a language-learning curriculum into EPISODES. "
+        "Each episode will become a SHORT video (1-2 minutes) with ONE conversation scene in ONE location.\n\n"
+        "RULES:\n"
+        "- Only group lessons that share a NATURAL conversation scenario (e.g. two lessons about "
+        "ordering food can share one café scene). Do NOT force unrelated topics together.\n"
+        "- Lessons about fundamentals (alphabet, pronunciation, grammar rules) should usually be "
+        "SEPARATE episodes — they need focused practice, not cramming.\n"
+        "- A group of 2 is fine when the lessons are truly complementary. Groups of 3+ are rare.\n"
+        "- Keep lessons in their given order. Groups must be CONTIGUOUS.\n"
+        "- When in doubt, keep lessons SEPARATE — a focused 1-lesson episode is better than a "
+        "confusing multi-topic one.\n"
+        "- Return group_sizes as an array that sums to the total number of lessons."
+    )
+    prompt = f"Level {level_name} ({cefr}). Chapter lessons, in order:\n{block}\n\nDecide the contiguous group sizes."
+    config = types.GenerateContentConfig(
+        system_instruction=system,
+        response_mime_type="application/json",
+        response_schema=SPLIT_SCHEMA,  # reuse the same schema (group_sizes + reason)
+        temperature=0.2,
+    )
+    for attempt in range(3):
+        try:
+            resp = client.models.generate_content(model=MODEL, contents=[prompt], config=config)
+            out = json.loads(resp.text)
+            sizes = [int(s) for s in out.get("group_sizes", []) if int(s) > 0]
+            if sizes and sum(sizes) == n:
+                reason = out.get("reason", "")
+                return sizes, reason
+        except Exception as e:
+            print(f"   ⚠️  grouping attempt {attempt+1}/3 failed: {e}")
+            time.sleep(2 * (attempt + 1))
+    return [1] * n, "grouping planner failed — one lesson per episode"
+
+
+def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=None, max_eps=None, language="Finnish"):
+    """Turn a chapter's lessons into episodes.
+
+    Default (min_eps=None): LLM decides which lessons belong together.
+    With min_eps/max_eps set: fixed grouping into that many episodes per chapter.
+    """
     lessons = chapter.get("lessons", [])
     n_lessons = len(lessons)
-    lo = min(min_eps, n_lessons) or 1
-    hi = min(max_eps, n_lessons) or 1
-    groups = chunk_contiguous(lessons, choose_k(n_lessons, lo, hi))
+
+    if min_eps is not None and max_eps is not None:
+        # Fixed grouping mode (--per-chapter flag)
+        lo = min(min_eps, n_lessons) or 1
+        hi = min(max_eps, n_lessons) or 1
+        groups = chunk_contiguous(lessons, choose_k(n_lessons, lo, hi))
+    else:
+        # LLM-based intelligent grouping (default)
+        sizes, reason = plan_grouping(level_name, cefr, lessons)
+        groups = _partition(lessons, sizes)
+        n_groups = len(groups)
+        if n_groups == n_lessons:
+            print(f"      → {n_groups} episodes (all separate): {reason}")
+        else:
+            group_desc = "+".join(str(s) for s in sizes)
+            print(f"      → {n_groups} episodes (grouped {group_desc}): {reason}")
+
     return _author_episodes(track, chapter["name"], chapter.get("desc", ""),
-                            level_name, cefr, groups, cast)
+                            level_name, cefr, groups, cast, language)
 
 
-def build_episodes(curriculum, cast, start_id=1, min_eps=2, max_eps=3):
+def build_episodes(curriculum, cast, start_id=1, min_eps=None, max_eps=None, language="Finnish"):
     track = curriculum.get("track", "")
     episodes = []
     next_id = start_id
@@ -334,9 +398,10 @@ def build_episodes(curriculum, cast, start_id=1, min_eps=2, max_eps=3):
         cefr = level.get("cefr", "")
         for chapter in level.get("chapters", []):
             n = len(chapter.get("lessons", []))
-            print(f"🪄 {level.get('name','')} › {chapter['name']} ({n} lesson(s) → {min(min_eps,n)}-{min(max_eps,n)} episodes)...")
+            mode = "LLM decides" if min_eps is None else f"{min(min_eps,n)}-{min(max_eps,n)} fixed"
+            print(f"🪄 {level.get('name','')} › {chapter['name']} ({n} lessons, {mode})...")
             for ep in expand_chapter(track, level.get("name", ""), cefr, chapter, cast,
-                                     min_eps=min_eps, max_eps=max_eps):
+                                     min_eps=min_eps, max_eps=max_eps, language=language):
                 ep_out = {"id": next_id, **ep}
                 episodes.append(ep_out)
                 next_id += 1
@@ -378,9 +443,11 @@ def cmd_build(paths, append=False, min_eps=2, max_eps=3):
 
     start_id = 1
     existing = []
+    language = "Finnish"
     if paths.episodes.exists():
         prev = load_json(paths.episodes)
         existing = prev.get("episodes", [])
+        language = prev.get("series", {}).get("language", "Finnish")
         if append and existing:
             start_id = max(e["id"] for e in existing) + 1
         elif not append:
@@ -389,12 +456,25 @@ def cmd_build(paths, append=False, min_eps=2, max_eps=3):
             print(f"💾 Backed up existing episodes -> {bak.name}")
             existing = []
 
-    new_eps = build_episodes(curriculum, cast, start_id=start_id, min_eps=min_eps, max_eps=max_eps)
+    # Auto-detect language from slug/title if episodes.json defaulted to Finnish
+    # but the series name clearly indicates another language
+    from language_config import supported_languages
+    track = curriculum.get("track", "")
+    combined = f"{paths.slug or ''} {track}".lower()
+    for lang in supported_languages():
+        if lang.lower() != "finnish" and lang.lower() in combined:
+            if language == "Finnish":
+                print(f"🌐 Auto-detected language: {lang} (from series name, overriding default Finnish)")
+            language = lang
+            break
+
+    print(f"🌐 Language: {language}")
+    new_eps = build_episodes(curriculum, cast, start_id=start_id, min_eps=min_eps, max_eps=max_eps, language=language)
     all_eps = existing + new_eps
 
     series_block = {
         "title": curriculum.get("track", "Series"),
-        "language": "Finnish",
+        "language": language,
         "default_language_level": (curriculum.get("levels", [{}])[0].get("cefr") or "A1"),
         "default_length": "Short",
     }
@@ -612,8 +692,8 @@ def main():
     force = "--force" in args
     args = [a for a in args if a not in ("--append", "--force")]
 
-    # --per-chapter <n> (exact) or <lo-hi> (range). Default 2-3.
-    min_eps, max_eps = 2, 3
+    # --per-chapter <n> (exact) or <lo-hi> (range). Default: LLM decides grouping.
+    min_eps, max_eps = None, None
     pc = None
     for i, a in enumerate(args):
         if a == "--per-chapter" and i + 1 < len(args):

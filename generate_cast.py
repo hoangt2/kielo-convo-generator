@@ -115,8 +115,8 @@ def main():
     if not paths.base.exists():
         sys.exit(f"❌ Series folder not found: {paths.base}. Create it with series_new.py first.")
 
-    # options
-    count = 5
+    # options — count=None means let the LLM decide based on curriculum
+    count = None
     rest = []
     i = 0
     while i < len(args):
@@ -131,11 +131,13 @@ def main():
     # series context
     title = paths.slug or "this series"
     level = "A1"
+    language = "Finnish"
     if paths.episodes.exists():
         try:
             ep = json.loads(paths.episodes.read_text(encoding="utf-8"))
             title = ep.get("series", {}).get("title", title)
             level = ep.get("series", {}).get("default_language_level", level)
+            language = ep.get("series", {}).get("language", language)
         except Exception:
             pass
     curriculum_excerpt = ""
@@ -150,27 +152,43 @@ def main():
         except Exception:
             pass
 
-    system = """You design a small recurring CAST for a Finnish-learning conversation video series.
+    system = f"""You design a small recurring CAST for a {language}-learning conversation video series.
 Return JSON only.
 
 Rules:
-- Exactly ONE character has is_protagonist=true: a sympathetic LEARNER of Finnish (the audience
-  surrogate) who speaks carefully and asks for help. The rest are native Finnish speakers.
+- Exactly ONE character has is_protagonist=true: a sympathetic LEARNER of {language} (the audience
+  surrogate) who speaks carefully and asks for help. The rest are native {language} speakers.
 - Give the cast variety in age, gender and personality so many everyday scenes are castable.
-- `speech_style` must describe register concretely (spoken puhekieli with Mä/Sä and contractions,
-  vs. the learner's careful Minä/Sinä), since it drives the dialogue.
+- `speech_style` must describe register concretely (natural spoken {language} with casual forms
+  vs. the learner's careful standard {language}), since it drives the dialogue.
 - `appearance` must be specific and STABLE (build, hair, skin tone, typical clothing) so the same
   character can be drawn consistently every episode. Keep ids short and lowercase."""
+
+    if count:
+        count_instruction = (
+            f"Design exactly {count} characters that fit the scenarios in this curriculum:\n\n"
+            f"{curriculum_excerpt or '(no curriculum provided — infer from the series title)'}\n\n"
+            f"Return exactly {count} characters."
+        )
+    else:
+        count_instruction = (
+            f"Read the curriculum below and decide how many recurring characters are needed to "
+            f"cover ALL the scenarios naturally (typically 4-8). Include roles that the lessons "
+            f"actually require (e.g. a colleague for work scenes, a shopkeeper for shopping, "
+            f"a friend for social scenes). Do NOT pad with characters that have no clear role "
+            f"in any lesson.\n\n"
+            f"{curriculum_excerpt or '(no curriculum provided — infer from the series title)'}\n\n"
+            f"Return as many characters as the curriculum needs."
+        )
 
     prompt = (
         f"Series: {title}\nTarget CEFR level: {level}\n"
         f"{'Extra theme hint: ' + theme_hint + chr(10) if theme_hint else ''}"
-        f"Design {count} characters that fit the scenarios in this curriculum:\n\n"
-        f"{curriculum_excerpt or '(no curriculum provided — infer from the series title)'}\n\n"
-        f"Return exactly {count} characters."
+        f"{count_instruction}"
     )
 
-    print(f"🪄 Designing a cast of {count} for '{title}' (level {level})...")
+    count_label = str(count) if count else "auto (based on curriculum)"
+    print(f"🪄 Designing cast for '{title}' (level {level}, count: {count_label})...")
     config = types.GenerateContentConfig(
         system_instruction=system,
         response_mime_type="application/json",
@@ -203,7 +221,7 @@ Rules:
             "gender": c.get("gender", ""),
             "age": c.get("age", "Adult"),
             "default_tone": c.get("default_tone", ""),
-            "finnish_level": level if is_proto else "Native",
+            "language_level": level if is_proto else "Native",
             "speech_style": c.get("speech_style", ""),
             "personality": c.get("personality", ""),
             "appearance": c.get("appearance", ""),
@@ -225,7 +243,7 @@ Rules:
 
     print(f"\n✅ Wrote {len(characters)} characters -> {paths.cast}")
     for cid, c in characters.items():
-        tag = " (protagonist)" if c["finnish_level"] == level else ""
+        tag = " (protagonist)" if c["language_level"] == level else ""
         print(f"   • {cid}: {c['name']} — {c['role']}{tag}  [{c['gender']}, {c['age']}, voice {c['voice_id']}]")
     print("\nNext:")
     print("   python series_plan.py all " + (paths.curriculum_txt.as_posix() if paths.curriculum_txt.exists() else "<curriculum.txt>"))

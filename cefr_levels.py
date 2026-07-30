@@ -24,7 +24,8 @@ def normalize_level(arg: str) -> str:
 
 
 # Per-level guidance covering vocabulary, grammar, sentence length and pace.
-LEVEL_GUIDELINES = {
+# These are Finnish-specific — other languages use a generic version.
+FINNISH_GUIDELINES = {
     "A1": (
         "Vocabulary: ONLY the most common everyday words (greetings, small numbers, days, "
         "simple food, family, basic actions). No idioms, no rare or abstract words.\n"
@@ -80,43 +81,90 @@ LEVEL_GUIDELINES = {
     ),
 }
 
+# Generic CEFR guidelines for any language without specific rules.
+GENERIC_GUIDELINES = {
+    "A1": (
+        "Vocabulary: ONLY the most basic everyday words (greetings, numbers, days, "
+        "simple food, family, basic actions). No idioms or abstract words.\n"
+        "Grammar: PRESENT TENSE ONLY. Simplest verb forms. No complex grammar.\n"
+        "Sentences: very short — 3–6 words, ONE clause each. No subordinate clauses.\n"
+        "Delivery & pace: speak SLOWLY and clearly with natural pauses."
+    ),
+    "A2": (
+        "Vocabulary: common everyday words for familiar topics.\n"
+        "Grammar: present and basic past tense. Simple connectors (and, but, because).\n"
+        "Sentences: short to medium, one or two clauses.\n"
+        "Delivery & pace: slow and clear with brief pauses."
+    ),
+    "B1": (
+        "Vocabulary: everyday plus opinions, plans and feelings. Common idioms OK.\n"
+        "Grammar: most tenses including conditional. Compound and simple complex sentences.\n"
+        "Sentences: medium length, multiple clauses allowed.\n"
+        "Delivery & pace: normal conversational pace."
+    ),
+    "B2": (
+        "Vocabulary: broad, including abstract topics and idioms.\n"
+        "Grammar: varied and accurate structures, passive voice, longer clauses.\n"
+        "Sentences: varied length with natural complexity.\n"
+        "Delivery & pace: near-natural, fluent pace."
+    ),
+    "C1": (
+        "Vocabulary: rich, nuanced and idiomatic.\n"
+        "Grammar: full range of complex structures used naturally.\n"
+        "Sentences: complex and varied, as a native speaker would use.\n"
+        "Delivery & pace: fully natural pace."
+    ),
+    "C2": (
+        "Vocabulary: sophisticated, precise and register-aware.\n"
+        "Grammar: native-level command of all structures and nuance.\n"
+        "Sentences: fully natural, sophisticated and varied.\n"
+        "Delivery & pace: fully natural native pace."
+    ),
+}
 
-def conversation_level_block(level: str) -> str:
-    """Prompt section for the conversation (puhekieli) writer, or '' if no level."""
+
+def _get_guidelines(level, language="Finnish"):
+    """Return the level guidelines for a language, falling back to generic."""
+    if language == "Finnish":
+        return FINNISH_GUIDELINES.get(level, "")
+    return GENERIC_GUIDELINES.get(level, "")
+
+
+def conversation_level_block(level: str, language: str = "Finnish") -> str:
+    """Prompt section for the conversation writer, or '' if no level."""
     if not level:
         return ""
     level = normalize_level(level)
-    guidance = LEVEL_GUIDELINES.get(level)
+    guidance = _get_guidelines(level, language)
     if not guidance:
         return ""
     return (
         f"\n        CEFR LANGUAGE LEVEL: {level}\n"
         f"        The dialogue MUST match this learner level. Follow these constraints strictly.\n"
-        f"        IMPORTANT: when natural spoken Finnish would normally use a structure ABOVE this "
-        f"level (e.g. conditional politeness like 'sopisiko', a 'että/koska' clause, or an exact "
-        f"time like 'varttia vaille'), choose the simpler in-level form instead — even if it sounds "
+        f"        IMPORTANT: when natural spoken {language} would normally use a structure ABOVE this "
+        f"level, choose the simpler in-level form instead — even if it sounds "
         f"a little plainer or less polite. Staying within the level is MORE important than sounding "
-        f"fully native. Keep it natural spoken Finnish (puhekieli: mä/sä/oon) within those limits.\n"
+        f"fully native. Keep it natural spoken {language} within those limits.\n"
         f"        {guidance}\n"
     )
 
 
-def podcast_level_block(level: str) -> str:
+def podcast_level_block(level: str, language: str = "Finnish") -> str:
     """Prompt section for the podcast scriptwriter, or '' if no level.
 
-    Podcasts are English-led; the level constrains the Finnish phrases that are
+    Podcasts are English-led; the level constrains the target-language phrases that are
     taught and the overall pace/depth of the lesson.
     """
     if not level:
         return ""
     level = normalize_level(level)
-    guidance = LEVEL_GUIDELINES.get(level)
+    guidance = _get_guidelines(level, language)
     if not guidance:
         return ""
     return (
         f"\n        CEFR LANGUAGE LEVEL: {level}\n"
-        f"        The Finnish phrases taught and the lesson depth MUST match this learner "
-        f"level. Apply these constraints to the Finnish content (the English explanations "
+        f"        The {language} phrases taught and the lesson depth MUST match this learner "
+        f"level. Apply these constraints to the {language} content (the English explanations "
         f"stay clear and simple):\n"
         f"        {guidance}\n"
     )

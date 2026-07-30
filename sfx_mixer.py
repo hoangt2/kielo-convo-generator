@@ -37,13 +37,15 @@ PAUSE_MAX_MS = 900        # Maximum pause between dialogue segments
 PAUSE_AFTER_SFX_MS = 200  # Short pause after an SFX clip before next dialogue
 
 
-def get_dialogue_timestamps(mp3_path: Path) -> list:
+def get_dialogue_timestamps(mp3_path: Path, language: str = "Finnish") -> list:
     """Use faster-whisper to get timestamps for each dialogue segment."""
     from faster_whisper import WhisperModel
+    from language_config import get_iso_code
     
+    iso = get_iso_code(language)
     print(f"   🎙️  Transcribing for timestamp alignment...")
     model = WhisperModel("large-v3", device="cpu", compute_type="int8")
-    segments, info = model.transcribe(str(mp3_path), language="fi", beam_size=5)
+    segments, info = model.transcribe(str(mp3_path), language=iso, beam_size=5)
     
     timestamps = []
     for seg in segments:
@@ -238,13 +240,14 @@ def mix_sfx_into_audio(mp3_path: Path, script_path: Path, sfx_folder: Path) -> b
     dialogue_list = data.get("dialogue_list", [])
     idea = data.get("idea", {})
     ambient_setting = idea.get("ambient_setting", "")
+    language = data.get("metadata", {}).get("language", "Finnish")
     
     # Check if there are any SFX entries
     has_sfx = any(item.get("type") == "sfx" for item in dialogue_list)
     
     if has_sfx:
         # Get Whisper timestamps
-        timestamps = get_dialogue_timestamps(mp3_path)
+        timestamps = get_dialogue_timestamps(mp3_path, language)
         
         if timestamps:
             # Classify SFX positions

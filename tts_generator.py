@@ -11,7 +11,8 @@ OUTPUT_AUDIO_DIR = "mp3"
 
 
 def load_dialogue_data(file_path):
-    """Loads the dialogue list from a JSON file."""
+    """Loads the dialogue list and language from a JSON file.
+    Returns (dialogue_list, language) or (None, None) on error."""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -26,24 +27,26 @@ def load_dialogue_data(file_path):
         if not dialogue_only:
             raise ValueError(f"No dialogue entries found in {os.path.basename(file_path)}")
 
-        return dialogue_only
+        language = data.get("metadata", {}).get("language", "Finnish")
+        return dialogue_only, language
 
     except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
         print(f"❌ Skipping {file_path}: {e}")
-        return None
+        return None, None
 
 
-def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type):
+def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type, language="Finnish"):
     """Generates and saves the conversation or podcast audio for one script. Returns True on success."""
     try:
         print(f"⏳ Generating {script_type} audio for: {output_filename} ...")
 
-        # Force Finnish for conversations so the model doesn't mis-detect short/ambiguous
-        # words (e.g. the Finnish greeting "Moi" being read as French "moi"/moa).
+        # Set the language code from metadata so the model doesn't mis-detect
+        # short/ambiguous words (e.g. the Finnish greeting "Moi" being read as French).
         # Podcasts are English-led, so leave their language auto-detected.
         convert_kwargs = {"inputs": dialogue_list}
         if script_type == "conversation":
-            convert_kwargs["language_code"] = "fi"
+            from language_config import get_iso_code
+            convert_kwargs["language_code"] = get_iso_code(language)
 
         # Generate audio using ElevenLabs
         # NOTE: elevenlabs_client.text_to_dialogue.convert is used for both
@@ -89,9 +92,9 @@ def process_scripts_directory(elevenlabs_client, scripts_dir, script_type):
         # Prepend type to filename to avoid naming conflicts if titles are the same
         output_filename = f"{script_type}_{base_name}.mp3" 
 
-        dialogue_list = load_dialogue_data(file_path)
+        dialogue_list, language = load_dialogue_data(file_path)
         if dialogue_list:
-            if not generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type):
+            if not generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type, language):
                 had_errors = True
 
     if had_errors:

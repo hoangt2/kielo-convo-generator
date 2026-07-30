@@ -28,7 +28,7 @@ except Exception:
 # _get_openai_client, translate_texts_fi_to_en, generate_ass_file, 
 # embed_subtitles, cleanup_temp_file remain the same) ...
 
-ASS_HEADER = """
+ASS_HEADER_TEMPLATE = """
 [Script Info]
 Title: Auto-generated Subtitles
 ScriptType: v4.00+
@@ -37,7 +37,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Finnish,Roboto,12,&H00ea72ac,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,2,10,10,15,1
+Style: Target,Roboto,12,&H00ea72ac,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,2,10,10,15,1
 Style: English,Roboto,12,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,2,10,10,15,1
 
 [Events]
@@ -61,10 +61,12 @@ def extract_audio(video_file: Path) -> Path:
     return audio_file
 
 
-def transcribe_finnish(audio_file: Path, model_name: str = "large-v3"):
+def transcribe_audio(audio_file: Path, language: str = "Finnish", model_name: str = "large-v3"):
+    from language_config import get_iso_code
+    iso = get_iso_code(language)
     model = WhisperModel(model_name, device="cpu", compute_type="int8")
-    finnish_segments, info = model.transcribe(str(audio_file), language="fi", beam_size=5)
-    return list(finnish_segments), info
+    segments, info = model.transcribe(str(audio_file), language=iso, beam_size=5)
+    return list(segments), info
 
 
 def _get_gemini_client():
@@ -75,11 +77,12 @@ def _get_gemini_client():
     return client
 
 
-def translate_texts_fi_to_en(texts: List[str], model: str = "gemini-2.5-flash") -> List[str]:
-    """Translate a list of Finnish strings to English using Google Gemini.
+def translate_texts_to_en(texts: List[str], language: str = "Finnish", model: str = "gemini-2.5-flash") -> List[str]:
+    """Translate a list of target-language strings to English using Google Gemini.
 
     Args:
-        texts: list of Finnish strings.
+        texts: list of strings in the target language.
+        language: the source language name (e.g. "Finnish", "Swedish").
         model: Gemini model name suitable for translation.
 
     Returns:
@@ -91,7 +94,7 @@ def translate_texts_fi_to_en(texts: List[str], model: str = "gemini-2.5-flash") 
     outputs: List[str] = []
 
     system_instruction = (
-        "You are a professional translator. Translate from Finnish to English. "
+        f"You are a professional translator. Translate from {language} to English. "
         "Preserve meaning, tone, and proper names. Return only the translated text."
     )
 
@@ -105,7 +108,7 @@ def translate_texts_fi_to_en(texts: List[str], model: str = "gemini-2.5-flash") 
         chunk = texts[i : i + batch_size]
         numbered = "\n\n".join(f"{idx+1}. {t}" for idx, t in enumerate(chunk))
         user_prompt = (
-            "Translate each numbered Finnish line to English. "
+            f"Translate each numbered {language} line to English. "
             "Respond with the translations only, one per line, in the same numbering order, without extra commentary.\n\n"
             f"{numbered}"
         )
@@ -139,15 +142,15 @@ def translate_texts_fi_to_en(texts: List[str], model: str = "gemini-2.5-flash") 
     return outputs
 
 
-def generate_ass_file(subtitle_file: Path, finnish_segments, english_texts: List[str]):
+def generate_ass_file(subtitle_file: Path, segments, english_texts: List[str]):
     with open(subtitle_file, "w", encoding="utf-8") as f:
-        f.write(ASS_HEADER)
-        for fin_seg, eng_text in zip(finnish_segments, english_texts):
-            start = format_time_ass(fin_seg.start)
-            end = format_time_ass(fin_seg.end)
-            fi_line = fin_seg.text.strip().replace("\n", " ")
+        f.write(ASS_HEADER_TEMPLATE)
+        for seg, eng_text in zip(segments, english_texts):
+            start = format_time_ass(seg.start)
+            end = format_time_ass(seg.end)
+            target_line = seg.text.strip().replace("\n", " ")
             en_line = eng_text.strip().replace("\n", " ")
-            f.write(f"Dialogue: 0,{start},{end},Finnish,,0,0,0,,{fi_line}\n")
+            f.write(f"Dialogue: 0,{start},{end},Target,,0,0,0,,{target_line}\n")
             f.write(f"Dialogue: 0,{start},{end},English,,0,0,0,,{en_line}\n")
 
 
@@ -240,17 +243,17 @@ def generate_subtitles(
         audio_file = extract_audio(video_file)
         print("Audio extracted.")
 
-        print("Step 2: Transcribing to Finnish with Whisper...")
-        finnish_segments, info = transcribe_finnish(audio_file)
+        print("Step 2: Transcribing audio with Whisper...")
+        segments, info = transcribe_audio(audio_file)
         print(f"Detected language '{info.language}' ({info.language_probability:.2f}).")
 
-        print("Step 3: Translating Finnish → English with Gemini...")
-        fi_texts = [s.text.strip().replace("\n", " ") for s in finnish_segments]
-        en_texts = translate_texts_fi_to_en(fi_texts, model=translation_model)
+        print(f"Step 3: Translating → English with Gemini...")
+        target_texts = [s.text.strip().replace("\n", " ") for s in segments]
+        en_texts = translate_texts_to_en(target_texts, model=translation_model)
         print("Translation complete.")
 
         print("Step 4: Writing ASS subtitle file...")
-        generate_ass_file(subtitle_create_file, finnish_segments, en_texts)
+        generate_ass_file(subtitle_create_file, segments, en_texts)
         print(f"ASS file '{subtitle_create_file.name}' created.")
 
         print("Step 5: Embedding subtitles into video...")

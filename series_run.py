@@ -91,7 +91,7 @@ def main():
     # 3. The existing pipeline (idea generation is replaced by the compile step above)
     pipeline = [
         ("generate_scripts.py", "Step 3: Generating dialogue script", []),
-        ("check_finnish_grammar.py", "Step 4: Checking Finnish grammar & naturalness", []),
+        ("check_grammar.py", "Step 4: Checking grammar & naturalness", []),
         ("generate_illustrations.py", "Step 5: Generating illustration (uses references)", []),
         ("generate_sfx.py", "Step 6: Generating sound effects", []),
         ("tts_generator.py", "Step 7: Generating audio (TTS)", []),

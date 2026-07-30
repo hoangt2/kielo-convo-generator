@@ -1,0 +1,10 @@
+{
+  "_comment": "Run series_plan.py to populate from a curriculum, or add episodes by hand.",
+  "series": {
+    "title": "Finnish for practical nurse A1",
+    "language": "Finnish",
+    "default_language_level": "A1",
+    "default_length": "Short"
+  },
+  "episodes": []
+}
