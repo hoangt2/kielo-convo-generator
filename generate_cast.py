@@ -82,13 +82,104 @@ def slugify_id(s):
     return out or "char"
 
 
-def assign_voices(chars):
-    """Pick a distinct voice_id per character from VOICES, matched by gender/age."""
+def native_voice_pool(language):
+    """Voices in the ElevenLabs account whose primary language IS `language`.
+
+    Returns a list of {voice_id, gender, age, name} dicts, or [] if the key is
+    missing, the API fails, or no native voices exist. This is what keeps a
+    Swedish series from getting French/English voices: we prefer voices the
+    provider actually tags as the target language (labels.language == iso).
+    """
+    try:
+        import os
+        from elevenlabs.client import ElevenLabs
+        from language_config import get_iso_code
+    except Exception:
+        return []
+    api_key = os.getenv("ELEVENLABS_API_KEY")
+    if not api_key:
+        return []
+    iso = get_iso_code(language)
+    try:
+        voices = ElevenLabs(api_key=api_key).voices.get_all().voices
+    except Exception as e:
+        print(f"   ⚠️  Could not fetch ElevenLabs voices ({e}); using generic pool.")
+        return []
+    pool = []
+    for v in voices:
+        labels = getattr(v, "labels", {}) or {}
+        if (labels.get("language") or "").lower() != iso.lower():
+            continue  # native only — a voice merely "verified" in the language isn't enough
+        pool.append({
+            "voice_id": v.voice_id,
+            "gender": (labels.get("gender") or "").lower(),
+            "age": labels.get("age", ""),
+            "description": labels.get("description", "") or labels.get("use_case", ""),
+            "name": getattr(v, "name", ""),
+        })
+    return pool
+
+
+def voice_availability_text(native, language):
+    """Human-readable summary of castable native voices, for the cast-design prompt.
+
+    Lets the LLM design characters that FIT the voices we actually have (gender, rough
+    age), instead of designing first and discovering there's no matching voice.
+    """
+    if not native:
+        return ""
+    lines = []
+    for label, g in (("Male", "male"), ("Female", "female")):
+        vs = [v for v in native if v.get("gender") == g]
+        if not vs:
+            continue
+        items = []
+        for v in vs:
+            age = v.get("age") or "adult"
+            desc = v.get("description") or ""
+            items.append(f"{age}{' — ' + desc if desc else ''}")
+        lines.append(f"- {label} voices ({len(vs)}): " + "; ".join(items))
+    unknown = [v for v in native if v.get("gender") not in ("male", "female")]
+    if unknown:
+        lines.append(f"- Voices of unspecified gender ({len(unknown)})")
+    if not lines:
+        return ""
+    return (
+        f"\n\nCAST TO AVAILABLE VOICES — the series is voiced by these native {language} voices, "
+        f"and each character is matched to ONE distinct voice. Design the cast so every character "
+        f"fits one of these by gender and rough age:\n" + "\n".join(lines) +
+        f"\nDo NOT create a character whose gender or age has no matching voice above (e.g. if there "
+        f"is no elderly voice, do not make an elderly character), and do not create more characters "
+        f"of a gender than there are voices for it. These are voice constraints only — never name a "
+        f"character after a voice."
+    )
+
+
+def assign_voices(chars, language=None, native=None):
+    """Pick a distinct voice_id per character, matched by gender/age.
+
+    Prefers voices native to `language` (so a Swedish series gets Swedish voices);
+    falls back to the generic project pool when no native voice fits a character.
+    Pass `native` to reuse an already-fetched pool and avoid a second API call.
+    """
+    if native is None:
+        native = native_voice_pool(language) if language else []
+    if native:
+        names = ", ".join(f"{p['name']}" for p in native)
+        print(f"   🎙️  {len(native)} native {language} voice(s) available: {names}")
+    else:
+        print(f"   🎙️  No native {language} voices found; using generic voice pool.")
+
     used = set()
     for c in chars:
         gender = c.get("gender", "").lower()
         age = normalize_age(c.get("age", ""))
+        # Preference order: native+gender+age → native+gender → any native →
+        # generic+gender+age → generic+gender → any generic.
         tiers = [
+            [v for v in native if v.get("gender") == gender and normalize_age(v.get("age", "")) == age],
+            [v for v in native if v.get("gender") == gender],
+            list(native),
             [v for v in VOICES if v.get("gender", "").lower() == gender and normalize_age(v.get("age", "")) == age],
             [v for v in VOICES if v.get("gender", "").lower() == gender],
             list(VOICES),
@@ -99,8 +190,8 @@ def assign_voices(chars):
             if fresh:
                 chosen = random.choice(fresh)
                 break
-        if not chosen:  # all used up — allow reuse
-            chosen = random.choice(VOICES)
+        if not chosen:  # all used up — allow reuse, preferring native
+            chosen = random.choice(native or VOICES)
         used.add(chosen["voice_id"])
         c["voice_id"] = chosen["voice_id"]
 
@@ -152,6 +243,10 @@ def main():
         except Exception:
             pass
 
+    # Fetch the castable native voices ONCE, so the design step can shape characters to fit
+    # them and assign_voices can reuse the same pool without a second API call.
+    native = native_voice_pool(language)
+
     system = f"""You design a small recurring CAST for a {language}-learning conversation video series.
 Return JSON only.
 
@@ -162,7 +257,7 @@ Rules:
 - `speech_style` must describe register concretely (natural spoken {language} with casual forms
   vs. the learner's careful standard {language}), since it drives the dialogue.
 - `appearance` must be specific and STABLE (build, hair, skin tone, typical clothing) so the same
-  character can be drawn consistently every episode. Keep ids short and lowercase."""
+  character can be drawn consistently every episode. Keep ids short and lowercase.{voice_availability_text(native, language)}"""
 
     if count:
         count_instruction = (
@@ -200,7 +295,7 @@ Rules:
     if not chars:
         sys.exit("❌ Model returned no characters. Try again.")
 
-    assign_voices(chars)
+    assign_voices(chars, language=language, native=native)
 
     # build cast.json
     characters = {}

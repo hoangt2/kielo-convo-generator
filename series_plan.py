@@ -390,19 +390,40 @@ def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=None, max_eps
                             level_name, cefr, groups, cast, language)
 
 
-def build_episodes(curriculum, cast, start_id=1, min_eps=None, max_eps=None, language="Finnish"):
+# --------------------------------------------------------------------------------------
+# Scaffolding fade: which episodes are authored as GUIDED (bilingual, teacher-led) lessons
+# for true beginners vs. normal immersive conversations. The first `guided_chapters`
+# chapters of a beginner (A1) level get the guided format; difficulty then "fades" into
+# full-target-language conversation. Baked in here so recreating a series keeps the fade.
+# --------------------------------------------------------------------------------------
+GUIDED_FADE_LEVELS = {"A1"}
+GUIDED_FADE_CHAPTERS = 4
+
+
+def _guided_format(cefr, chapter_index, guided_chapters):
+    """Return "guided" for early-chapter A1 episodes, else "conversation"."""
+    level = normalize_level(cefr) if cefr and is_cefr_level(cefr) else ""
+    if guided_chapters > 0 and level in GUIDED_FADE_LEVELS and chapter_index < guided_chapters:
+        return "guided"
+    return "conversation"
+
+
+def build_episodes(curriculum, cast, start_id=1, min_eps=None, max_eps=None,
+                   language="Finnish", guided_chapters=GUIDED_FADE_CHAPTERS):
     track = curriculum.get("track", "")
     episodes = []
     next_id = start_id
     for level in curriculum.get("levels", []):
         cefr = level.get("cefr", "")
-        for chapter in level.get("chapters", []):
+        for chapter_index, chapter in enumerate(level.get("chapters", [])):
             n = len(chapter.get("lessons", []))
             mode = "LLM decides" if min_eps is None else f"{min(min_eps,n)}-{min(max_eps,n)} fixed"
-            print(f"🪄 {level.get('name','')} › {chapter['name']} ({n} lessons, {mode})...")
+            fmt = _guided_format(cefr, chapter_index, guided_chapters)
+            tag = "  🧑‍🏫 guided" if fmt == "guided" else ""
+            print(f"🪄 {level.get('name','')} › {chapter['name']} ({n} lessons, {mode}){tag}...")
             for ep in expand_chapter(track, level.get("name", ""), cefr, chapter, cast,
                                      min_eps=min_eps, max_eps=max_eps, language=language):
-                ep_out = {"id": next_id, **ep}
+                ep_out = {"id": next_id, **ep, "format": fmt}
                 episodes.append(ep_out)
                 next_id += 1
     return episodes
@@ -433,7 +454,7 @@ def cmd_parse(paths, curriculum_txt):
     return curriculum
 
 
-def cmd_build(paths, append=False, min_eps=2, max_eps=3):
+def cmd_build(paths, append=False, min_eps=2, max_eps=3, guided_chapters=GUIDED_FADE_CHAPTERS):
     if not paths.curriculum_json.exists():
         sys.exit(f"❌ {paths.curriculum_json} not found. Run `parse` first.")
     if not paths.cast.exists():
@@ -469,7 +490,11 @@ def cmd_build(paths, append=False, min_eps=2, max_eps=3):
             break
 
     print(f"🌐 Language: {language}")
-    new_eps = build_episodes(curriculum, cast, start_id=start_id, min_eps=min_eps, max_eps=max_eps, language=language)
+    if guided_chapters > 0:
+        print(f"🧑‍🏫 Guided fade: first {guided_chapters} chapter(s) of each "
+              f"{'/'.join(sorted(GUIDED_FADE_LEVELS))} level use the guided (bilingual) format.")
+    new_eps = build_episodes(curriculum, cast, start_id=start_id, min_eps=min_eps, max_eps=max_eps,
+                             language=language, guided_chapters=guided_chapters)
     all_eps = existing + new_eps
 
     series_block = {
@@ -690,7 +715,35 @@ def main():
     series_paths.announce(paths.slug)
     append = "--append" in args
     force = "--force" in args
-    args = [a for a in args if a not in ("--append", "--force")]
+    no_guided = "--no-guided" in args
+    args = [a for a in args if a not in ("--append", "--force", "--no-guided")]
+
+    # --guided-chapters <n>: how many early chapters per A1 level use the guided format
+    # (0 disables). --no-guided is shorthand for 0. Default GUIDED_FADE_CHAPTERS.
+    guided_chapters = 0 if no_guided else GUIDED_FADE_CHAPTERS
+    gc = None
+    for i, a in enumerate(args):
+        if a == "--guided-chapters" and i + 1 < len(args):
+            gc = args[i + 1]
+        elif a.startswith("--guided-chapters="):
+            gc = a.split("=", 1)[1]
+    if gc is not None:
+        try:
+            guided_chapters = max(0, int(gc))
+        except ValueError:
+            sys.exit("❌ --guided-chapters expects a non-negative integer, e.g. --guided-chapters 4")
+        cleaned, skip = [], False
+        for a in args:
+            if skip:
+                skip = False
+                continue
+            if a == "--guided-chapters":
+                skip = True
+                continue
+            if a.startswith("--guided-chapters="):
+                continue
+            cleaned.append(a)
+        args = cleaned
 
     # --per-chapter <n> (exact) or <lo-hi> (range). Default: LLM decides grouping.
     min_eps, max_eps = None, None
@@ -735,7 +788,7 @@ def main():
                      f"(this would overwrite any edits).")
         cmd_parse(paths, args[1])
     elif cmd == "build":
-        cmd_build(paths, append=append, min_eps=min_eps, max_eps=max_eps)
+        cmd_build(paths, append=append, min_eps=min_eps, max_eps=max_eps, guided_chapters=guided_chapters)
     elif cmd == "all":
         if len(args) < 2:
             sys.exit("Usage: python series_plan.py all <curriculum.txt> [--series slug] [--append] [--per-chapter 2-3] [--force]")
@@ -743,7 +796,7 @@ def main():
             print(f"ℹ️  Using existing {paths.curriculum_json.name} (pass --force to re-parse {Path(args[1]).name}).")
         else:
             cmd_parse(paths, args[1])
-        cmd_build(paths, append=append, min_eps=min_eps, max_eps=max_eps)
+        cmd_build(paths, append=append, min_eps=min_eps, max_eps=max_eps, guided_chapters=guided_chapters)
     elif cmd == "split":
         if len(args) >= 2 and args[1].lower() == "all":
             cmd_split_all(paths)

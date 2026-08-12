@@ -101,6 +101,9 @@ def build_idea(episode, cast):
         "ambient_setting": episode.get("ambient_setting", ""),
         "illustration_layout": episode.get("illustration_layout", "single"),
         "language_level": episode.get("language_level", ""),
+        # Script format: "guided" routes generate_scripts.py to the bilingual,
+        # teacher-led lesson for true beginners; anything else = normal conversation.
+        "format": episode.get("format", "conversation"),
         "characters": idea_characters,
     }
 

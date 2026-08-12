@@ -1,0 +1,126 @@
+✅ Gemini client initialized.
+📂 Series: everyday-swedish-a1
+✅ Gemini client ready. Generating 2 reference portrait(s).
+
+⏭️  alex: already exists (use --force to regenerate).
+
+⏭️  gunilla: already exists (use --force to regenerate).
+
+🏁 Done. Reference portraits are in series/everyday-swedish-a1/characters/.
+📂 Series: everyday-swedish-a1
+✅ Compiled 1 episode(s) -> ideas.json  (level: A1)
+   #2 Förlåt, vad betyder det?
+
+   Next:  python generate_scripts.py   (then check_finnish_grammar.py, etc.)
+   ⚠️  Skip generate_ideas_json.py — series_compile.py replaces it.
+
+🪄 Generating GUIDED lesson for: Förlåt, vad betyder det? ...
+✅ Saved JSON: scripts/forlat-vad-betyder-det.json
+
+🎉 All conversation scripts generated successfully!
+
+============================================================
+🗣️  GRAMMAR & NATURALNESS CHECKER (SWEDISH)
+============================================================
+
+📂 Found 1 script(s) in 'scripts/'
+
+🔍 Checking: forlat-vad-betyder-det.json
+   Pass 1: Checking grammar and naturalness...
+   📝 Pass 1 found 2 issue(s):
+      [unnatural_phrasing]
+      • "[encouraging] Repetera: jag förstår inte."
+        → "[encouraging] Säg efter mig: jag förstår inte."
+        Reason: I en uppmuntrande kontext, särskilt när man lär ut något, låter 'Säg efter mig' mer naturligt och inbjudande än 'Repetera', som kan upplevas som något mer formellt eller instruerande.
+      [unnatural_phrasing]
+      • "[demonstrating] Det här är att vispa."
+        → "[demonstrating] Så här vispar man."
+        Reason: När man demonstrerar en handling är 'Så här vispar man' en mer idiomatisk och naturlig formulering på svenska än 'Det här är att vispa', även om den senare är grammatiskt korrekt.
+   Pass 2: Verifying fixes are natural...
+   ✓ Pass 2: All fixes verified as natural.
+   ✅ Fixed and saved: forlat-vad-betyder-det.json
+
+============================================================
+🎉 Done! Fixed 1/1 script(s)
+============================================================
+
+✅ Gemini client initialized.
+
+🎨 Generating illustration for: forlat-vad-betyder-det.json
+   🧍 Using reference: series/everyday-swedish-a1/characters/alex.png
+   🧍 Using reference: series/everyday-swedish-a1/characters/gunilla.png
+✅ Image saved to illustrations/conversation_forlat-vad-betyder-det.png (headcount 2 ✓, attempt 1)
+
+🔊 Found 1 script(s) for SFX generation
+
+🎬 Processing: forlat-vad-betyder-det.json
+   📋 Found 3 SFX entries
+   🔊 Generating SFX: "The gentle clink of a ceramic mixing bowl being set on a wooden counter." (2.0s)
+   ❌ SFX generation error: headers: {'date': 'Sat, 08 Aug 2026 01:52:07 GMT', 'server': 'uvicorn', 'content-length': '167', 'content-type': 'application/json', 'vary': 'Accept-Language', 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST, PATCH, OPTIONS, DELETE, GET, PUT', 'access-control-max-age': '600', 'strict-transport-security': 'max-age=1800;', 'x-trace-id': '2591ccea822964e46273880122bab9ec', 'x-region': 'us-central1', 'via': '1.1 google', 'alt-svc': 'h3=":443"; ma=2592000'}, status_code: 401, body: {'detail': {'type': 'authentication_error', 'code': 'unauthorized', 'message': 'Invalid API key', 'status': 'invalid_api_key', 'request_id': '2591ccea822964e46273880122bab9ec'}}
+   🔊 Generating SFX: "A metal whisk is picked up and lightly tapped against the bowl." (1.5s)
+   ❌ SFX generation error: headers: {'date': 'Sat, 08 Aug 2026 01:52:07 GMT', 'server': 'uvicorn', 'content-length': '167', 'content-type': 'application/json', 'vary': 'Accept-Language', 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST, PATCH, OPTIONS, DELETE, GET, PUT', 'access-control-max-age': '600', 'strict-transport-security': 'max-age=1800;', 'x-trace-id': 'c7c698496b98d89c6273880122bab198', 'x-region': 'us-central1', 'via': '1.1 google', 'alt-svc': 'h3=":443"; ma=2592000'}, status_code: 401, body: {'detail': {'type': 'authentication_error', 'code': 'unauthorized', 'message': 'Invalid API key', 'status': 'invalid_api_key', 'request_id': 'c7c698496b98d89c6273880122bab198'}}
+   🔊 Generating SFX: "The sound of slow, deliberate whisking begins." (3.0s)
+   ❌ SFX generation error: headers: {'date': 'Sat, 08 Aug 2026 01:52:07 GMT', 'server': 'uvicorn', 'content-length': '167', 'content-type': 'application/json', 'vary': 'Accept-Language', 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST, PATCH, OPTIONS, DELETE, GET, PUT', 'access-control-max-age': '600', 'strict-transport-security': 'max-age=1800;', 'x-trace-id': 'c523cdfec54ec37d6273880122bab5d5', 'x-region': 'us-central1', 'via': '1.1 google', 'alt-svc': 'h3=":443"; ma=2592000'}, status_code: 401, body: {'detail': {'type': 'authentication_error', 'code': 'unauthorized', 'message': 'Invalid API key', 'status': 'invalid_api_key', 'request_id': 'c523cdfec54ec37d6273880122bab5d5'}}
+   🔄 Reusing existing ambient: presets/ambience/home_kitchen.mp3
+
+❌ SFX generation completed with errors!
+📂 Series: everyday-swedish-a1
+
+============================================================
+🎬 SERIES EPISODE 2: Förlåt, vad betyder det? (Sorry, What Does That Mean?)
+============================================================
+
+============================================================
+🧹 CLEANUP IN PROGRESS
+============================================================
+📂 Cleaning directory: illustrations/...
+📂 Cleaning directory: mp3/...
+📂 Cleaning directory: output_videos/...
+📂 Cleaning directory: scripts/...
+📂 Cleaning directory: sfx/...
+🗑️  Deleted file: ideas.json
+   (File podcast_ideas.json not found, skipping)
+
+============================================================
+✨ CLEANUP COMPLETE
+============================================================
+
+
+============================================================
+🚀 Step 1: Ensuring character reference portraits
+   Running: generate_character_refs.py alex gunilla --series everyday-swedish-a1
+============================================================
+✅ generate_character_refs.py done.
+
+============================================================
+🚀 Step 2: Compiling episode 2
+   Running: series_compile.py 2 --series everyday-swedish-a1
+============================================================
+✅ series_compile.py done.
+
+============================================================
+🚀 Step 3: Generating dialogue script
+   Running: generate_scripts.py
+============================================================
+✅ generate_scripts.py done.
+
+============================================================
+🚀 Step 4: Checking grammar & naturalness
+   Running: check_grammar.py
+============================================================
+✅ check_grammar.py done.
+
+============================================================
+🚀 Step 5: Generating illustration (uses references)
+   Running: generate_illustrations.py
+============================================================
+✅ generate_illustrations.py done.
+
+============================================================
+🚀 Step 6: Generating sound effects
+   Running: generate_sfx.py
+============================================================
+
+❌ generate_sfx.py failed (exit 1).
+
+❌ Pipeline stopped at generate_sfx.py.

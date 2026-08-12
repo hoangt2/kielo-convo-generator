@@ -2,57 +2,57 @@
   "_comment": "AI-generated cast. Keep voice_id and appearance STABLE for consistency. `id` keys are referenced by episodes and series_plan.py.",
   "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
   "characters": {
-    "alex": {
-      "name": "Alex",
-      "role": "The learner, an expat new to Sweden.",
-      "voice_id": "dlbXHgJnwobU5JdZ8F5M",
-      "gender": "Male",
-      "age": "Young Adult",
-      "default_tone": "Curious and earnest",
-      "language_level": "A1",
-      "speech_style": "Careful, by-the-book standard Swedish (rikssvenska). Pronounces words fully, uses 'jag' and 'du'. Often asks for clarification.",
-      "personality": "A friendly and observant newcomer, eager to learn and connect with people, but sometimes hesitant when speaking.",
-      "appearance": "Medium build with broad shoulders. Short, dark curly hair, olive skin tone. Typically wears practical, comfortable clothes like a hoodie, jeans, and a beanie.",
-      "reference_image": "series/everyday-swedish-a1/characters/alex.png"
-    },
-    "lina": {
-      "name": "Lina",
-      "role": "Alex's main friend and conversation partner.",
+    "kaisa": {
+      "name": "Kaisa",
+      "role": "The learner, new in Sweden",
       "voice_id": "YSabzCJMvEHDduIDMdwV",
       "gender": "Female",
       "age": "Young Adult",
-      "default_tone": "Patient and encouraging",
-      "language_level": "Native",
-      "speech_style": "Clear, modern spoken Swedish (vardagssvenska) with a Stockholm accent. Speaks at a natural pace but is happy to slow down to help Alex.",
-      "personality": "Outgoing, cheerful, and very patient. Enjoys explaining her language and culture. Studies at the university.",
-      "appearance": "Slender, athletic build. Long, straight blonde hair, often worn in a high ponytail. Fair skin with freckles. Wears casual, trendy clothes like oversized sweaters and sneakers.",
-      "reference_image": "series/everyday-swedish-a1/characters/lina.png"
+      "default_tone": "Curious, slightly hesitant",
+      "language_level": "A1",
+      "speech_style": "Careful, clear standard Swedish (rikssvenska), often asking for clarification. Uses formal pronouns 'jag', 'du' consistently.",
+      "personality": "Earnest, friendly, and observant. Eager to learn and not afraid to make mistakes.",
+      "appearance": "Medium build with long, straight brown hair often in a ponytail. Fair skin. Wears practical, comfortable clothes like jeans and sweaters.",
+      "reference_image": "series/everyday-swedish-a1/characters/kaisa.png"
     },
     "erik": {
       "name": "Erik",
-      "role": "The owner of a local café Alex frequents.",
-      "voice_id": "1SM7GgM6IMuvQlz2BwM3",
+      "role": "Kaisa's friendly colleague and first friend",
+      "voice_id": "dlbXHgJnwobU5JdZ8F5M",
       "gender": "Male",
-      "age": "Adult",
-      "default_tone": "Warm and efficient",
+      "age": "Young Adult",
+      "default_tone": "Encouraging, relaxed",
       "language_level": "Native",
-      "speech_style": "Casual, friendly spoken Swedish. Uses common colloquialisms and contractions naturally. Speaks quickly but clearly.",
-      "personality": "A practical and good-humored business owner. He's always busy but makes time for a quick chat with his regulars.",
-      "appearance": "Stocky, solid build. Short, receding brown hair, light skin. Often has a bit of stubble. Typically wears a dark t-shirt or polo shirt under a work apron.",
+      "speech_style": "Natural, casual Stockholm-area Swedish. Uses common contractions and colloquialisms (e.g., 'dom' for de/dem). Speaks at a normal pace but slows down for Kaisa.",
+      "personality": "Patient, outgoing, and helpful. Has a good sense of humor and enjoys explaining things about Swedish life.",
+      "appearance": "Slender build with short, wavy blond hair. Light skin with a few freckles. Typically wears t-shirts, hoodies, and slim-fit trousers.",
       "reference_image": "series/everyday-swedish-a1/characters/erik.png"
     },
-    "gunnel": {
-      "name": "Gunnel",
-      "role": "Alex's kind, retired neighbor.",
+    "lina": {
+      "name": "Lina",
+      "role": "Barista at a local café Kaisa frequents",
       "voice_id": "0rEo3eAjssGDUCXHYENf",
       "gender": "Female",
-      "age": "Senior",
-      "default_tone": "Calm and gentle",
+      "age": "Young Adult",
+      "default_tone": "Efficient, cheerful",
       "language_level": "Native",
-      "speech_style": "Slightly formal but natural standard Swedish. Speaks more slowly and deliberately than the younger characters, enunciating clearly.",
-      "personality": "A sweet-natured woman who enjoys gardening and talking to her neighbors. She is motherly and encouraging towards Alex.",
-      "appearance": "Short and stout build. Short, neatly-styled silver hair. Pale skin with kind wrinkles. Often wears a knitted cardigan over a floral blouse and comfortable trousers.",
-      "reference_image": "series/everyday-swedish-a1/characters/gunnel.png"
+      "speech_style": "Clear, friendly service-oriented Swedish. Slightly more formal than with friends but still natural and spoken at a fast pace.",
+      "personality": "Bright, energetic, and professional. Always has a smile for customers but is focused on her work.",
+      "appearance": "Athletic build with dark curly hair tied up in a messy bun. Olive skin tone. Usually seen in her café uniform: a black t-shirt or apron.",
+      "reference_image": "series/everyday-swedish-a1/characters/lina.png"
+    },
+    "bjorn": {
+      "name": "Björn",
+      "role": "Kaisa's kind, retired neighbor",
+      "voice_id": "NOpBlnGInO9m6vDvFkFC",
+      "gender": "Male",
+      "age": "Senior",
+      "default_tone": "Warm, fatherly",
+      "language_level": "Native",
+      "speech_style": "Calm, slightly old-fashioned standard Swedish with a gentle, clear pace. Avoids modern slang.",
+      "personality": "Wise, patient, and good-natured. Enjoys gardening and having a 'fika' (coffee break) with his neighbors.",
+      "appearance": "Sturdy build with a bit of a belly. Short, neat grey hair and a tidy grey beard. Tan, weathered skin. Often wears comfortable cardigans and slacks.",
+      "reference_image": "series/everyday-swedish-a1/characters/bjorn.png"
     }
   }
 }

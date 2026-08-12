@@ -23,27 +23,42 @@ def load_dialogue_data(file_path):
 
         # Filter out SFX entries — only keep dialogue entries for TTS
         dialogue_only = [item for item in dialogue_list if item.get("type") != "sfx"]
-        
+
         if not dialogue_only:
             raise ValueError(f"No dialogue entries found in {os.path.basename(file_path)}")
 
         language = data.get("metadata", {}).get("language", "Finnish")
-        return dialogue_only, language
+        # Guided lessons are English-led (the teaching happens in English), so their
+        # audio must NOT be forced to the target language's pronunciation.
+        fmt = data.get("idea", {}).get("format", "conversation")
+        return dialogue_only, language, fmt
 
     except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
         print(f"❌ Skipping {file_path}: {e}")
-        return None, None
+        return None, None, None
 
 
-def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type, language="Finnish"):
+def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type, language="Finnish", fmt="conversation"):
     """Generates and saves the conversation or podcast audio for one script. Returns True on success."""
     try:
         print(f"⏳ Generating {script_type} audio for: {output_filename} ...")
 
+        # Send ONLY the fields the text_to_dialogue API expects. Guided lessons tag each
+        # line with an extra "lang" key (sv/en) for other pipeline steps; strip it (and
+        # anything else) here so the ElevenLabs SDK doesn't reject the input.
+        clean_inputs = [
+            {"text": d.get("text", ""), "voice_id": d.get("voice_id", "")}
+            for d in dialogue_list
+        ]
+
         # Set the language code from metadata so the model doesn't mis-detect
         # short/ambiguous words (e.g. the Finnish greeting "Moi" being read as French).
-        # Podcasts are English-led, so leave their language auto-detected.
-        convert_kwargs = {"inputs": dialogue_list}
+        # Guided lessons are mostly English, BUT the few target-language words are the
+        # whole point of the lesson — without the target language_code they get read as
+        # English (e.g. Swedish "tak" vs "tack" collapse to the same /tæk/). So we still
+        # force the target language for guided; the guide's English just picks up a light,
+        # natural target-language accent. Podcasts stay English (auto-detected).
+        convert_kwargs = {"inputs": clean_inputs}
         if script_type == "conversation":
             from language_config import get_iso_code
             convert_kwargs["language_code"] = get_iso_code(language)
@@ -92,9 +107,9 @@ def process_scripts_directory(elevenlabs_client, scripts_dir, script_type):
         # Prepend type to filename to avoid naming conflicts if titles are the same
         output_filename = f"{script_type}_{base_name}.mp3" 
 
-        dialogue_list, language = load_dialogue_data(file_path)
+        dialogue_list, language, fmt = load_dialogue_data(file_path)
         if dialogue_list:
-            if not generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type, language):
+            if not generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename, script_type, language, fmt):
                 had_errors = True
 
     if had_errors:

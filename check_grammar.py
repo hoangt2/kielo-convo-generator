@@ -215,13 +215,16 @@ def check_and_fix_grammar(dialogue_list: list, language: str = "Finnish") -> tup
     Pass 1: Check and fix issues.
     Pass 2: Verify the fixes themselves are natural.
     Returns (fixed_dialogue_list, was_modified).
-    Skips SFX entries (type: "sfx") — only checks dialogue lines.
+    Skips SFX entries (type: "sfx") and English bridge lines (lang: "en", used by
+    guided beginner lessons) — only the target-language dialogue is checked.
     """
-    
-    # Separate dialogue entries from SFX entries, preserving positions
-    dialogue_indices = []  # indices of dialogue items in the original list
+
+    # Separate target-language dialogue from SFX and English bridge lines, preserving
+    # positions. English glosses in guided lessons are intentional and must NOT be
+    # run through a target-language grammar checker, so treat them like SFX: pass through.
+    dialogue_indices = []  # indices of checkable target-language items in the original list
     for i, item in enumerate(dialogue_list):
-        if item.get("type") != "sfx":
+        if item.get("type") != "sfx" and item.get("lang") != "en":
             dialogue_indices.append(i)
     
     dialogue_texts = [dialogue_list[i].get("text", "") for i in dialogue_indices]

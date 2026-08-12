@@ -9,7 +9,7 @@ from google import genai
 from google.genai import types
 from google.genai.errors import APIError
 from cefr_levels import conversation_level_block, podcast_level_block
-from language_config import get_language_config
+from language_config import get_language_config, get_iso_code
 
 # --- Load environment variables ---
 load_dotenv()
@@ -224,6 +224,219 @@ def generate_conversation(idea, metadata):
     print("❌ Error: Failed to generate dialogue after all retries.")
     return {"dialogue_list": [], "error": "Failed after retries"}
 
+# --- Guided-lesson generation (true-beginner, bilingual gloss-once) ---
+
+# Role keywords used to tell the learner apart from the guide in a guided lesson.
+_LEARNER_HINTS = ("learn", "student", "beginner", "expat", "new to", "newcomer")
+_GUIDE_HINTS = ("teach", "guide", "help", "neighbor", "neighbour", "host",
+                "friend", "colleague", "tutor", "mentor", "barista", "clerk")
+
+
+def _identify_guided_roles(characters):
+    """Pick (learner, guide, extras) for a guided lesson from character role text.
+
+    The learner is whoever is described as new to the language; the guide is the
+    patient local who models it. Any remaining characters play small background
+    parts. Falls back to positional order when role text is uninformative.
+    """
+    learner = next(
+        (c for c in characters
+         if any(k in (c.get("role") or "").lower() for k in _LEARNER_HINTS)),
+        None,
+    )
+    if learner is None:
+        learner = characters[0]
+
+    others = [c for c in characters if c is not learner]
+    guide = next(
+        (c for c in others
+         if any(k in (c.get("role") or "").lower() for k in _GUIDE_HINTS)),
+        None,
+    )
+    if guide is None and others:
+        guide = others[0]
+
+    extras = [c for c in others if c is not guide]
+    return learner, guide, extras
+
+
+def generate_guided_lesson(idea, metadata):
+    """Call Gemini to generate a GUIDED, bilingual teacher/learner lesson scene.
+
+    Same output schema as generate_conversation (a 'dialogue_list' of dialogue +
+    sfx entries) so the rest of the pipeline is unchanged — but the scene is
+    scaffolded for someone who has never spoken the language: the guide introduces
+    each new target-language chunk, glosses its meaning in English exactly ONCE,
+    and the learner repeats it. Each dialogue entry is tagged with "lang" ("sv"/"en"
+    for the target language vs. the English bridge) so downstream steps (e.g. the
+    grammar checker) can treat the English glosses correctly.
+    """
+    characters = idea.get("characters", [])
+    if not characters:
+        raise ValueError("Idea must contain a 'characters' list with 'name' and 'voice_id'.")
+
+    language = metadata.get("language", "Finnish")
+    lang_cfg = get_language_config(language)
+    spoken_label = lang_cfg["spoken_label"]
+    lang_code = get_iso_code(language)
+
+    learner, guide, extras = _identify_guided_roles(characters)
+    if guide is None:
+        # Degenerate single-character idea — nothing to guide against; fall back.
+        return generate_conversation(idea, metadata)
+
+    char_info_text = "\n".join(
+        f"- {c['name']} (Gender: {c.get('gender','unknown')}, "
+        f"Default Tone: {c.get('default_tone','neutral')}, Voice ID: {c.get('voice_id','')})"
+        for c in characters
+    )
+    extras_note = ""
+    if extras:
+        extra_names = ", ".join(c["name"] for c in extras)
+        extras_note = (
+            f"\n        Other characters ({extra_names}) may appear only briefly in small "
+            f"background parts; they must NOT take over the lesson."
+        )
+
+    ambient_setting = idea.get('ambient_setting', '')
+    ambient_note = ""
+    if ambient_setting:
+        ambient_note = (
+            f"\n        Ambient Setting: {ambient_setting} (use it to inspire a few "
+            f"contextually appropriate sound effects)."
+        )
+
+    level_block = conversation_level_block(metadata.get('language_level'), language)
+
+    prompt = f"""
+        You are writing a GUIDED beginner {language} lesson as a short (1–2 minute) scene for
+        someone who has NEVER spoken a word of {language} and understands almost NONE of it yet.
+        It must feel like a warm, real moment between people — a patient guide gently teaching a
+        friend their very first words — NOT a dry classroom drill.
+
+        THE TWO KEY ROLES:
+        - GUIDE = {guide['name']}: a warm local who is TEACHING {learner['name']} their first words.
+        - LEARNER = {learner['name']}: brand new to {language}. Listens, asks, repeats, tries.{extras_note}
+
+        THE #1 RULE — ENGLISH IS THE TEACHING LANGUAGE:
+        The guide talks to the learner in ENGLISH. All instructions, encouragement, reactions, and
+        scene talk ("Here, hold the bowl", "Great, now try this", "Don't worry") are in ENGLISH.
+        {language} is NOT used for conversation or glue — a total beginner cannot decode it yet.
+
+        {language} appears ONLY as the small, deliberate phrases being TAUGHT. Every single piece of
+        {language} the learner hears MUST be one the guide is explicitly teaching in that moment.
+        There must be ZERO untranslated {language}. If a {language} phrase is spoken, it is ALWAYS:
+          1. Framed first in English  — e.g. 'In {language}, "thank you" is...'
+          2. Said slowly in {language} — the short target phrase only.
+          3. Glossed/confirmed in English right away — e.g. 'That means "thank you".'
+          4. Repeated by the learner in {language}, and the guide reacts in English ('Perfect!').
+        Never let a {language} phrase go by without its English meaning attached.
+
+        HARD LIMITS (a true beginner overloads fast):
+        - Teach AT MOST 3–4 short {language} phrases in the WHOLE scene. Fewer, repeated well, wins.
+        - Each {language} phrase is short and clear; the learner repeats it, and it comes back 2–3
+          times across the scene so it sticks.
+        - The MAJORITY of the words in the scene are ENGLISH (the teaching). {language} is the small,
+          precious part being learned — not the background.
+        - Keep every {language} phrase within the CEFR level below; use the simpler in-level form if
+          natural phrasing would exceed it.
+
+        Give the scene a tiny natural arc: a reason it starts, the guide teaching the phrases one at a
+        time with repetition, and a warm close where the learner uses what they just learned.
+
+        Characters:
+        {char_info_text}
+
+        OUTPUT FORMAT — a single JSON object with a key 'dialogue_list', a JSON array of objects.
+        There are TWO entry types:
+
+        1. Dialogue entry (a spoken line):
+        {{
+            "text": "[emotion] the spoken line, with sound cues like [laugh] if natural.",
+            "voice_id": "the exact voice_id for the speaker from the list above.",
+            "lang": "{lang_code}" for a {language} line, or "en" for an English bridge line.
+        }}
+
+        2. Sound-effect entry (environmental/action sound between lines):
+        {{ "type": "sfx", "text": "short sound description", "duration": 2.0, "timing": "before" }}
+
+        Dialogue rules:
+        - Use the EXACT voice_id for each speaker.
+        - EVERY dialogue entry MUST include the "lang" field ("{lang_code}" or "en"). This is mandatory.
+        - Lines that are purely {language} → "lang": "{lang_code}". Lines that are the English meaning/
+          encouragement → "lang": "en". Do NOT mix both languages inside one entry — split them into
+          two entries so each has a single clear "lang".
+        - The 'text' field must start with an emotion/tone in brackets (e.g., [warm], [encouraging]).
+        - Keep the guide encouraging and the learner earnest. Match each character's tone.
+
+        Sound effects: add 2–4 at natural action moments (see the setting). "timing" is "before" or
+        "after" the adjacent dialogue line. Don't add one for every line.
+
+        Metadata:
+        Language: {language} ({spoken_label})
+        Tone: {metadata.get('tone', 'warm, encouraging')}
+        Length: {metadata.get('length', '1-2 minutes')}{ambient_note}{level_block}
+
+        Lesson idea:
+        Title: {idea['title']}
+        Description: {idea['description']}
+
+        Generate the full guided lesson scene now.
+    """
+
+    max_retries = 3
+    retry_delay = 2
+
+    for attempt in range(max_retries):
+        try:
+            config = types.GenerateContentConfig(
+                temperature=0.7,
+                response_mime_type="application/json",
+                system_instruction=(
+                    f"You are a patient {language} teacher who writes warm, realistic guided lesson "
+                    f"scenes for absolute beginners. You scaffold with English glosses used sparingly "
+                    f"(gloss-once), keep the {language} short and in-level, and have the learner repeat "
+                    f"each new chunk. You strictly output only valid JSON."
+                ),
+            )
+
+            response = client.models.generate_content(
+                model='gemini-2.5-pro',
+                contents=prompt,
+                config=config,
+            )
+
+            json_output = json.loads(response.text.strip())
+
+            dialogue = json_output.get("dialogue_list")
+            if dialogue and len(dialogue) > 0:
+                # Guarantee every spoken entry carries a lang tag (default to target language)
+                # so downstream steps never have to guess.
+                for entry in dialogue:
+                    if entry.get("type") != "sfx" and not entry.get("lang"):
+                        entry["lang"] = lang_code
+                return json_output
+            else:
+                print(f"   ⚠️  Empty dialogue received, retrying... ({attempt + 1}/{max_retries})")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))
+                continue
+
+        except APIError as e:
+            print(f"   ⚠️  API error: {e}, retrying... ({attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (attempt + 1))
+            continue
+        except json.JSONDecodeError:
+            print(f"   ⚠️  Invalid JSON response, retrying... ({attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (attempt + 1))
+            continue
+
+    print("❌ Error: Failed to generate guided lesson after all retries.")
+    return {"dialogue_list": [], "error": "Failed after retries"}
+
+
 # --- NEW Function for Podcast Script Generation ---
 
 def generate_podcast_script(idea, metadata):
@@ -380,12 +593,21 @@ def process_ideas_file(filename, script_type, idea_key):
     metadata = data["metadata"]
     ideas = data[idea_key]
 
-    generator_func = generate_conversation if script_type == 'conversation' else generate_podcast_script
-
     for idea in ideas:
-        print(f"🪄 Generating {script_type} for: {idea['title']} ...")
+        # Within the conversation type, an idea can opt into the GUIDED (bilingual,
+        # teacher-led) format for true beginners via its "format" field. Everything
+        # else keeps the existing behavior untouched.
+        if script_type == 'conversation' and idea.get("format") == "guided":
+            generator_func = generate_guided_lesson
+            print(f"🪄 Generating GUIDED lesson for: {idea['title']} ...")
+        elif script_type == 'conversation':
+            generator_func = generate_conversation
+            print(f"🪄 Generating {script_type} for: {idea['title']} ...")
+        else:
+            generator_func = generate_podcast_script
+            print(f"🪄 Generating {script_type} for: {idea['title']} ...")
 
-        conversation_data = generator_func(idea, metadata) 
+        conversation_data = generator_func(idea, metadata)
         
         json_path = save_scripts(idea['title'], script_type, idea, metadata, conversation_data)
 
