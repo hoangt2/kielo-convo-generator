@@ -4,6 +4,8 @@ from pathlib import Path
 from PIL import Image
 import subprocess
 
+from script_archive import archive_script
+
 # --- Configuration ---
 ILLUSTRATION_FOLDER = Path("illustrations")
 MP3_FOLDER = Path("mp3")
@@ -84,6 +86,13 @@ else:
 
             subprocess.run(cmd, check=True)
             print(f"✅ Video saved: {output_path.name}")
+
+            # Preserve the dialogue script — cleanup() wipes scripts/ on the next run.
+            archived = archive_script(name)
+            if archived:
+                print(f"🗄️  Script archived: {archived.name} -> {archived.parent.name}/")
+            else:
+                print(f"⚠️  No script found to archive for {name}")
 
         except Exception as e:
             print(f"❌ Error processing {name}: {e}")

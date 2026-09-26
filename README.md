@@ -91,10 +91,10 @@ lessons are combined into a few episodes (2–3 per chapter by default), kept in
 consecutive order**, each authored as one believable scene using the fixed cast.
 
 ```bash
-python series_plan.py all series/curriculum.txt     # parse outline + build episodes.json
-python series_plan.py all series/curriculum.txt --force   # re-parse even if curriculum.json exists
-python series_plan.py parse series/curriculum.txt   # stage 1 only → series/curriculum.json
-python series_plan.py build                          # stage 2 only → series/episodes.json
+python series_plan.py all                           # parse outline + build episodes.json (auto-finds curriculum.txt)
+python series_plan.py all --force                   # re-parse even if curriculum.json exists
+python series_plan.py parse                         # stage 1 only → curriculum.json
+python series_plan.py build                          # stage 2 only → episodes.json
 python series_plan.py build --append                 # add to existing episodes instead of replacing
 python series_plan.py build --per-chapter 2          # exactly 2 per chapter (or a range like 2-4)
 python series_plan.py split 10                       # AI decides WHERE to split (or that it shouldn't)
@@ -134,7 +134,7 @@ python series_new.py doctor-visits "At the Doctor" --copy-cast   # reuse the cur
 python generate_cast.py                            # AI-design a cast from the curriculum/theme
 #   ...or edit series/<slug>/cast.json by hand, or use --copy-cast above
 
-python series_plan.py all path/to/curriculum.txt   # targets the active series
+python series_plan.py all                          # targets the active series (automatically finds curriculum.txt)
 python generate_character_refs.py
 python series_run.py 1
 ```
@@ -238,7 +238,7 @@ Both modes produce an `ideas.json` (Series Mode via `series_compile.py`, Idea Mo
 | 4 | `python generate_sfx.py` | Generate SFX clips from script cues + ambient loops. | `sfx/<slug>/`, `presets/ambience/` |
 | 5 | `python tts_generator.py` | Text-to-speech per dialogue line via ElevenLabs (`podcast` / `all` modes available). | `mp3/` |
 | 6 | `python sfx_mixer.py` | Whisper-align timestamps, insert pauses, place SFX, overlay ambience. | `mp3/` (in place) |
-| 7 | `python generate_videos.py` | Combine audio + illustration into video. | `output_videos/` |
+| 7 | `python generate_videos.py` | Combine audio + illustration into video, and archive the dialogue script behind it. | `output_videos/`, `script_archive/` |
 | 8 | `python music_mixer.py` | Add background music — only to videos whose ambient is `quiet`/unset (others keep their ambience). | `output_videos/` |
 
 Optional subtitles: `python generate_subtitled_videos.py` (run manually).
@@ -295,6 +295,7 @@ more slugs; with no arguments they process everything.
 ### Utility scripts
 - `cefr_levels.py` — CEFR (A1–C2) definitions and per-level prompt guidance
 - `cleanup.py` — reset the project by removing generated files
+- `script_archive.py` — keeps the dialogue script behind each rendered video
 - `subtitle_generator.py` / `generate_subtitled_videos.py` — optional subtitles
 - `audio_mixer.py` — audio mixing helpers
 
@@ -311,6 +312,20 @@ more slugs; with no arguments they process everything.
 - `sfx/` — sound effects (per-script subfolders)
 - `presets/` — background music; `presets/ambience/` — shared ambient loops (auto-generated)
 - `output_videos/` — finished videos (`output_videos/prod/` is preserved by cleanup)
+- `script_archive/` — dialogue scripts kept from every rendered video (never cleaned)
+
+## Script archiving
+`cleanup.py` wipes `scripts/` at the start of every run, so a script would otherwise only
+survive its own pipeline pass. Whenever `generate_videos.py` renders a video it copies that
+video's script into `script_archive/`, named after the video so the two stay paired:
+
+```
+output_videos/conversation_missa-kirjasto-on.mp4
+script_archive/conversation_missa-kirjasto-on.json
+```
+
+`series_run.py` also drops the archived script next to the episode video in
+`series/<slug>/output/`. Re-rendering a video refreshes its archived script.
 
 ## Cleanup
 ```bash

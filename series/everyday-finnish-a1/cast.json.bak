@@ -1,0 +1,32 @@
+{
+  "_comment": "AI-generated cast. Keep voice_id and appearance STABLE for consistency. `id` keys are referenced by episodes and series_plan.py.",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "anna": {
+      "name": "Anna",
+      "role": "The protagonist, a new resident in Finland learning the language.",
+      "voice_id": "YSabzCJMvEHDduIDMdwV",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Curious, friendly, slightly hesitant.",
+      "language_level": "A1",
+      "speech_style": "Careful, deliberate standard Finnish (yleiskieli), using 'minä' and 'sinä'. Often asks for clarification or for words to be repeated.",
+      "personality": "Eager to learn and connect with people. She is observant, thoughtful, and not afraid to make mistakes.",
+      "appearance": "Slender build with light brown skin. Has long, dark, curly hair often worn in a ponytail. Typically wears comfortable sweaters, jeans, and a distinctive bright red scarf.",
+      "reference_image": "series/everyday-finnish-a1/characters/anna.png"
+    },
+    "leo": {
+      "name": "Leo",
+      "role": "Anna's patient Finnish friend and colleague.",
+      "voice_id": "dlbXHgJnwobU5JdZ8F5M",
+      "gender": "Male",
+      "age": "Young Adult",
+      "default_tone": "Encouraging, cheerful, and relaxed.",
+      "language_level": "Native",
+      "speech_style": "Natural, everyday spoken Finnish (puhekieli), using 'mä' and 'sä'. He naturally uses casual forms but slows down to help Anna understand.",
+      "personality": "Outgoing, patient, and good-humored. He enjoys teaching Anna about Finnish life and language in practical situations.",
+      "appearance": "Medium, athletic build with fair skin. Short, sandy-blond hair. Usually dressed in casual, practical clothing like a hoodie or a t-shirt and wears rectangular-framed glasses.",
+      "reference_image": "series/everyday-finnish-a1/characters/leo.png"
+    }
+  }
+}

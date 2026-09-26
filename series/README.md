@@ -91,12 +91,12 @@ curriculum order** (decided in code), and the AI authors one scene per group tha
 lessons together.
 
 ```bash
-# one-shot: normalize the pasted curriculum, then generate grouped episodes
-python series_plan.py all series/curriculum.txt
-python series_plan.py all series/curriculum.txt --force   # re-parse even if curriculum.json exists
+# one-shot: normalize the active series' curriculum.txt, then generate grouped episodes
+python series_plan.py all
+python series_plan.py all --force                     # re-parse even if curriculum.json exists
 
 # or run the two stages separately (review curriculum.json in between)
-python series_plan.py parse series/curriculum.txt    # -> series/curriculum.json
+python series_plan.py parse                           # -> series/curriculum.json
 python series_plan.py build                           # -> series/episodes.json
 python series_plan.py build --append                  # add to existing episodes instead of replacing
 python series_plan.py build --per-chapter 2           # exactly 2 per chapter

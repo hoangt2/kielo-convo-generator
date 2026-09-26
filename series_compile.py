@@ -104,6 +104,10 @@ def build_idea(episode, cast):
         # Script format: "guided" routes generate_scripts.py to the bilingual,
         # teacher-led lesson for true beginners; anything else = normal conversation.
         "format": episode.get("format", "conversation"),
+        # Also exposed as first-class fields (not just folded into the description) so the
+        # GUIDED generator can treat them as the required lesson curriculum to fully cover.
+        "lessons_covered": episode.get("lessons_covered", []),
+        "key_phrases": episode.get("key_phrases", []),
         "characters": idea_characters,
     }
 

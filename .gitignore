@@ -30,3 +30,6 @@ scripts/
 podcast_scripts/
 subtitles/
 sfx/
+
+# Archived dialogue scripts (paired with generated videos)
+script_archive/

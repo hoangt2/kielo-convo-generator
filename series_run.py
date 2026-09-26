@@ -23,6 +23,7 @@ import sys
 from pathlib import Path
 
 from cleanup import cleanup
+import script_archive
 import series_paths
 
 BASE = Path(__file__).parent
@@ -114,6 +115,13 @@ def main():
         shutil.copy2(vid, dest)
         copied.append(dest)
         print(f"📦 Copied to series: {dest.relative_to(BASE)}")
+
+        # Keep the archived dialogue script next to the episode video.
+        archived = script_archive.archived_path(vid.stem)
+        if archived.exists():
+            script_dest = series_output / archived.name
+            shutil.copy2(archived, script_dest)
+            print(f"🗄️  Script archived to series: {script_dest.relative_to(BASE)}")
 
     print("\n" + "=" * 60)
     if copied:
