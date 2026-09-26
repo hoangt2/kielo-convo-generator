@@ -171,7 +171,7 @@ EPISODES_SCHEMA = types.Schema(
                     "tone": types.Schema(type="string"),
                     "key_phrases": types.Schema(
                         type="array", items=types.Schema(type="string"),
-                        description="4-8 target phrases in the target language covering the combined lessons.",
+                        description="Target phrases in the target language covering the combined lessons. Count is set by the rules in the system prompt — guided beginner episodes take far fewer.",
                     ),
                     "notes": types.Schema(type="string", description="Register/direction note for the scriptwriter."),
                     "illustration_layout": types.Schema(
@@ -222,7 +222,8 @@ def chunk_contiguous(items, k):
     return groups
 
 
-def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups, cast, language="Finnish"):
+def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups, cast,
+                     language="Finnish", guided=False):
     """Author ONE episode per pre-decided lesson group (LLM writes the scene; grouping is fixed).
 
     `groups` is a list of lesson lists (each lesson a dict with 'title' and optional 'desc').
@@ -242,6 +243,23 @@ def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups
         if protagonist else "Include the main learner character in every episode."
     )
 
+    # A guided episode's key_phrases become a hard checklist downstream — generate_scripts.py
+    # tells the writer to teach EVERY one. Eight items, three of them full sentences, is more
+    # than a first-episode beginner can hold, so the brief itself has to be smaller: the load
+    # cannot be fixed later by the scriptwriter, which is obeying orders.
+    if guided:
+        phrase_rule = (
+            f"EXACTLY 3-4 very short {language} items — single words or 2-3 word chunks. "
+            f"This is a lesson for someone who has never spoken {language}, and every item "
+            f"here MUST be taught in full, so keep the load tiny.\n"
+            f"  - NO full-sentence classroom meta-language (no 'What is the difference?', "
+            f"'Can you say that again?', 'I understand'). The guide says those in English.\n"
+            f"  - At most ONE minimal pair / contrast example per episode.\n"
+            f"  - Prefer concrete words the learner can picture over abstract phrases."
+        )
+    else:
+        phrase_rule = f"4-8 natural {language} phrases spanning the group's lessons."
+
     system = f"""You design short {language} conversation video episodes for a fixed cast.
 
 The lessons have ALREADY been grouped for you, in order. Write EXACTLY ONE episode per group, in
@@ -260,7 +278,7 @@ Rules:
   the manager for scheduling). A one-off non-cast role is NOT allowed — map to the closest cast member.
 - `lessons_covered`: the exact lesson titles of that group, in order.
 - `description`: IN {language.upper()} (spoken style), 3-5 sentences, one concrete scene tying the group together.
-- `key_phrases`: 4-8 natural {language} phrases spanning the group's lessons.
+- `key_phrases`: {phrase_rule}
 - `ambient_setting`: best fit from the allowed list for the scene's single location.
 - `notes`: one line on register (formal vs casual) and who mirrors whom.
 - `illustration_layout`: set to 'split' when characters are NOT in the same physical location
@@ -361,7 +379,8 @@ def plan_grouping(level_name, cefr, lessons):
     return [1] * n, "grouping planner failed — one lesson per episode"
 
 
-def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=None, max_eps=None, language="Finnish"):
+def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=None, max_eps=None,
+                   language="Finnish", guided=False):
     """Turn a chapter's lessons into episodes.
 
     Default (min_eps=None): LLM decides which lessons belong together.
@@ -387,7 +406,7 @@ def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=None, max_eps
             print(f"      → {n_groups} episodes (grouped {group_desc}): {reason}")
 
     return _author_episodes(track, chapter["name"], chapter.get("desc", ""),
-                            level_name, cefr, groups, cast, language)
+                            level_name, cefr, groups, cast, language, guided=guided)
 
 
 # --------------------------------------------------------------------------------------
@@ -422,7 +441,8 @@ def build_episodes(curriculum, cast, start_id=1, min_eps=None, max_eps=None,
             tag = "  🧑‍🏫 guided" if fmt == "guided" else ""
             print(f"🪄 {level.get('name','')} › {chapter['name']} ({n} lessons, {mode}){tag}...")
             for ep in expand_chapter(track, level.get("name", ""), cefr, chapter, cast,
-                                     min_eps=min_eps, max_eps=max_eps, language=language):
+                                     min_eps=min_eps, max_eps=max_eps, language=language,
+                                     guided=(fmt == "guided")):
                 ep_out = {"id": next_id, **ep, "format": fmt}
                 episodes.append(ep_out)
                 next_id += 1
@@ -781,21 +801,29 @@ def main():
     cmd = args[0].lower()
 
     if cmd == "parse":
-        if len(args) < 2:
-            sys.exit("Usage: python series_plan.py parse <curriculum.txt> [--series slug]")
+        curriculum_txt = args[1] if len(args) >= 2 else paths.curriculum_txt
+        if not Path(curriculum_txt).exists():
+            sys.exit(f"❌ Curriculum file not found at: {curriculum_txt}\n"
+                     f"Usage: python series_plan.py parse [<curriculum.txt>] [--series slug]")
         if paths.curriculum_json.exists() and not force:
             sys.exit(f"ℹ️  {paths.curriculum_json.name} already exists — pass --force to re-parse "
                      f"(this would overwrite any edits).")
-        cmd_parse(paths, args[1])
+        cmd_parse(paths, curriculum_txt)
     elif cmd == "build":
         cmd_build(paths, append=append, min_eps=min_eps, max_eps=max_eps, guided_chapters=guided_chapters)
     elif cmd == "all":
-        if len(args) < 2:
-            sys.exit("Usage: python series_plan.py all <curriculum.txt> [--series slug] [--append] [--per-chapter 2-3] [--force]")
+        curriculum_txt = args[1] if len(args) >= 2 else paths.curriculum_txt
+        
+        # We only need curriculum_txt if curriculum.json doesn't exist yet, OR if force is requested
+        needs_parsing = not paths.curriculum_json.exists() or force
+        if needs_parsing and not Path(curriculum_txt).exists():
+            sys.exit(f"❌ Curriculum file not found at: {curriculum_txt}\n"
+                     f"Usage: python series_plan.py all [<curriculum.txt>] [--series slug] [--append] [--per-chapter 2-3] [--force]")
+                     
         if paths.curriculum_json.exists() and not force:
-            print(f"ℹ️  Using existing {paths.curriculum_json.name} (pass --force to re-parse {Path(args[1]).name}).")
+            print(f"ℹ️  Using existing {paths.curriculum_json.name} (pass --force to re-parse {Path(curriculum_txt).name if curriculum_txt else ''}).")
         else:
-            cmd_parse(paths, args[1])
+            cmd_parse(paths, curriculum_txt)
         cmd_build(paths, append=append, min_eps=min_eps, max_eps=max_eps, guided_chapters=guided_chapters)
     elif cmd == "split":
         if len(args) >= 2 and args[1].lower() == "all":

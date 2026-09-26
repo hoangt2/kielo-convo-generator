@@ -1,0 +1,71 @@
+{
+  "_comment": "AI-generated cast. Keep voice_id and appearance STABLE for consistency. `id` keys are referenced by episodes and series_plan.py.",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "sara": {
+      "name": "Sara",
+      "role": "The learner, an international student living in Helsinki.",
+      "voice_id": "YSabzCJMvEHDduIDMdwV",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Inquisitive, friendly, slightly hesitant",
+      "language_level": "A1",
+      "speech_style": "Careful, slow standard Finnish (kirjakieli). Uses 'Minä' and 'Sinä'. Asks for help and clarification often.",
+      "personality": "Eager to learn and connect with people. Observant and thoughtful, but sometimes overwhelmed by Finnish grammar. Not afraid to make mistakes.",
+      "appearance": "Slender build, fair skin with a few freckles, shoulder-length wavy brown hair. Typically wears comfortable clothes like a hoodie, jeans, and a warm beanie.",
+      "reference_image": "series/finnish-grammar-a1/characters/sara.png"
+    },
+    "leo": {
+      "name": "Leo",
+      "role": "A native Finnish friend who helps the protagonist practice.",
+      "voice_id": "dlbXHgJnwobU5JdZ8F5M",
+      "gender": "Male",
+      "age": "Young Adult",
+      "default_tone": "Relaxed, encouraging, patient",
+      "language_level": "Native",
+      "speech_style": "Casual spoken Helsinki Finnish (puhekieli). Uses 'mä', 'sä', 'se', 'me mennään'. Speaks at a natural, sometimes fast, pace.",
+      "personality": "Easygoing, practical, and has a dry sense of humor. Enjoys showing Sara everyday Finnish life without being a formal teacher.",
+      "appearance": "Medium build, olive skin tone, short dark messy hair. Often wears band t-shirts, a black zip-up hoodie, and sneakers.",
+      "reference_image": "series/finnish-grammar-a1/characters/leo.png"
+    },
+    "iiris": {
+      "name": "Iiris",
+      "role": "A native Finnish friend who enjoys explaining the language.",
+      "voice_id": "cyD08lEy76q03ER1jZ7y",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Bright, enthusiastic, helpful",
+      "language_level": "Native",
+      "speech_style": "Clear and energetic spoken Finnish (puhekieli). Uses 'mä' and 'sä' but enunciates clearly, naturally slowing down to explain grammar points.",
+      "personality": "Outgoing, patient, and a bit of a language nerd. She loves finding patterns and explaining rules with simple examples and gestures.",
+      "appearance": "Athletic build, light skin, long blonde hair usually in a neat braid or high ponytail. Wears colorful sweaters, practical trousers, and walking shoes.",
+      "reference_image": "series/finnish-grammar-a1/characters/iiris.png"
+    },
+    "cafe_worker": {
+      "name": "Tarjoilija",
+      "role": "Incidental character for cafe and restaurant scenes.",
+      "voice_id": "1SM7GgM6IMuvQlz2BwM3",
+      "gender": "Male",
+      "age": "Adult",
+      "default_tone": "Polite, neutral, efficient",
+      "language_level": "Native",
+      "speech_style": "Standard service puhekieli. Polite but brief. Uses phrases like 'Mitä saisi olla?' and 'Tuleeko muuta?'.",
+      "personality": "Professional and focused. Not unfriendly, but doesn't engage in small talk, representing a typical, efficient Finnish service interaction.",
+      "appearance": "Lean build, pale skin, short light brown hair, clean-shaven. Wears a standard black apron over a plain t-shirt.",
+      "reference_image": "series/finnish-grammar-a1/characters/cafe_worker.png"
+    },
+    "shop_clerk": {
+      "name": "Myyjä",
+      "role": "Incidental character for shopping scenarios at a kiosk or grocery store.",
+      "voice_id": "OYTbf65OHHFELVut7v2H",
+      "gender": "Female",
+      "age": "Adult",
+      "default_tone": "Friendly, professional, calm",
+      "language_level": "Native",
+      "speech_style": "Polite and clear service Finnish. Uses standard phrases like 'Tarvitsetko kuittia?' and 'Hyvää päivänjatkoa!'.",
+      "personality": "Patient and helpful, used to dealing with customers. Smiles readily and is happy to help someone find what they're looking for.",
+      "appearance": "Average build, wears glasses, has dark hair cut into a sharp bob. Wears a company vest over a long-sleeved top.",
+      "reference_image": "series/finnish-grammar-a1/characters/shop_clerk.png"
+    }
+  }
+}

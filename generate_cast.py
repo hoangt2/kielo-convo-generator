@@ -341,7 +341,7 @@ Rules:
         tag = " (protagonist)" if c["language_level"] == level else ""
         print(f"   • {cid}: {c['name']} — {c['role']}{tag}  [{c['gender']}, {c['age']}, voice {c['voice_id']}]")
     print("\nNext:")
-    print("   python series_plan.py all " + (paths.curriculum_txt.as_posix() if paths.curriculum_txt.exists() else "<curriculum.txt>"))
+    print("   python series_plan.py all")
     print("   python generate_character_refs.py")
 
 

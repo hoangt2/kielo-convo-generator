@@ -1,0 +1,17 @@
+{
+  "_comment": "Per-series TTS pronunciation overrides, applied by tts_generator.py to target-language lines only. These live with the series, not with a script, because scripts get regenerated. Each rule: {match, say, word?, whole_line?}. Chosen by ear — see README notes on why IPA rules are not used.",
+  "rules": [
+    {
+      "_why": "Bare Latin letters give eleven_v3 nothing to go on and it reads them as English letter names. Swedish letter names spelled out phonetically.",
+      "match": "A, B, C...",
+      "say": "Å, Be, Se...",
+      "word": false
+    },
+    {
+      "_why": "A bare 'Tack.' comes out with a long vowel, colliding with 'tak'. A terminal '!' shortens it. Only on a line that is nothing but the word: in a phrase such as 'Ett kort a: tack.' the vowel is already short and plain is preferred.",
+      "match": "Tack.",
+      "say": "Tack!",
+      "whole_line": true
+    }
+  ]
+}

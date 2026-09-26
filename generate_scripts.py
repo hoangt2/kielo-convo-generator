@@ -41,6 +41,26 @@ def slugify(title):
     return re.sub(r'[^a-z0-9]+', '-', text).strip('-')
 
 
+def _repair_voice_ids(dialogue_list, characters):
+    """Fix voice_ids that the LLM may have subtly altered (e.g. changed casing).
+
+    Builds a case-insensitive lookup from the authoritative character list and
+    replaces every voice_id in the dialogue with the exact original value.
+    Entries without a voice_id (e.g. SFX) are left untouched.
+    """
+    # Map lowercased voice_id → exact voice_id from the character definitions
+    canonical = {
+        c.get("voice_id", "").lower(): c["voice_id"]
+        for c in characters
+        if c.get("voice_id")
+    }
+    for entry in dialogue_list:
+        vid = entry.get("voice_id")
+        if vid and vid.lower() in canonical:
+            entry["voice_id"] = canonical[vid.lower()]
+    return dialogue_list
+
+
 # --- Core Logic: Updated to use Gemini API ---
 
 def generate_conversation(idea, metadata):
@@ -200,6 +220,7 @@ def generate_conversation(idea, metadata):
             
             # Validate that dialogue_list is not empty
             if json_output.get("dialogue_list") and len(json_output["dialogue_list"]) > 0:
+                _repair_voice_ids(json_output["dialogue_list"], characters)
                 return json_output
             else:
                 print(f"   ⚠️  Empty dialogue received, retrying... ({attempt + 1}/{max_retries})")
@@ -228,16 +249,28 @@ def generate_conversation(idea, metadata):
 
 # Role keywords used to tell the learner apart from the guide in a guided lesson.
 _LEARNER_HINTS = ("learn", "student", "beginner", "expat", "new to", "newcomer")
-_GUIDE_HINTS = ("teach", "guide", "help", "neighbor", "neighbour", "host",
-                "friend", "colleague", "tutor", "mentor", "barista", "clerk")
+
+# The guide must be a PERSONAL COMPANION who knows the learner — a friend, neighbour,
+# colleague or family member. Someone like that teaching a beginner their first words
+# is believable. A transactional service worker (barista, cashier, clerk, librarian…)
+# doing it is NOT — it breaks the scene ("the barista started the lesson"). So the guide
+# is chosen ONLY from companions; service/stranger roles are never made the tutor.
+_COMPANION_HINTS = (
+    "friend", "befriend", "buddy", "pal", "neighbor", "neighbour", "colleague",
+    "classmate", "coworker", "co-worker", "roommate", "flatmate", "host", "tutor",
+    "mentor", "family", "sister", "brother", "mother", "father", "parent", "cousin",
+    "partner", "spouse", "husband", "wife", "girlfriend", "boyfriend",
+)
 
 
 def _identify_guided_roles(characters):
     """Pick (learner, guide, extras) for a guided lesson from character role text.
 
-    The learner is whoever is described as new to the language; the guide is the
-    patient local who models it. Any remaining characters play small background
-    parts. Falls back to positional order when role text is uninformative.
+    The learner is whoever is described as new to the language. The guide is a personal
+    COMPANION of the learner (friend/neighbour/colleague/family) — never a transactional
+    service worker, whose teaching a beginner would break the scene. Returns guide=None
+    when no companion is present (the caller then generates a normal conversation instead
+    of forcing a stranger to tutor). Any remaining characters play small background parts.
     """
     learner = next(
         (c for c in characters
@@ -250,11 +283,9 @@ def _identify_guided_roles(characters):
     others = [c for c in characters if c is not learner]
     guide = next(
         (c for c in others
-         if any(k in (c.get("role") or "").lower() for k in _GUIDE_HINTS)),
+         if any(k in (c.get("role") or "").lower() for k in _COMPANION_HINTS)),
         None,
     )
-    if guide is None and others:
-        guide = others[0]
 
     extras = [c for c in others if c is not guide]
     return learner, guide, extras
@@ -282,7 +313,9 @@ def generate_guided_lesson(idea, metadata):
 
     learner, guide, extras = _identify_guided_roles(characters)
     if guide is None:
-        # Degenerate single-character idea — nothing to guide against; fall back.
+        # No personal companion in the scene to guide the learner (only the learner, or
+        # only service workers/strangers). Forcing a stranger to tutor breaks the scene,
+        # so generate a normal conversation instead of a guided lesson.
         return generate_conversation(idea, metadata)
 
     char_info_text = "\n".join(
@@ -308,11 +341,33 @@ def generate_guided_lesson(idea, metadata):
 
     level_block = conversation_level_block(metadata.get('language_level'), language)
 
+    # The lesson's phrases are the REQUIRED curriculum for a guided episode — every one must be
+    # taught, not a "pick a few" suggestion. Build an explicit checklist from the episode so the
+    # model covers the whole lesson (the scene simply gets longer to fit them all).
+    lessons_covered = idea.get("lessons_covered", []) or []
+    key_phrases = idea.get("key_phrases", []) or []
+    lessons_line = ""
+    if lessons_covered:
+        lessons_line = "\n        Lessons this episode must cover: " + "; ".join(lessons_covered)
+    if key_phrases:
+        phrase_lines = "\n".join(f"          {i}. {p}" for i, p in enumerate(key_phrases, 1))
+        curriculum_block = (
+            f"\n\n        REQUIRED CURRICULUM — teach EVERY one of these target phrases (this is a "
+            f"checklist, NOT optional):{lessons_line}\n{phrase_lines}\n"
+            f"        Adapt wording/inflection to fit the scene naturally, but do not skip any phrase. "
+            f"If two phrases pair up (a prompt and its reply, e.g. a thank-you and 'you're welcome'), "
+            f"teach them together. Ignore any 'optional / not a checklist' framing in the scenario "
+            f"description below — for a guided lesson these phrases ARE the lesson."
+        )
+    else:
+        curriculum_block = ""
+
     prompt = f"""
-        You are writing a GUIDED beginner {language} lesson as a short (1–2 minute) scene for
-        someone who has NEVER spoken a word of {language} and understands almost NONE of it yet.
-        It must feel like a warm, real moment between people — a patient guide gently teaching a
-        friend their very first words — NOT a dry classroom drill.
+        You are writing a GUIDED beginner {language} lesson as a scene for someone who has NEVER
+        spoken a word of {language} and understands almost NONE of it yet. It must feel like a warm,
+        real moment between people — a patient guide gently teaching a friend — NOT a dry classroom
+        drill. Take as long as the lesson needs (a few minutes is fine): it is more important to
+        cover every target phrase clearly, with repetition, than to keep it short.
 
         THE TWO KEY ROLES:
         - GUIDE = {guide['name']}: a warm local who is TEACHING {learner['name']} their first words.
@@ -332,17 +387,39 @@ def generate_guided_lesson(idea, metadata):
           4. Repeated by the learner in {language}, and the guide reacts in English ('Perfect!').
         Never let a {language} phrase go by without its English meaning attached.
 
-        HARD LIMITS (a true beginner overloads fast):
-        - Teach AT MOST 3–4 short {language} phrases in the WHOLE scene. Fewer, repeated well, wins.
-        - Each {language} phrase is short and clear; the learner repeats it, and it comes back 2–3
-          times across the scene so it sticks.
-        - The MAJORITY of the words in the scene are ENGLISH (the teaching). {language} is the small,
-          precious part being learned — not the background.
+        ACCURACY — GET THE TEACHING FACTS RIGHT (these mistakes ruin the lesson):
+        - The {language} line and its English framing/gloss MUST match EXACTLY. If you frame a line as
+          'the formal way, "Minä olen Alex"', the {language} line that follows must be spelled/spoken
+          as "Minä olen Alex" — never model a different form (e.g. the casual "Mä oon Alex") under that
+          label. If the learner is asked to repeat a specific form, they repeat THAT form, not another.
+        - Label register CORRECTLY. Spoken/casual forms are NOT the "standard", "formal", "textbook" or
+          "by the book" forms, and vice-versa. In {language}, the written/standard pronouns and endings
+          (e.g. Finnish 'minä', 'sinä', 'olen', 'sanomme') are the formal ones; the shortened spoken
+          forms (e.g. 'mä', 'sä', 'oon', 'sanotaan') are the casual ones. Never call a casual form the
+          formal/standard one, or a formal form the casual one.
+        - HONOUR EACH SPEAKER'S REGISTER from the Character speech styles / direction below. If the
+          learner is described as speaking careful standard {language} (e.g. 'minä/sinä'), keep them in
+          that register — do NOT have them suddenly switch to casual forms unless adopting that new form
+          is the EXPLICIT point/payoff of this lesson, and only at the moment the scene earns it.
+        - When the lesson itself is a CONTRAST between two forms (e.g. formal vs spoken pronouns), show
+          BOTH forms, label each one correctly, let the contrast surface naturally from the two speakers'
+          registers, and only then explain the difference. Do not blur the two together.
+
+        COVERAGE & PACING (cover the whole lesson, but never overwhelm):
+        - Teach EVERY target phrase in the REQUIRED CURRICULUM below — do not drop any. The scene can
+          be as long as it needs to be to fit them all naturally.
+        - Introduce ONE phrase at a time: teach it, have the learner repeat it, react, then move on.
+          Don't dump several new phrases at once — a beginner still needs each one handled slowly.
+        - Reuse phrases: bring earlier phrases back later in the scene (e.g. in a short recap or a
+          natural callback) so they stick, not just taught once and forgotten.
+        - Each {language} phrase is short and clear. The MAJORITY of the words are still ENGLISH (the
+          teaching/glue); {language} is the precious part being learned.
         - Keep every {language} phrase within the CEFR level below; use the simpler in-level form if
           natural phrasing would exceed it.
 
-        Give the scene a tiny natural arc: a reason it starts, the guide teaching the phrases one at a
-        time with repetition, and a warm close where the learner uses what they just learned.
+        Give the scene a natural arc: a reason it starts, the guide teaching the phrases one at a time
+        (grouping ones that pair up), with repetition and a brief recap, and a warm close where the
+        learner uses several of the phrases they just learned.{curriculum_block}
 
         Characters:
         {char_info_text}
@@ -375,7 +452,8 @@ def generate_guided_lesson(idea, metadata):
         Metadata:
         Language: {language} ({spoken_label})
         Tone: {metadata.get('tone', 'warm, encouraging')}
-        Length: {metadata.get('length', '1-2 minutes')}{ambient_note}{level_block}
+        Length: as long as needed to teach every phrase in the curriculum clearly, with repetition
+        (do NOT cut the lesson short to save time).{ambient_note}{level_block}
 
         Lesson idea:
         Title: {idea['title']}
@@ -410,6 +488,8 @@ def generate_guided_lesson(idea, metadata):
 
             dialogue = json_output.get("dialogue_list")
             if dialogue and len(dialogue) > 0:
+                # Fix voice_ids the LLM may have subtly altered (casing)
+                _repair_voice_ids(dialogue, characters)
                 # Guarantee every spoken entry carries a lang tag (default to target language)
                 # so downstream steps never have to guess.
                 for entry in dialogue:
@@ -523,6 +603,7 @@ def generate_podcast_script(idea, metadata):
             
             # Validate that dialogue_list is not empty
             if json_output.get("dialogue_list") and len(json_output["dialogue_list"]) > 0:
+                _repair_voice_ids(json_output["dialogue_list"], characters)
                 return json_output
             else:
                 print(f"   ⚠️  Empty dialogue received, retrying... ({attempt + 1}/{max_retries})")
