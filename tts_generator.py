@@ -213,6 +213,72 @@ def transcribe(elevenlabs_client, pcm_bytes, iso_code):
     return result.text
 
 
+
+# --- Series pronunciation overrides -----------------------------------------
+
+def load_pronunciation_overrides():
+    """Load series/<active>/pronunciation.json, if present.
+
+    These live with the SERIES, not the script, because scripts are regenerated:
+    a fix hand-applied to a script's "tts_text" is silently lost the next time the
+    episode is rewritten. Anything a voice reliably mispronounces belongs here.
+
+    Each rule is {"match": "...", "say": "...", "word": true|false}. "word" (the
+    default for a single word) matches on word boundaries so "tack" does not also
+    rewrite "tacksam"; set it false to replace a literal phrase anywhere.
+    """
+    try:
+        from series_paths import get_active, SERIES_ROOT
+        slug = get_active()
+        path = (SERIES_ROOT / slug / "pronunciation.json") if slug else (SERIES_ROOT / "pronunciation.json")
+        if not path.exists():
+            return []
+        rules = json.loads(path.read_text(encoding="utf-8")).get("rules", [])
+        if rules:
+            print(f"   🗣️  {len(rules)} pronunciation override(s) from {path.name}")
+        return rules
+    except Exception as e:
+        print(f"   ⚠️  Could not load pronunciation overrides: {e}")
+        return []
+
+
+def apply_pronunciation_overrides(text, rules):
+    """Rewrite what gets SENT to the model. The caller keeps the original for subtitles.
+
+    Matching ignores case but preserves it, so one rule for "tack" also covers the
+    sentence-initial "Tack" that opens half these lines.
+    """
+    out = text
+    for rule in rules:
+        match, say = rule.get("match"), rule.get("say")
+        if not match or say is None:
+            continue
+
+        # "whole_line" fires only when the line says nothing but this, keeping any
+        # audio tag. Needed because the same word can want different treatment by
+        # position: a bare "Tack." needs the "!" that shortens its vowel, while the
+        # "tack" inside "Ett kort a: tack." is already short and must be left alone.
+        if rule.get("whole_line"):
+            if spoken_text(out).strip().lower() == match.strip().lower():
+                tag = AUDIO_TAG_RE.match(out.strip())
+                out = (tag.group(0) + " " + say) if tag else say
+            continue
+
+        def repl(m, say=say):
+            found = m.group(0)
+            if found[:1].isupper() and say[:1].islower():
+                return say[:1].upper() + say[1:]
+            return say
+
+        pattern = (r"(?<!\w)%s(?!\w)" if rule.get("word", " " not in match) else r"%s")
+        out = re.sub(pattern % re.escape(match), repl, out, flags=re.IGNORECASE)
+
+    # A rule ending in "!" or "?" absorbs whatever terminal punctuation follows, so
+    # "tack" -> "tack!" yields "tack!" in both "Ett kort a: tack." and "Ja. Tack!",
+    # rather than "tack!." or "Tack!!".
+    return re.sub(r"([!?])[!?.]+", r"\1", out)
+
+
 # --- Per-line synthesis ------------------------------------------------------
 
 def _line_language(item, target_iso):
@@ -227,7 +293,7 @@ def _line_language(item, target_iso):
     return lang if lang else target_iso
 
 
-def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total):
+def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, overrides=()):
     """Synthesize one line, verifying target-language lines and retrying a misread.
 
     Returns (pcm_bytes, warning_or_None).
@@ -236,10 +302,14 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total):
     # subtitles and for the verification comparison below. Needed because a voice may
     # refuse a contrast as spelled — Sten renders "Tak" as /tak/ — and a respelling
     # like "Taak" is the only lever that reaches the acoustics.
-    text = item.get("tts_text") or item.get("text", "")
     expected = item.get("text", "")
+    text = item.get("tts_text") or expected
     voice_id = item.get("voice_id", "")
     iso = _line_language(item, target_iso)
+    # Series overrides apply only to target-language lines, and never override an
+    # explicit per-line tts_text.
+    if overrides and iso == target_iso and not item.get("tts_text"):
+        text = apply_pronunciation_overrides(text, overrides)
     # A line may opt out with "verify": false. Needed for lines that are correct but
     # untranscribable as written — e.g. reciting "Å, Ä, Ö", where Å is genuinely
     # voiced [oː] and Scribe duly returns "O", which no string comparison can accept.
@@ -307,11 +377,13 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
     from language_config import get_iso_code
 
     target_iso = get_iso_code(language)
+    overrides = load_pronunciation_overrides()
     total = len(dialogue_list)
 
     def task(i):
         return synthesize_line(
             elevenlabs_client, dialogue_list[i], target_iso, locator, i + 1, total,
+            overrides=overrides,
         )
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
