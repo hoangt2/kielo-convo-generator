@@ -54,6 +54,16 @@ PCM_SAMPLE_RATE = 44100
 PCM_SAMPLE_WIDTH = 2
 PCM_CHANNELS = 1
 
+# Guided lessons are for people who have never heard the language, and native-rate
+# delivery is too fast to pick apart. Target-language lines are slowed to this factor;
+# English narration keeps its natural pace, so the lesson does not drag.
+#
+# Done by time-stretching rather than the API's `speed`: on eleven_v3 that parameter is
+# barely applied. Measured over 3 takes of the same line, speed=0.7 gave a median 1.36s
+# against 1.20s native — ~13% where 0.7 implies ~43% — with the ranges overlapping.
+# Stretching scales vowel and consonant alike, so quantity contrasts (tak/tack) survive.
+GUIDED_TARGET_SPEED = 0.75
+
 # How many lines to synthesize concurrently.
 MAX_WORKERS = 4
 
@@ -167,6 +177,26 @@ _CYRILLIC_FOLD = str.maketrans({
 def spoken_text(text):
     """The words actually voiced: audio tags like [very clear] are direction, not speech."""
     return AUDIO_TAG_RE.sub(" ", text or "").strip()
+
+
+# eleven_v3 performs a clarity cue like [clearly] literally — as a throat-clear before the
+# line — which grates when every few lines have one. The scriptwriter reaches for it because
+# the CEFR prompts say "speak slowly and clearly". Pace is handled by the guided slow-down
+# and [slowly]; the clarity word itself is dropped, and the rest of the tag is kept.
+_CLARITY_RE = re.compile(r"^(?:(?:very|extra|more|so)\s+)?clear(?:ly)?$", re.IGNORECASE)
+_TAG_PARTS_RE = re.compile(r"\s*(?:,|\band\b|&)\s*", re.IGNORECASE)
+
+
+def strip_clarity_cues(text):
+    """Remove 'clearly'/'clear' from audio tags: "[slowly, clearly]" -> "[slowly]", "[Clearly]" -> ""."""
+    def fix(match):
+        parts = [p for p in _TAG_PARTS_RE.split(match.group(0)[1:-1]) if p.strip()]
+        kept = [p for p in parts if not _CLARITY_RE.match(p.strip())]
+        if len(kept) == len(parts):
+            return match.group(0)
+        return "[%s]" % ", ".join(kept) if kept else ""
+    out = AUDIO_TAG_RE.sub(fix, text or "")
+    return re.sub(r"[ \t]{2,}", " ", out).strip()
 
 
 def _normalize_for_compare(text):
@@ -303,7 +333,7 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
     # refuse a contrast as spelled — Sten renders "Tak" as /tak/ — and a respelling
     # like "Taak" is the only lever that reaches the acoustics.
     expected = item.get("text", "")
-    text = item.get("tts_text") or expected
+    text = strip_clarity_cues(item.get("tts_text") or expected)
     voice_id = item.get("voice_id", "")
     iso = _line_language(item, target_iso)
     # Series overrides apply only to target-language lines, and never override an
@@ -362,12 +392,33 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
     return best_audio, warning
 
 
+def _stretch(pcm_bytes, factor):
+    """Slow raw PCM by `factor` via ffmpeg's atempo, preserving pitch."""
+    if not pcm_bytes or factor == 1.0:
+        return pcm_bytes
+    import subprocess
+    cmd = [
+        "ffmpeg", "-v", "error",
+        "-f", "s16le", "-ar", str(PCM_SAMPLE_RATE), "-ac", str(PCM_CHANNELS), "-i", "pipe:0",
+        "-filter:a", "atempo=%s" % factor,
+        "-f", "s16le", "-ar", str(PCM_SAMPLE_RATE), "-ac", str(PCM_CHANNELS), "pipe:1",
+    ]
+    try:
+        proc = subprocess.run(cmd, input=pcm_bytes, stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE, check=True)
+        return proc.stdout or pcm_bytes
+    except Exception as e:
+        print(f"   ⚠️  Could not slow line ({e}); using it at full speed.")
+        return pcm_bytes
+
+
 def _silence(ms):
     n_samples = int(PCM_SAMPLE_RATE * ms / 1000.0)
     return b"\x00" * (n_samples * PCM_SAMPLE_WIDTH * PCM_CHANNELS)
 
 
-def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, locator):
+def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, locator,
+                                 fmt="conversation"):
     """Synthesize a conversation one line at a time and concatenate.
 
     Returns (mp3_bytes, warnings). See the note by MODEL_ID for why this does not
@@ -389,12 +440,18 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         results = list(pool.map(task, range(total)))
 
+    slow = GUIDED_TARGET_SPEED if fmt == "guided" else 1.0
+    if slow != 1.0:
+        print(f"   🐢 Slowing {language} lines to {slow}x for beginners")
+
     pcm_parts, warnings = [], []
     for i, (audio, warning) in enumerate(results):
         if warning:
             warnings.append(warning)
         if audio is None:
             continue
+        if slow != 1.0 and _line_language(dialogue_list[i], target_iso) == target_iso:
+            audio = _stretch(audio, slow)
         if pcm_parts:
             same_speaker = (
                 dialogue_list[i].get("voice_id") == dialogue_list[i - 1].get("voice_id")
@@ -416,7 +473,7 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
 def _generate_podcast_audio(elevenlabs_client, dialogue_list, locator):
     """Podcasts stay on text_to_dialogue — English, and no minimal pairs to protect."""
     clean_inputs = [
-        {"text": d.get("text", ""), "voice_id": d.get("voice_id", "")}
+        {"text": strip_clarity_cues(d.get("text", "")), "voice_id": d.get("voice_id", "")}
         for d in dialogue_list
     ]
     convert_kwargs = {"inputs": clean_inputs, "model_id": MODEL_ID}
@@ -443,7 +500,7 @@ def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename,
         if script_type == "conversation":
             print(f"   🎚️  Synthesizing {len(dialogue_list)} line(s) individually...")
             audio_bytes, warnings = _generate_conversation_audio(
-                elevenlabs_client, dialogue_list, language, locator,
+                elevenlabs_client, dialogue_list, language, locator, fmt=fmt,
             )
         else:
             audio_bytes, warnings = _generate_podcast_audio(

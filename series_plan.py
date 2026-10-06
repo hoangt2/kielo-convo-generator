@@ -48,6 +48,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
+import series_continuity
 import series_paths
 from cefr_levels import normalize_level, is_cefr_level
 
@@ -223,10 +224,12 @@ def chunk_contiguous(items, k):
 
 
 def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups, cast,
-                     language="Finnish", guided=False):
+                     language="Finnish", guided=False, prior_eps=None):
     """Author ONE episode per pre-decided lesson group (LLM writes the scene; grouping is fixed).
 
     `groups` is a list of lesson lists (each lesson a dict with 'title' and optional 'desc').
+    `prior_eps` are the episodes that already come before these in the series; they keep new
+    descriptions from restaging meetings that already happened.
     Returns cleaned episode dicts, in group order.
     """
     summary, protagonist = cast_summary(cast)
@@ -260,6 +263,9 @@ def _author_episodes(track, chapter_name, chapter_desc, level_name, cefr, groups
     else:
         phrase_rule = f"4-8 natural {language} phrases spanning the group's lessons."
 
+    continuity = series_continuity.planning_block(prior_eps or [], cast)
+    continuity_block = f"\n\n{continuity}" if continuity else ""
+
     system = f"""You design short {language} conversation video episodes for a fixed cast.
 
 The lessons have ALREADY been grouped for you, in order. Write EXACTLY ONE episode per group, in
@@ -283,7 +289,7 @@ Rules:
 - `notes`: one line on register (formal vs casual) and who mirrors whom.
 - `illustration_layout`: set to 'split' when characters are NOT in the same physical location
   (e.g. phone calls, video calls, texting, customer service calls). Otherwise 'single' (default).
-- `title` is a short {language} title; `title_en` is a short descriptive English title.
+- `title` is a short {language} title; `title_en` is a short descriptive English title.{continuity_block}
 Return the episodes array in group order. Output only the JSON."""
 
     config = types.GenerateContentConfig(
@@ -380,7 +386,7 @@ def plan_grouping(level_name, cefr, lessons):
 
 
 def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=None, max_eps=None,
-                   language="Finnish", guided=False):
+                   language="Finnish", guided=False, prior_eps=None):
     """Turn a chapter's lessons into episodes.
 
     Default (min_eps=None): LLM decides which lessons belong together.
@@ -406,7 +412,8 @@ def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=None, max_eps
             print(f"      → {n_groups} episodes (grouped {group_desc}): {reason}")
 
     return _author_episodes(track, chapter["name"], chapter.get("desc", ""),
-                            level_name, cefr, groups, cast, language, guided=guided)
+                            level_name, cefr, groups, cast, language, guided=guided,
+                            prior_eps=prior_eps)
 
 
 # --------------------------------------------------------------------------------------
@@ -416,19 +423,27 @@ def expand_chapter(track, level_name, cefr, chapter, cast, min_eps=None, max_eps
 # full-target-language conversation. Baked in here so recreating a series keeps the fade.
 # --------------------------------------------------------------------------------------
 GUIDED_FADE_LEVELS = {"A1"}
-GUIDED_FADE_CHAPTERS = 4
+# None = every chapter of a guided-fade level. A1 is for people who have never spoken
+# the language, and a learner is not ready for full-immersion conversation by chapter 5
+# — so the fade happens at the LEVEL boundary (A1 guided, A2+ immersive), not part-way
+# through A1. An integer still caps it at that many chapters.
+GUIDED_FADE_CHAPTERS = None
 
 
 def _guided_format(cefr, chapter_index, guided_chapters):
-    """Return "guided" for early-chapter A1 episodes, else "conversation"."""
+    """Return "guided" for A1 episodes, else "conversation"."""
     level = normalize_level(cefr) if cefr and is_cefr_level(cefr) else ""
-    if guided_chapters > 0 and level in GUIDED_FADE_LEVELS and chapter_index < guided_chapters:
+    if level not in GUIDED_FADE_LEVELS:
+        return "conversation"
+    if guided_chapters is None:
+        return "guided"
+    if guided_chapters > 0 and chapter_index < guided_chapters:
         return "guided"
     return "conversation"
 
 
 def build_episodes(curriculum, cast, start_id=1, min_eps=None, max_eps=None,
-                   language="Finnish", guided_chapters=GUIDED_FADE_CHAPTERS):
+                   language="Finnish", guided_chapters=GUIDED_FADE_CHAPTERS, existing=None):
     track = curriculum.get("track", "")
     episodes = []
     next_id = start_id
@@ -442,7 +457,8 @@ def build_episodes(curriculum, cast, start_id=1, min_eps=None, max_eps=None,
             print(f"🪄 {level.get('name','')} › {chapter['name']} ({n} lessons, {mode}){tag}...")
             for ep in expand_chapter(track, level.get("name", ""), cefr, chapter, cast,
                                      min_eps=min_eps, max_eps=max_eps, language=language,
-                                     guided=(fmt == "guided")):
+                                     guided=(fmt == "guided"),
+                                     prior_eps=(existing or []) + episodes):
                 ep_out = {"id": next_id, **ep, "format": fmt}
                 episodes.append(ep_out)
                 next_id += 1
@@ -510,11 +526,15 @@ def cmd_build(paths, append=False, min_eps=2, max_eps=3, guided_chapters=GUIDED_
             break
 
     print(f"🌐 Language: {language}")
-    if guided_chapters > 0:
+    if guided_chapters is None:
+        print(f"🧑‍🏫 Guided: EVERY chapter of each {'/'.join(sorted(GUIDED_FADE_LEVELS))} "
+              f"level uses the guided (bilingual) format.")
+    elif guided_chapters > 0:
         print(f"🧑‍🏫 Guided fade: first {guided_chapters} chapter(s) of each "
               f"{'/'.join(sorted(GUIDED_FADE_LEVELS))} level use the guided (bilingual) format.")
     new_eps = build_episodes(curriculum, cast, start_id=start_id, min_eps=min_eps, max_eps=max_eps,
-                             language=language, guided_chapters=guided_chapters)
+                             language=language, guided_chapters=guided_chapters,
+                             existing=existing)
     all_eps = existing + new_eps
 
     series_block = {
@@ -608,10 +628,11 @@ def _episode_lessons(ep, desc_map):
     return [{"title": t, "desc": desc_map.get(t, "")} for t in ep.get("lessons_covered", [])]
 
 
-def _author_split(ep, groups, cast):
+def _author_split(ep, groups, cast, prior_eps=None):
     return _author_episodes(
         ep.get("track", ""), ep.get("chapter", ep.get("track", "")), "",
         ep.get("level", ""), ep.get("language_level", ""), groups, cast,
+        prior_eps=prior_eps,
     )
 
 
@@ -657,7 +678,7 @@ def cmd_split(paths, ep_id, sizes):
     for gi, g in enumerate(groups):
         print(f"   {gi+1}. {', '.join(l['title'] for l in g)}")
 
-    new_eps = _author_split(ep, groups, cast)
+    new_eps = _author_split(ep, groups, cast, prior_eps=episodes[:pos])
     if len(new_eps) != len(groups):
         sys.exit("❌ Authoring failed — no changes made.")
 
@@ -703,7 +724,7 @@ def cmd_split_all(paths):
             continue
         print(f"   ✂️  #{ep.get('id')} {ep.get('title_en','')}: split into {len(sizes)} — {reason}")
         groups = _partition(lessons, sizes)
-        authored = _author_split(ep, groups, cast)
+        authored = _author_split(ep, groups, cast, prior_eps=new_list)
         if len(authored) == len(groups):
             new_list.extend(authored)
             n_split += 1

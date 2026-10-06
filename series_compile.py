@@ -30,6 +30,7 @@ import json
 import sys
 from pathlib import Path
 
+import series_continuity
 import series_paths
 
 BASE = Path(__file__).parent
@@ -53,8 +54,12 @@ def resolve_character(char_ref, cast):
     return char
 
 
-def build_idea(episode, cast):
-    """Turn one episode definition into a pipeline `idea` object."""
+def build_idea(episode, cast, episodes=(), language="Finnish"):
+    """Turn one episode definition into a pipeline `idea` object.
+
+    `episodes` is the whole series in order; it is what lets the script writer know who has
+    already met and what has already been taught (see series_continuity.py).
+    """
     chars = [resolve_character(ref, cast) for ref in episode["characters"]]
 
     # Characters in the shape generate_scripts.py / generate_illustrations.py expect.
@@ -108,6 +113,9 @@ def build_idea(episode, cast):
         # GUIDED generator can treat them as the required lesson curriculum to fully cover.
         "lessons_covered": episode.get("lessons_covered", []),
         "key_phrases": episode.get("key_phrases", []),
+        # What the cast and learner already share from earlier episodes ("" for episode 1),
+        # so later episodes don't restage first meetings or open as lesson one.
+        "continuity": series_continuity.script_block(episode, list(episodes), cast, language),
         "characters": idea_characters,
     }
 
@@ -150,7 +158,8 @@ def main():
                 sys.exit(f"❌ '{a}' is not a valid episode id. Run `python series_compile.py list`.")
             selected.append(episodes[int(a)])
 
-    ideas = [build_idea(ep, cast) for ep in selected]
+    language = series.get("language", "Finnish")
+    ideas = [build_idea(ep, cast, episodes_data["episodes"], language) for ep in selected]
 
     # One shared level for the run (single episode = that episode's level).
     if len(selected) == 1 and selected[0].get("language_level"):

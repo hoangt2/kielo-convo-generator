@@ -41,6 +41,12 @@ def slugify(title):
     return re.sub(r'[^a-z0-9]+', '-', text).strip('-')
 
 
+def _continuity_block(idea):
+    """The series-continuity brief for this episode (empty for a standalone idea or episode 1)."""
+    text = (idea.get("continuity") or "").strip()
+    return f"\n\n        {text}\n" if text else ""
+
+
 def _repair_voice_ids(dialogue_list, characters):
     """Fix voice_ids that the LLM may have subtly altered (e.g. changed casing).
 
@@ -99,6 +105,7 @@ def generate_conversation(idea, metadata):
         ambient_note = f"\n        Ambient Setting: {ambient_setting} (This describes the environment — use it to inspire contextually appropriate sound effects.)"
 
     level_block = conversation_level_block(metadata.get('language_level'), language)
+    continuity_block = _continuity_block(idea)
 
     prompt = f"""
         You are a {language} dialogue writer specializing in NATURAL {spoken_label.upper()}.
@@ -165,13 +172,15 @@ def generate_conversation(idea, metadata):
         Dialogue Instructions:
         - Use the **exact** 'voice_id' provided in the Characters list for each dialogue line.
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
+        - NEVER use [clearly], [clear] or any "clear/clearly" tag — the voice engine performs it as
+          a throat-clear. Use [slowly] or an emotion tag instead.
         - Write ONLY in natural {spoken_label} — avoid formal/written language!
         - Keep the speech natural, expressive, and varied.
         - Match each character's tone and personality.
         - If the Description lists "Teaching ideas"/example phrases, treat them as OPTIONAL inspiration
           only — weave in just the few that fit naturally, adapt them, and DROP the rest. A coherent
           scene always wins over using more phrases. Never include a phrase if it breaks the logic.
-        - **IMPORTANT — Name usage:** Determine whether the characters know each other based on the scenario description. If they are strangers (e.g., customer and clerk, patient and receptionist, passenger and driver, someone asking directions from a passerby), they must NOT call each other by name. Use generic forms of address instead (e.g., {generic_address}). Only use character names in dialogue if the scenario clearly implies a personal relationship (e.g., friends, family, colleagues who know each other).
+        - **IMPORTANT — Name usage:** Determine whether the characters know each other based on the scenario description. If they are strangers (e.g., customer and clerk, patient and receptionist, passenger and driver, someone asking directions from a passerby), they must NOT call each other by name. Use generic forms of address instead (e.g., {generic_address}). Only use character names in dialogue if the scenario clearly implies a personal relationship (e.g., friends, family, colleagues who know each other). If a SERIES CONTINUITY section is present, it is authoritative about who already knows whom.
 
         Metadata:
         Language: {language} ({spoken_label})
@@ -180,7 +189,7 @@ def generate_conversation(idea, metadata):
 
         Idea:
         Title: {idea['title']}
-        Description: {idea['description']}
+        Description: {idea['description']}{continuity_block}
 
         Generate the full conversation in natural {spoken_label} with sound effects at appropriate moments.
     """
@@ -340,6 +349,24 @@ def generate_guided_lesson(idea, metadata):
         )
 
     level_block = conversation_level_block(metadata.get('language_level'), language)
+    continuity_block = _continuity_block(idea)
+
+    # Episode 1 starts from zero. Every later episode is a learner who has already had lessons
+    # and people who already know each other — writing them as a blank slate is what made
+    # episode 9 open with "you must be Leo... your very first Swedish lesson".
+    if continuity_block:
+        learner_status = (f"someone who is still a beginner in {language}: they know only the few short "
+                          f"phrases listed under SERIES CONTINUITY and understand almost NONE of the rest")
+        learner_state = f"still a beginner in {language}, but not a newcomer to these lessons"
+        teaching_what = "new words"
+        callback_rule = (f"\n        Exception: a {language} phrase listed under SERIES CONTINUITY as already "
+                         f"taught may be used as a short callback; the guide briefly confirms it in English "
+                         f"('Like you learned...') instead of teaching it from scratch.")
+    else:
+        learner_status = f"someone who has NEVER spoken a word of {language} and understands almost NONE of it yet"
+        learner_state = f"brand new to {language}"
+        teaching_what = "their first words"
+        callback_rule = ""
 
     # The lesson's phrases are the REQUIRED curriculum for a guided episode — every one must be
     # taught, not a "pick a few" suggestion. Build an explicit checklist from the episode so the
@@ -363,15 +390,15 @@ def generate_guided_lesson(idea, metadata):
         curriculum_block = ""
 
     prompt = f"""
-        You are writing a GUIDED beginner {language} lesson as a scene for someone who has NEVER
-        spoken a word of {language} and understands almost NONE of it yet. It must feel like a warm,
+        You are writing a GUIDED beginner {language} lesson as a scene for {learner_status}.
+        It must feel like a warm,
         real moment between people — a patient guide gently teaching a friend — NOT a dry classroom
         drill. Take as long as the lesson needs (a few minutes is fine): it is more important to
         cover every target phrase clearly, with repetition, than to keep it short.
 
         THE TWO KEY ROLES:
-        - GUIDE = {guide['name']}: a warm local who is TEACHING {learner['name']} their first words.
-        - LEARNER = {learner['name']}: brand new to {language}. Listens, asks, repeats, tries.{extras_note}
+        - GUIDE = {guide['name']}: a warm local who is TEACHING {learner['name']} {teaching_what}.
+        - LEARNER = {learner['name']}: {learner_state}. Listens, asks, repeats, tries.{extras_note}
 
         THE #1 RULE — ENGLISH IS THE TEACHING LANGUAGE:
         The guide talks to the learner in ENGLISH. All instructions, encouragement, reactions, and
@@ -380,7 +407,7 @@ def generate_guided_lesson(idea, metadata):
 
         {language} appears ONLY as the small, deliberate phrases being TAUGHT. Every single piece of
         {language} the learner hears MUST be one the guide is explicitly teaching in that moment.
-        There must be ZERO untranslated {language}. If a {language} phrase is spoken, it is ALWAYS:
+        There must be ZERO untranslated {language}.{callback_rule} If a {language} phrase is spoken, it is ALWAYS:
           1. Framed first in English  — e.g. 'In {language}, "thank you" is...'
           2. Said slowly in {language} — the short target phrase only.
           3. Glossed/confirmed in English right away — e.g. 'That means "thank you".'
@@ -444,6 +471,8 @@ def generate_guided_lesson(idea, metadata):
           encouragement → "lang": "en". Do NOT mix both languages inside one entry — split them into
           two entries so each has a single clear "lang".
         - The 'text' field must start with an emotion/tone in brackets (e.g., [warm], [encouraging]).
+        - NEVER use [clearly], [clear] or any "clear/clearly" tag — the voice engine performs it as
+          a throat-clear. Use [slowly] or an emotion tag instead.
         - Keep the guide encouraging and the learner earnest. Match each character's tone.
 
         Sound effects: add 2–4 at natural action moments (see the setting). "timing" is "before" or
@@ -457,7 +486,7 @@ def generate_guided_lesson(idea, metadata):
 
         Lesson idea:
         Title: {idea['title']}
-        Description: {idea['description']}
+        Description: {idea['description']}{continuity_block}
 
         Generate the full guided lesson scene now.
     """
