@@ -34,7 +34,9 @@ ILLUSTRATION_STYLE = (
     "Characters have friendly, realistically proportioned bodies at a consistent scale "
     "relative to each other and the environment. "
     "Soft pastel-leaning color palette. High quality vector-art style. "
-    "No text, labels, words, letters, speech bubbles, or thought bubbles anywhere in the image."
+    "No text, labels, words, letters, speech bubbles, or thought bubbles anywhere in the image. "
+    "The artwork fills the ENTIRE tall frame edge to edge, top to bottom: no border, no frame line, "
+    "no blank paper or margin at the bottom or sides."
 )
 
 ## 🏗️ Core Functions
@@ -76,7 +78,7 @@ def create_generic_prompt(data: dict) -> str:
     # In series mode the description has extra blocks (target phrases, speech styles, direction)
     # appended after a blank line; those are for the scriptwriter, NOT the illustrator. Keeping
     # them would make the model render speech bubbles with that text, so we take the first block.
-    scene = (description or "").split("\n\n")[0].strip()
+    scene = (idea.get("illustration_scene") or (description or "").split("\n\n")[0]).strip()
 
     # Detect whether characters are in separate locations (phone call, video call, etc.).
     # 1) Explicit field from episodes.json (set by series_plan.py AI) — most reliable.
@@ -120,7 +122,8 @@ def create_generic_prompt(data: dict) -> str:
             f"Each panel should have a rich, detailed background that fits THAT character's location. "
             f"Convey interaction through gesture and expression (e.g. holding a phone, looking at a screen). "
             f"Tone: {tone}.\n\n"
-            f"REMINDER: EXACTLY {n} {'person' if n == 1 else 'people'}, each in their OWN separate panel."
+            f"REMINDER: EXACTLY {n} {'person' if n == 1 else 'people'}, each in their OWN separate panel. "
+            f"NO speech bubbles, NO captions, NO writing of any kind anywhere (not on signs, books or screens)."
         )
     else:
         # Standard single-scene layout
@@ -137,7 +140,8 @@ def create_generic_prompt(data: dict) -> str:
             f"(furniture, plants, props) in the same flat 2D style. Background contains OBJECTS ONLY, "
             f"no additional people. Convey interaction through gesture and expression. "
             f"Tone: {tone}.\n\n"
-            f"REMINDER: The image must contain EXACTLY {n} {'person' if n == 1 else 'people'}, not one more."
+            f"REMINDER: The image must contain EXACTLY {n} {'person' if n == 1 else 'people'}, not one more. "
+            f"NO speech bubbles, NO captions, NO writing of any kind anywhere (not on signs, books or screens)."
         )
 
     return prompt
@@ -190,6 +194,24 @@ def count_people(image) -> int:
     except Exception as e:
         print(f"   ⚠️  headcount check failed: {e}")
         return -1
+
+
+def has_visible_text(image) -> bool:
+    """Ask a vision model whether the image shows any writing or a speech bubble. False on error."""
+    try:
+        resp = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[
+                "Does this illustration contain ANY visible text: words, letters, numbers, captions, "
+                "signs with writing, labels, or speech bubbles / thought bubbles (even empty ones)? "
+                "Reply with ONLY YES or NO.",
+                image,
+            ],
+        )
+        return (resp.text or "").strip().upper().startswith("YES")
+    except Exception as e:
+        print(f"   ⚠️  text check failed: {e}")
+        return False
 
 
 def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") -> bool:
@@ -282,10 +304,17 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
     expected = len(data.get("idea", {}).get("characters", []))
     MAX_ATTEMPTS = 6
     best_image, best_diff = None, None
+    text_found = False
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
         # On retries, prepend a correction hint to help the model self-correct
-        if attempt > 1 and best_diff is not None:
+        if attempt > 1 and text_found:
+            retry_hint = (
+                "IMPORTANT: Your previous illustration contained text or speech bubbles. Draw NO text of any kind: "
+                "no speech bubbles, no captions, no letters, no numbers, no writing on signs, books or screens."
+            )
+            retry_contents = [retry_hint] + contents if not isinstance(contents[0], Image.Image) else contents[:1] + [retry_hint] + contents[1:]
+        elif attempt > 1 and best_diff is not None:
             retry_hint = (
                 f"IMPORTANT: Your previous illustration had the WRONG number of people. "
                 f"Draw EXACTLY {expected} people, no more, no less. "
@@ -297,6 +326,12 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
 
         image = _render_once(retry_contents, config, label)
         if image is None:
+            continue
+        text_found = has_visible_text(image)
+        if text_found:
+            print(f"   🔁 attempt {attempt}/{MAX_ATTEMPTS}: the image contains text or a speech bubble — regenerating")
+            if best_image is None:
+                best_image, best_diff = image, 98      # last resort only
             continue
         if expected <= 0:
             best_image = image

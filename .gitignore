@@ -33,3 +33,4 @@ sfx/
 
 # Archived dialogue scripts (paired with generated videos)
 script_archive/
+.tts_cache/

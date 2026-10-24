@@ -1,0 +1,69 @@
+{
+  "_comment": "Everyday Finnish A1, planned with Tung 2026-10-24 (see SERIES_BIBLE.md). Episodes are added chapter by chapter; ids must stay unique.",
+  "series": {
+    "title": "Everyday Finnish",
+    "language": "Finnish",
+    "default_language_level": "A1",
+    "default_length": "Short"
+  },
+  "episodes": [
+    {
+      "id": 1,
+      "lessons_covered": [
+        "Saying Hello & Goodbye"
+      ],
+      "title": "Moi!",
+      "title_en": "Hi!",
+      "description": "Alex astuu ensimmäisenä aamuna uuden kotitalonsa pihalle ja on matkalla töihin. Naapuri Linnea, nuori opiskelija, on lähdössä pyörällä yliopistolle ja sanoo hänelle iloisesti: Moi! Alex ja Linnea kertovat nimensä toisilleen englanniksi. Linnea opettaa Alexille, miten suomalaiset sanovat moi, huomenta ja hei hei arjessa. Alex toistaa sanat huolellisesti ja lähtee töihin sanoen: Hei hei!",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "street",
+      "format": "guided",
+      "tone": "Warm, upbeat, encouraging",
+      "key_phrases": [
+        "Moi",
+        "Huomenta",
+        "Hei hei"
+      ],
+      "notes": "First meeting: Alex and Linnea, who lives in the same building and studies at the university, exchange names in English (the Finnish for introducing yourself is taught in episode 6). Linnea speaks clear, relaxed Finnish and slows down for Alex; he repeats after her. Late August, Alex's first morning in the building.",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Survival Basics",
+      "level": "Beginner",
+      "language_level": "A1",
+      "illustration_scene": "A sunny late-summer morning in the leafy courtyard of a Helsinki apartment building. Alex, a young man in a hoodie, stands chatting with Linnea, a student about to cycle to the university; her bicycle is beside her with books in the basket. Both smile and use friendly gestures. A path, flowers and the building entrance are in the background."
+    },
+    {
+      "id": 2,
+      "lessons_covered": [
+        "Answering Yes, No, & Thanks",
+        "Sorry & You're Welcome"
+      ],
+      "title": "Kiitos!",
+      "title_en": "Thanks!",
+      "description": "Alex menee kahvilaan ja haluaa ostaa kahvin. Baristan nimi on Sanni, ja hän kertoo sen englanniksi. Sanni kysyy, haluaako Alex maitoa kahviinsa, ja Alex oppii vastaamaan kyllä tai ei. Kun Sanni ojentaa kahvin ja sanoo ole hyvä, Alex sanoo kiitos. Sitten Alex törmää vahingossa sokeritelineeseen ja pyytää anteeksi.",
+      "characters": [
+        "alex",
+        "sanni"
+      ],
+      "ambient_setting": "cafe",
+      "format": "guided",
+      "tone": "Friendly, efficient, light",
+      "key_phrases": [
+        "Kyllä",
+        "Ei",
+        "Kiitos",
+        "Anteeksi"
+      ],
+      "notes": "Alex and Sanni have never met; Sanni says her name in English. Sanni says 'Ole hyvä' when handing over the coffee but it is not drilled (four taught phrases is the limit). Sanni speaks clear Helsinki puhekieli; Alex stays careful.",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Survival Basics",
+      "level": "Beginner",
+      "language_level": "A1",
+      "illustration_scene": "The counter of a cosy Helsinki café on a bright morning. Sanni, the barista, stands behind the counter with a coffee cup in her hand and a friendly, efficient smile; Alex stands in front, slightly unsure, looking at the cup. Behind them are coffee machines, pastries under glass and a small sugar stand beside the counter."
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import os
 import io
 import re
 import json
+import time
 import sys # Added to handle command-line arguments
 import difflib
 import unicodedata
@@ -309,6 +310,167 @@ def apply_pronunciation_overrides(text, rules):
     return re.sub(r"([!?])[!?.]+", r"\1", out)
 
 
+_SERIES_TTS_SETTINGS = None
+_LAST_LINE_TIMINGS = []   # filled by _generate_conversation_audio, saved beside the mp3
+
+
+def _series_tts_settings():
+    """series/<active>/tts_settings.json, if present (cached).
+
+    {"default_model": "eleven_turbo_v2_5"} voices EVERY line with that model, so one character
+    keeps one voice (mixing models changes the voice). "max_attempts" raises the retry count and
+    "level_lines_dbfs" levels each line to the same loudness before joining. The older
+    {"word_models": {"Moi": "eleven_turbo_v2_5"}} voices only target-language lines that
+    contain that word with the given model instead of eleven_v3. Needed for Finnish:
+    eleven_v3 reads a bare "Moi" the French way ("mwa"), however it is spelled or
+    punctuated, and the Scribe check cannot hear the difference. The turbo model, which the
+    Kielo app uses for Finnish speech, says it right (chosen by ear, 2026-10-24), but it
+    garbles a lone "Huomenta" that eleven_v3 handles, so it is used only where needed.
+    Turbo has no audio tags, so they are stripped from those lines; every other line keeps
+    eleven_v3 and its tags.
+    """
+    global _SERIES_TTS_SETTINGS
+    if _SERIES_TTS_SETTINGS is None:
+        _SERIES_TTS_SETTINGS = {}
+        try:
+            from series_paths import get_active, SERIES_ROOT
+            slug = get_active()
+            path = (SERIES_ROOT / slug / "tts_settings.json") if slug else (SERIES_ROOT / "tts_settings.json")
+            if path.exists():
+                _SERIES_TTS_SETTINGS = json.loads(path.read_text(encoding="utf-8"))
+                print(f"   🎙️  Series voice settings from {path.name}: {_SERIES_TTS_SETTINGS}")
+        except Exception as e:
+            print(f"   ⚠️  Could not load series voice settings: {e}")
+    return _SERIES_TTS_SETTINGS
+
+
+# --- Gemini TTS provider ------------------------------------------------------
+# {"provider": "gemini", "gemini_voices": {"<cast id>": "<Gemini voice>"}} in a series'
+# tts_settings.json voices every line with Gemini 3.8 Flash TTS. Chosen for Finnish: on
+# 2026-10-24 eleven_v3 and turbo both failed by ear ("Moi" read as "mwa"; turbo robotic),
+# while Gemini's Sulafat voice said it right. The model is voice-dependent (Leda and Aoede
+# said "Moa"), so every character's voice has to be listened to. The bracketed mood cues in
+# the script become Gemini "style" directions; Finnish lines also get "speaking Finnish" to
+# pin the language, and guided lines "speaking slowly" instead of being time-stretched.
+
+GEMINI_TTS_MODEL = "gemini-3.8-flash-tts"
+_LANGUAGE_NAMES = {"fi": "Finnish", "sv": "Swedish", "en": "English"}
+_GEMINI_CLIENT = None
+_GEMINI_VOICES = None
+
+
+def _gemini_voice_for(voice_id):
+    """Gemini voice for a line, found through the cast: ElevenLabs voice_id -> cast id -> voice."""
+    global _GEMINI_VOICES
+    settings = _series_tts_settings()
+    if _GEMINI_VOICES is None:
+        _GEMINI_VOICES = {}
+        try:
+            from series_paths import get_active, SERIES_ROOT
+            slug = get_active()
+            base = (SERIES_ROOT / slug) if slug else SERIES_ROOT
+            cast = json.loads((base / "cast.json").read_text(encoding="utf-8"))["characters"]
+            names = settings.get("gemini_voices", {})
+            for cid, ch in cast.items():
+                if cid in names:
+                    _GEMINI_VOICES[ch.get("voice_id")] = names[cid]
+        except Exception as e:
+            print(f"   ⚠️  Could not map cast to Gemini voices: {e}")
+    return _GEMINI_VOICES.get(voice_id) or settings.get("gemini_default_voice", "Kore")
+
+
+def _gemini_pcm(text, voice, extra_style=()):
+    """One line through Gemini TTS -> raw 16-bit mono PCM at PCM_SAMPLE_RATE."""
+    import base64
+    from pydub import AudioSegment
+    global _GEMINI_CLIENT
+    if _GEMINI_CLIENT is None:
+        from google import genai
+        _GEMINI_CLIENT = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    tags = [t[1:-1].strip().lower() for t in AUDIO_TAG_RE.findall(text)]
+    plain = re.sub(r"[ \t]{2,}", " ", AUDIO_TAG_RE.sub(" ", text)).strip()
+    style = ", ".join([t for t in tags if t] + list(extra_style))
+    part = {"type": "text", "text": plain}
+    if style:
+        part["annotations"] = [{"type": "speech_metadata", "style": style}]
+    model = _series_tts_settings().get("gemini_model", GEMINI_TTS_MODEL)
+    last = None
+    for attempt in range(4):
+        try:
+            r = _GEMINI_CLIENT.interactions.create(
+                model=model, input=[{"type": "user_input", "content": [part]}],
+                response_format={"type": "audio"},
+                generation_config={"speech_config": [{"voice": voice}]},
+            )
+            wav = base64.b64decode(r.output_audio.data)
+            seg = (AudioSegment.from_wav(io.BytesIO(wav)).set_frame_rate(PCM_SAMPLE_RATE)
+                   .set_channels(PCM_CHANNELS).set_sample_width(PCM_SAMPLE_WIDTH))
+            return seg.raw_data
+        except Exception as e:                       # rate limits and blips: back off and retry
+            last = e
+            time.sleep(2 * (attempt + 1))
+    raise last
+
+
+# --- Approved-line cache -------------------------------------------------------
+# {"cache_lines": true} in a series' tts_settings.json keeps every line that passed the
+# check in .tts_cache/, keyed by what is actually sent (provider/model, voice, language,
+# final text). A rebuild then reuses the takes already accepted and only voices lines that
+# are new or changed, so one bad line can be redone without touching the rest. To redo one
+# line: python tts_generator.py --redo "Huomenta."  (drops its cached takes, then rebuild).
+
+CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".tts_cache")
+
+
+def _cache_key(model_id, voice_id, iso, text):
+    import hashlib
+    return hashlib.sha1("|".join([model_id, voice_id, iso, text]).encode("utf-8")).hexdigest()[:16]
+
+
+def _cache_get(key):
+    path = os.path.join(CACHE_DIR, key + ".pcm")
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return f.read()
+    return None
+
+
+def _cache_put(key, pcm, text, voice_id):
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    with open(os.path.join(CACHE_DIR, key + ".pcm"), "wb") as f:
+        f.write(pcm)
+    idx_path = os.path.join(CACHE_DIR, "index.json")
+    try:
+        idx = json.load(open(idx_path, encoding="utf-8"))
+    except Exception:
+        idx = {}
+    idx[key] = {"text": text, "voice_id": voice_id, "seconds": round(len(pcm) / (PCM_SAMPLE_RATE * PCM_SAMPLE_WIDTH * PCM_CHANNELS), 2)}
+    json.dump(idx, open(idx_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+
+
+def redo_cached_line(fragment):
+    """Drop cached takes whose text contains `fragment` (case-insensitive). Returns how many."""
+    idx_path = os.path.join(CACHE_DIR, "index.json")
+    try:
+        idx = json.load(open(idx_path, encoding="utf-8"))
+    except Exception:
+        return 0
+    gone = [k for k, v in idx.items() if fragment.lower() in v.get("text", "").lower()]
+    for k in gone:
+        try:
+            os.remove(os.path.join(CACHE_DIR, k + ".pcm"))
+        except OSError:
+            pass
+        idx.pop(k)
+    json.dump(idx, open(idx_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    return len(gone)
+
+
+# A spoken word needs a minimum length: a take clipped to half a word still transcribes as
+# the whole word often enough to pass the check, so very short audio is retried too.
+MIN_SECONDS_PER_LETTER = 0.045
+
+
 # --- Per-line synthesis ------------------------------------------------------
 
 def _line_language(item, target_iso):
@@ -350,10 +512,27 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
         and spoken_text(expected)
     )
 
+    settings = _series_tts_settings()
+    model_id = settings.get("default_model") or MODEL_ID
+    if iso == target_iso:
+        for word, word_model in (_series_tts_settings().get("word_models") or {}).items():
+            if re.search(r"(?<!\w)%s(?!\w)" % re.escape(word), spoken_text(text), re.IGNORECASE):
+                model_id = word_model
+                break
+    use_gemini = settings.get("provider") == "gemini"
+    if not use_gemini and not model_id.startswith("eleven_v3"):   # no audio tags outside v3
+        text = re.sub(r"[ \t]{2,}", " ", AUDIO_TAG_RE.sub(" ", text)).strip()
+    gemini_voice = _gemini_voice_for(voice_id) if use_gemini else None
+    gemini_extra = []
+    if use_gemini and iso == target_iso:
+        gemini_extra.append("speaking " + _LANGUAGE_NAMES.get(iso, iso))
+        if item.get("_slow_style"):
+            gemini_extra.append("slowly and clearly")
+
     kwargs = {
         "voice_id": voice_id,
         "text": text,
-        "model_id": MODEL_ID,
+        "model_id": model_id,
         "language_code": iso,
         "output_format": LINE_OUTPUT_FORMAT,
     }
@@ -362,10 +541,26 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
 
     best_audio, best_ratio, best_heard = None, -1.0, ""
 
-    for attempt in range(1, MAX_ATTEMPTS + 1):
-        audio = b"".join(elevenlabs_client.text_to_speech.convert(**kwargs))
+    cache_key = None
+    if settings.get("cache_lines"):
+        cache_key = _cache_key(
+            "gemini:" + settings.get("gemini_model", GEMINI_TTS_MODEL) if use_gemini else model_id,
+            (gemini_voice if use_gemini else voice_id) or "", iso, text + "|" + "|".join(gemini_extra),
+        )
+        cached = _cache_get(cache_key)
+        if cached is not None:
+            return cached, None
+
+    max_attempts = int(settings.get("max_attempts", MAX_ATTEMPTS))
+    for attempt in range(1, max_attempts + 1):
+        if use_gemini:
+            audio = _gemini_pcm(text, gemini_voice, gemini_extra)
+        else:
+            audio = b"".join(elevenlabs_client.text_to_speech.convert(**kwargs))
 
         if not should_verify:
+            if cache_key:
+                _cache_put(cache_key, audio, text, voice_id)
             return audio, None
 
         try:
@@ -376,7 +571,14 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
             return audio, None
 
         ok, ratio = pronunciation_matches(expected, heard)
+        letters = sum(ch.isalpha() for ch in spoken_text(expected))
+        seconds = len(audio) / (PCM_SAMPLE_RATE * PCM_SAMPLE_WIDTH * PCM_CHANNELS)
+        if ok and seconds < letters * MIN_SECONDS_PER_LETTER:
+            ok = False
+            heard = f"{heard} (only {seconds:.2f}s: clipped?)"
         if ok:
+            if cache_key:
+                _cache_put(cache_key, audio, text, voice_id)
             if attempt > 1:
                 print(f"   ✓ [{index}/{total}] Correct on attempt {attempt}: {spoken_text(expected)!r}")
             return audio, None
@@ -387,7 +589,7 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
 
     warning = (
         f"line {index}: expected {spoken_text(expected)!r}, heard {best_heard!r} "
-        f"after {MAX_ATTEMPTS} attempts"
+        f"after {max_attempts} attempts"
     )
     return best_audio, warning
 
@@ -430,6 +632,12 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
     target_iso = get_iso_code(language)
     overrides = load_pronunciation_overrides()
     total = len(dialogue_list)
+    use_gemini = _series_tts_settings().get("provider") == "gemini"
+    if use_gemini and fmt == "guided":
+        dialogue_list = [
+            ({**d, "_slow_style": True} if _line_language(d, target_iso) == target_iso else d)
+            for d in dialogue_list
+        ]
 
     def task(i):
         return synthesize_line(
@@ -441,10 +649,19 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
         results = list(pool.map(task, range(total)))
 
     slow = GUIDED_TARGET_SPEED if fmt == "guided" else 1.0
+    if use_gemini:
+        slow = 1.0          # Gemini is asked to speak slowly; no time-stretching
     if slow != 1.0:
         print(f"   🐢 Slowing {language} lines to {slow}x for beginners")
 
     pcm_parts, warnings = [], []
+    # Exact start/end of every line in the joined audio. sfx_mixer uses these instead of
+    # re-transcribing: Whisper merges and splits neighbouring lines in English-led episodes,
+    # which breaks the one-segment-per-line assumption (and the sound effects with it).
+    global _LAST_LINE_TIMINGS
+    _LAST_LINE_TIMINGS = []
+    bytes_per_ms = PCM_SAMPLE_RATE * PCM_SAMPLE_WIDTH * PCM_CHANNELS / 1000.0
+    cursor_ms = 0.0
     for i, (audio, warning) in enumerate(results):
         if warning:
             warnings.append(warning)
@@ -452,13 +669,24 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
             continue
         if slow != 1.0 and _line_language(dialogue_list[i], target_iso) == target_iso:
             audio = _stretch(audio, slow)
+        level = _series_tts_settings().get("level_lines_dbfs")
+        if level is not None:
+            seg = AudioSegment(data=audio, sample_width=PCM_SAMPLE_WIDTH, frame_rate=PCM_SAMPLE_RATE, channels=PCM_CHANNELS)
+            if seg.dBFS != float("-inf"):
+                audio = seg.apply_gain(level - seg.dBFS).raw_data
         if pcm_parts:
             same_speaker = (
                 dialogue_list[i].get("voice_id") == dialogue_list[i - 1].get("voice_id")
             )
-            pcm_parts.append(_silence(
-                GAP_SAME_SPEAKER_MS if same_speaker else GAP_SPEAKER_CHANGE_MS
-            ))
+            gap_ms = GAP_SAME_SPEAKER_MS if same_speaker else GAP_SPEAKER_CHANGE_MS
+            pcm_parts.append(_silence(gap_ms))
+            cursor_ms += gap_ms
+        start_ms = cursor_ms
+        cursor_ms += len(audio) / bytes_per_ms
+        _LAST_LINE_TIMINGS.append({
+            "start": round(start_ms / 1000, 3), "end": round(cursor_ms / 1000, 3),
+            "text": spoken_text(dialogue_list[i].get("text", "")),
+        })
         pcm_parts.append(audio)
 
     combined = AudioSegment(
@@ -513,6 +741,13 @@ def generate_and_save_audio(elevenlabs_client, dialogue_list, output_filename,
             f.write(audio_bytes)
 
         print(f"✅ Saved: {output_path}")
+        timings_path = os.path.splitext(output_path)[0] + ".timings.json"
+        if script_type == "conversation" and len(_LAST_LINE_TIMINGS) == len(dialogue_list):
+            with open(timings_path, "w", encoding="utf-8") as f:
+                json.dump(_LAST_LINE_TIMINGS, f, ensure_ascii=False, indent=1)
+            print(f"   ⏱️  Saved exact line timings: {os.path.basename(timings_path)}")
+        elif os.path.exists(timings_path):
+            os.remove(timings_path)
         if warnings:
             print(f"   ⚠️  {len(warnings)} line(s) still sound wrong — check these by ear:")
             for w in warnings:
@@ -567,6 +802,10 @@ def process_scripts_directory(elevenlabs_client, scripts_dir, script_type):
 
 
 def main():
+    if len(sys.argv) >= 3 and sys.argv[1] == "--redo":
+        n = redo_cached_line(sys.argv[2])
+        print(f"Dropped {n} cached take(s) containing {sys.argv[2]!r}. Rebuild to voice them again.")
+        return
     # Load environment variables (API key)
     load_dotenv()
     api_key = os.getenv("ELEVENLABS_API_KEY")

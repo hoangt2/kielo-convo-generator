@@ -1,0 +1,6 @@
+{
+  "_comment": "Everyday Finnish A1 is voiced by ElevenLabs eleven_v3 with NATIVE FINNISH voices from the library (Swedish was fixed the same way: a non-native voice misreads the language). The old cast had a French voice for Alex (said 'Moi' as 'mwa'), an American voice for Anna, an Indian-accented one for Markku. Voices (chosen by ear by Tung, 2026-10-24): alex=Matias, linnea=Aurora, sanni=Aava, markku=Petteri, leo=Jussi, anna=Soili (middle-aged: the library has no native elderly woman). Each line is levelled to the same loudness and single words get up to 6 retries.",
+  "max_attempts": 6,
+  "level_lines_dbfs": -20,
+  "cache_lines": true
+}

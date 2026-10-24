@@ -39,6 +39,12 @@ PAUSE_AFTER_SFX_MS = 200  # Short pause after an SFX clip before next dialogue
 
 def get_dialogue_timestamps(mp3_path: Path, language: str = "Finnish") -> list:
     """Use faster-whisper to get timestamps for each dialogue segment."""
+    sidecar = Path(mp3_path).with_suffix(".timings.json")
+    if sidecar.exists():
+        exact = json.load(open(sidecar, encoding="utf-8"))
+        print(f"   ⏱️  Using exact line timings from the voice step ({len(exact)} lines)")
+        return exact
+
     from faster_whisper import WhisperModel
     from language_config import get_iso_code
     
@@ -256,6 +262,9 @@ def mix_sfx_into_audio(mp3_path: Path, script_path: Path, sfx_folder: Path) -> b
             # Reconstruct audio with pauses and SFX
             mixed = build_mixed_audio(original_audio, timestamps, sfx_positions, sfx_folder)
             print(f"   ⏱️  New duration with pauses+SFX: {len(mixed) / 1000:.1f}s")
+            # The audio is about to be replaced by the mixed version, so these timings
+            # would be stale if the mixer were run again: use them once.
+            Path(mp3_path).with_suffix(".timings.json").unlink(missing_ok=True)
         else:
             print("   ⚠️  No timestamps found, adding pauses only")
             mixed = original_audio

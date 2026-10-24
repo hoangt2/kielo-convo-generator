@@ -174,6 +174,9 @@ def generate_conversation(idea, metadata):
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
         - NEVER use [clearly], [clear] or any "clear/clearly" tag — the voice engine performs it as
           a throat-clear. Use [slowly] or an emotion tag instead.
+        - A bracket tag is ONLY one or two words of emotion, tone or pace, e.g. [warm], [slowly], [curious],
+          [encouraging]. NEVER put an action or gesture in a tag ([waving goodbye], [nodding], [calling after her],
+          [processing]): a voice cannot perform it and may read it aloud.
         - Write ONLY in natural {spoken_label} — avoid formal/written language!
         - Keep the speech natural, expressive, and varied.
         - Match each character's tone and personality.
@@ -473,6 +476,9 @@ def generate_guided_lesson(idea, metadata):
         - The 'text' field must start with an emotion/tone in brackets (e.g., [warm], [encouraging]).
         - NEVER use [clearly], [clear] or any "clear/clearly" tag — the voice engine performs it as
           a throat-clear. Use [slowly] or an emotion tag instead.
+        - A bracket tag is ONLY one or two words of emotion, tone or pace, e.g. [warm], [slowly], [curious],
+          [encouraging]. NEVER put an action or gesture in a tag ([waving goodbye], [nodding], [calling after her],
+          [processing]): a voice cannot perform it and may read it aloud.
         - Keep the guide encouraging and the learner earnest. Match each character's tone.
 
         Sound effects: add 2–4 at natural action moments (see the setting). "timing" is "before" or
@@ -593,6 +599,9 @@ def generate_podcast_script(idea, metadata):
         Instructions:
         - Use the **exact** 'voice_id' provided in the Characters list for each line.
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
+        - A bracket tag is ONLY one or two words of emotion, tone or pace, e.g. [warm], [slowly], [curious],
+          [encouraging]. NEVER put an action or gesture in a tag ([waving goodbye], [nodding], [calling after her],
+          [processing]): a voice cannot perform it and may read it aloud. NEVER use [clearly] or [clear].
         - The script must clearly deliver the lesson outlined in the concept.
         - **STRICTLY:** The vast majority (85%+) of the dialogue should be in English. Introduce and explain Finnish words/phrases clearly.
         - Ensure the total duration aligns with the metadata length.

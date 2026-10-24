@@ -1,0 +1,4 @@
+{
+  "_comment": "Per-series TTS pronunciation overrides for Everyday Finnish A1 (target-language lines only). Empty on purpose: the 'Moi' respellings and the 'Moi!' trick did not fix the French reading on eleven_v3; the fix is the model, see tts_settings.json.",
+  "rules": []
+}

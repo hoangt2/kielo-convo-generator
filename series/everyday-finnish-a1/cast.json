@@ -1,0 +1,84 @@
+{
+  "_comment": "AI-generated cast. Keep voice_id and appearance STABLE for consistency. `id` keys are referenced by episodes and series_plan.py.",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "alex": {
+      "name": "Alex",
+      "role": "The learner; a recent arrival in Finland exploring daily life.",
+      "voice_id": "lOPf5yCKGVCTYSpGXgQr",
+      "gender": "Male",
+      "age": "Young Adult",
+      "default_tone": "Curious, slightly hesitant, friendly",
+      "language_level": "A1",
+      "speech_style": "Careful, clear standard Finnish (kirjakieli pronunciation), using 'Minä' and 'Sinä'. Asks for clarification often.",
+      "personality": "Eager to learn and connect, observant, sometimes a bit overwhelmed but always polite.",
+      "appearance": "Slender build, light brown skin, short black curly hair. Wears practical, comfortable clothes like hoodies and jeans.",
+      "reference_image": "series/everyday-finnish-a1/characters/alex.png"
+    },
+    "linnea": {
+      "name": "Linnea",
+      "role": "A friendly university student who befriends Alex.",
+      "voice_id": "YSabzCJMvEHDduIDMdwV",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Warm, encouraging, patient",
+      "language_level": "Native",
+      "speech_style": "Natural, relaxed spoken Finnish (puhekieli), uses 'mä'/'sä'. Sometimes slows down or simplifies for Alex.",
+      "personality": "Kind, empathetic, and sociable. Enjoys explaining things about Finnish culture and language.",
+      "appearance": "Medium build with fair skin and freckles. Long, straight blonde hair, often in a ponytail. Wears colorful sweaters and glasses.",
+      "reference_image": "series/everyday-finnish-a1/characters/linnea.png"
+    },
+    "markku": {
+      "name": "Markku",
+      "role": "A busy, direct kiosk vendor or cashier.",
+      "voice_id": "uBwJeWtV6tQa8ixtM7ZQ",
+      "gender": "Male",
+      "age": "Adult",
+      "default_tone": "Gruff, efficient, direct",
+      "language_level": "Native",
+      "speech_style": "Fast, clipped puhekieli. Uses minimal words and expects the same. 'Mitäs sulle sais olla?'",
+      "personality": "Not unfriendly, but perpetually in a hurry and focused on his work. Impatient but fair.",
+      "appearance": "Broad-shouldered, stocky build with a weathered face. Bald on top with short grey hair on the sides. Wears a worn-out fleece vest.",
+      "reference_image": "series/everyday-finnish-a1/characters/markku.png"
+    },
+    "sanni": {
+      "name": "Sanni",
+      "role": "A young professional, works as a barista or librarian.",
+      "voice_id": "mAQFJGiGHnU55mtzMI27",
+      "gender": "Female",
+      "age": "Young Adult",
+      "default_tone": "Polite, professional, cheerful",
+      "language_level": "Native",
+      "speech_style": "Standard Helsinki puhekieli. Speaks clearly and confidently. Switches between formal and informal greetings depending on the context.",
+      "personality": "Efficient, organized, and helpful in a professional capacity. Keeps conversations focused but is friendly and approachable.",
+      "appearance": "Tall and slim build, olive skin tone. Dark brown hair cut in a sharp bob. Wears stylish but practical clothes, like a black turtleneck.",
+      "reference_image": "series/everyday-finnish-a1/characters/sanni.png"
+    },
+    "leo": {
+      "name": "Leo",
+      "role": "An energetic and outgoing friend from a hobby group.",
+      "voice_id": "dlbXHgJnwobU5JdZ8F5M",
+      "gender": "Male",
+      "age": "Young Adult",
+      "default_tone": "Enthusiastic, fast-paced, humorous",
+      "language_level": "Native",
+      "speech_style": "Very casual, fast puhekieli with modern slang. Often shortens words. 'Moro! Mitä äijä?'",
+      "personality": "Extroverted, spontaneous, and always suggesting activities. He's friendly but sometimes forgets to slow down for Alex.",
+      "appearance": "Athletic build, fair skin. Short, messy reddish-brown hair. Typically wears band t-shirts, a beanie, and sneakers.",
+      "reference_image": "series/everyday-finnish-a1/characters/leo.png"
+    },
+    "anna": {
+      "name": "Anna",
+      "role": "A helpful, friendly neighbour.",
+      "voice_id": "RiWFFlzYFZuu4lPMig3i",
+      "gender": "Female",
+      "age": "Middle-aged",
+      "default_tone": "Gentle, calm, warm",
+      "language_level": "Native",
+      "speech_style": "Clear spoken Finnish, uses common puhekieli forms but speaks at a moderate pace. Avoids very modern slang.",
+      "personality": "Patient, wise, and enjoys small talk. Has a quiet sense of humor and likes to help.",
+      "appearance": "Medium build with fair skin and a warm, kind smile with soft laugh lines. Shoulder-length brown hair with a few silver streaks, neatly tucked behind the ears. Often wears a cozy knitted cardigan over a simple blouse.",
+      "reference_image": "series/everyday-finnish-a1/characters/anna.png"
+    }
+  }
+}

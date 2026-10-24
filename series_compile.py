@@ -105,6 +105,9 @@ def build_idea(episode, cast, episodes=(), language="Finnish"):
         "description": description,
         "ambient_setting": episode.get("ambient_setting", ""),
         "illustration_layout": episode.get("illustration_layout", "single"),
+        # A picture-only scene (what can be SEEN, no spoken words) for the illustrator. The
+        # description quotes the lesson words, which the image model draws as speech bubbles.
+        "illustration_scene": episode.get("illustration_scene", ""),
         "language_level": episode.get("language_level", ""),
         # Script format: "guided" routes generate_scripts.py to the bilingual,
         # teacher-led lesson for true beginners; anything else = normal conversation.
