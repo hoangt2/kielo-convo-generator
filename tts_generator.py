@@ -188,6 +188,22 @@ _CLARITY_RE = re.compile(r"^(?:(?:very|extra|more|so)\s+)?clear(?:ly)?$", re.IGN
 _TAG_PARTS_RE = re.compile(r"\s*(?:,|\band\b|&)\s*", re.IGNORECASE)
 
 
+# Cues are one or two words of emotion, tone or pace. The script writer sometimes adds stage
+# directions to them ("[quietly, to Alex]", "[to Alex, in English]", "[from a distance]"); a
+# voice cannot perform those and may read them aloud, so they are dropped before voicing.
+_DIRECTION_RE = re.compile(r"\b(?:to\s+\w+|in\s+(?:english|finnish|swedish)|from\s+a\s+distance|calling\s+out)\b", re.IGNORECASE)
+
+
+def sanitize_cues(text):
+    """Remove direction words from bracket cues, keeping the emotion/tone/pace part."""
+    def fix(match):
+        parts = [p.strip() for p in match.group(0)[1:-1].split(",") if p.strip()]
+        kept = [p for p in parts if not _DIRECTION_RE.search(p)]
+        return "[%s]" % ", ".join(kept) if kept else ""
+    out = AUDIO_TAG_RE.sub(fix, text or "")
+    return re.sub(r"[ \t]{2,}", " ", out).strip()
+
+
 def strip_clarity_cues(text):
     """Remove 'clearly'/'clear' from audio tags: "[slowly, clearly]" -> "[slowly]", "[Clearly]" -> ""."""
     def fix(match):
@@ -495,7 +511,7 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
     # refuse a contrast as spelled — Sten renders "Tak" as /tak/ — and a respelling
     # like "Taak" is the only lever that reaches the acoustics.
     expected = item.get("text", "")
-    text = strip_clarity_cues(item.get("tts_text") or expected)
+    text = sanitize_cues(strip_clarity_cues(item.get("tts_text") or expected))
     voice_id = item.get("voice_id", "")
     iso = _line_language(item, target_iso)
     # Series overrides apply only to target-language lines, and never override an

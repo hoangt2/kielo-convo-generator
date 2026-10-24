@@ -20,27 +20,29 @@ Alex has just moved to Helsinki for a new job at a small tech company. The serie
 - Each episode refers back to earlier ones (a usual coffee, the library Linnea showed him, how long he has been here).
 
 ## Episodes
+Rule from the script writer: in an English-led (guided) lesson the teacher must be a personal companion (friend or neighbour), never a service worker. So every scene with Sanni or Markku also has a companion guide (Linnea or Anna); Sanni and Markku only have short service lines.
+
 | # | Lessons | Cast | Place | Relationship status |
 |---|---|---|---|---|
 | 1 | Saying hello & goodbye | Alex, Linnea | courtyard | first meeting; young neighbour; names in English |
-| 2 | Yes, no, thanks; sorry & you're welcome | Alex, Sanni | café | stranger; she says her name |
+| 2 | Yes, no, thanks; sorry & you're welcome | Alex, Linnea, Sanni | café | Linnea guides; Sanni is a stranger and says her name |
 | 3 | Saving the conversation (repeat, slower) | Alex, Linnea | courtyard/stairs | neighbours, second chat |
-| 4 | Basic questions (mikä, missä, kuka) | Alex, Sanni | café | she recognises him |
-| 5 | Making your first purchase | Alex, Markku | kiosk | strangers |
+| 4 | Basic questions (mikä, missä, kuka) | Alex, Linnea, Sanni | café | Linnea guides; Sanni recognises him |
+| 5 | Making your first purchase | Alex, Linnea, Markku | kiosk | Linnea guides; Markku is a stranger |
 | 6 | The spoken pronouns; introducing yourself | Alex, Anna | courtyard/stairs | first meeting with the older neighbour |
 | 7 | Sharing your origins | Alex, Linnea | café or library | friends already; she asks where he is from |
 | 8 | Numbers 0-10 | Alex, Anna | lift/stairwell | neighbours; counting floors |
 | 9 | Talk about work | Alex, Linnea | park | friendly acquaintances |
 | 10 | Finding where things are; getting around town | Alex, Linnea | street | Linnea shows him the city |
-| 11 | Asking for the price; numbers 10-100 | Alex, Markku | kiosk | Markku recognises him, says his name |
-| 12 | What time is it? | Alex, Sanni | café | regular-ish |
+| 11 | Asking for the price; numbers 10-100 | Alex, Anna, Markku | kiosk | Anna guides; Markku recognises Alex, says his name |
+| 12 | What time is it? | Alex, Linnea, Sanni | café | Linnea guides; he is becoming a regular |
 | 13 | Days of the week; parts of the day | Alex, Anna | home/courtyard | her weekly routine |
 | 14 | When shall we meet?; bigger numbers in time & dates | Alex, Linnea | library | arranging to study together |
 | 15 | Months; talking about the date | Alex, Anna | home_kitchen | her birthday |
-| 16 | At the café; ordering a meal | Alex, Sanni | café | regular |
+| 16 | At the café; ordering a meal | Alex, Linnea, Sanni | café | Linnea guides; he is a regular |
 | 17 | Likes & dislikes; asking about the food | Alex, Linnea | restaurant | friends |
 | 18 | Paying the bill | Alex, Linnea, Sanni | café | Sanni knows his order |
-| 19 | At the grocery shop | Alex, Markku | supermarket | Markku warmer |
+| 19 | At the grocery shop | Alex, Anna, Markku | supermarket | Anna guides; Markku warmer |
 | 20 | My family; brothers, sisters & kids | Alex, Linnea | park | friends share family news |
 | 21 | This is my friend; describing someone | Alex, Linnea, Leo | street | Leo first meeting |
 | 22 | "Do you have...?" | Alex, Leo | park | new acquaintance |

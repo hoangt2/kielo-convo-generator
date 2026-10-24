@@ -601,7 +601,8 @@ def generate_podcast_script(idea, metadata):
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
         - A bracket tag is ONLY one or two words of emotion, tone or pace, e.g. [warm], [slowly], [curious],
           [encouraging]. NEVER put an action or gesture in a tag ([waving goodbye], [nodding], [calling after her],
-          [processing]): a voice cannot perform it and may read it aloud. NEVER use [clearly] or [clear].
+          [processing]): a voice cannot perform it and may read it aloud. Never name who a line is
+          addressed to or which language it is in ([to Alex], [in English], [from a distance]). NEVER use [clearly] or [clear].
         - The script must clearly deliver the lesson outlined in the concept.
         - **STRICTLY:** The vast majority (85%+) of the dialogue should be in English. Introduce and explain Finnish words/phrases clearly.
         - Ensure the total duration aligns with the metadata length.

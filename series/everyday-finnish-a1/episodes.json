@@ -43,9 +43,10 @@
       ],
       "title": "Kiitos!",
       "title_en": "Thanks!",
-      "description": "Alex menee kahvilaan ja haluaa ostaa kahvin. Baristan nimi on Sanni, ja hän kertoo sen englanniksi. Sanni kysyy, haluaako Alex maitoa kahviinsa, ja Alex oppii vastaamaan kyllä tai ei. Kun Sanni ojentaa kahvin ja sanoo ole hyvä, Alex sanoo kiitos. Sitten Alex törmää vahingossa sokeritelineeseen ja pyytää anteeksi.",
+      "description": "Linnea vie Alexin kulman kahvilaan ja neuvoo häntä englanniksi, kun Alex tilaa ensimmäisen kahvinsa. Baristan nimi on Sanni, ja hän kertoo sen englanniksi. Sanni kysyy, haluaako Alex maitoa kahviinsa, ja Linnea opettaa Alexille sanat kyllä ja ei. Kun Sanni ojentaa kahvin ja sanoo ole hyvä, Alex sanoo kiitos. Sitten Alex törmää vahingossa sokeritelineeseen ja pyytää anteeksi.",
       "characters": [
         "alex",
+        "linnea",
         "sanni"
       ],
       "ambient_setting": "cafe",
@@ -57,13 +58,13 @@
         "Kiitos",
         "Anteeksi"
       ],
-      "notes": "Alex and Sanni have never met; Sanni says her name in English. Sanni says 'Ole hyvä' when handing over the coffee but it is not drilled (four taught phrases is the limit). Sanni speaks clear Helsinki puhekieli; Alex stays careful.",
+      "notes": "Linnea is Alex's friend and the guide: she coaches him in English and teaches the four phrases. Sanni, the barista, has short service lines only (asks about milk, hands over the coffee) and never teaches. Alex and Sanni have never met; Sanni says her name in English. Sanni says 'Ole hyvä' when handing over the coffee but it is not drilled (four taught phrases is the limit).",
       "illustration_layout": "single",
       "track": "Everyday Finnish",
       "chapter": "Survival Basics",
       "level": "Beginner",
       "language_level": "A1",
-      "illustration_scene": "The counter of a cosy Helsinki café on a bright morning. Sanni, the barista, stands behind the counter with a coffee cup in her hand and a friendly, efficient smile; Alex stands in front, slightly unsure, looking at the cup. Behind them are coffee machines, pastries under glass and a small sugar stand beside the counter."
+      "illustration_scene": "The counter of a cosy Helsinki café on a bright morning. Linnea, a student with glasses and a blonde ponytail, stands beside Alex, a young man in a hoodie, who is holding a coffee cup and looks slightly unsure; she smiles encouragingly. Sanni, the barista, stands behind the counter with a friendly smile. Behind them are coffee machines, pastries under glass and a small sugar stand at the end of the counter."
     }
   ]
 }
