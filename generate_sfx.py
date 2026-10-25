@@ -38,7 +38,23 @@ AMBIENT_PROMPTS = {
     "hospital": "Hospital ambience with soft beeping monitors, footsteps on linoleum, muffled PA announcements, and quiet atmosphere",
     "airport": "Airport terminal ambience with rolling luggage, flight announcements, distant crowd murmur, and departure hall atmosphere",
     "beach": "Beach ambience with ocean waves washing on shore, seagulls calling, gentle breeze, and distant beachgoers",
+    # Seasonal variants of the outdoor settings (series episodes with a season; summer uses the
+    # plain one). Picked by ambient_name(); each is generated once and kept like the others.
+    "street_autumn": "City street ambience in autumn rain: tyres hissing on wet asphalt, light steady rain, distant traffic, and footsteps on wet pavement",
+    "street_winter": "Winter city street ambience: cars driving slowly through slush, footsteps crunching on packed snow, a distant tram bell, and muffled cold stillness",
+    "street_spring": "City street ambience in spring with distant traffic, bicycles passing, meltwater dripping from roofs, birds singing, and pedestrian footsteps",
+    "park_autumn": "Outdoor park ambience in autumn with wind through the trees, dry leaves rustling and blowing across the paths, a few distant crows, and a faint city hum",
+    "park_winter": "Snowy winter park ambience: quiet muffled stillness, soft wind, distant footsteps crunching on snow, a faint city hum, and no birdsong",
+    "park_spring": "Spring park ambience with birds singing, meltwater trickling, a gentle breeze, and a faint city hum",
 }
+
+
+def ambient_name(idea: dict) -> str:
+    """The ambience clip for an idea: its setting, or the setting's seasonal variant if one exists."""
+    setting = idea.get("ambient_setting", "")
+    season = (idea.get("season") or {}).get("name", "")
+    seasonal = f"{setting}_{season}"
+    return seasonal if season and seasonal in AMBIENT_PROMPTS else setting
 
 # --- Load environment variables ---
 load_dotenv()
@@ -138,7 +154,7 @@ def process_script(client: ElevenLabs, script_path: Path) -> bool:
     
     dialogue_list = data.get("dialogue_list", [])
     idea = data.get("idea", {})
-    ambient_setting = idea.get("ambient_setting", "")
+    ambient_setting = ambient_name(idea)
     slug = script_path.stem
     sfx_folder = SFX_DIR / slug
     

@@ -69,8 +69,24 @@ def create_generic_prompt(data: dict) -> str:
         line = f"  • {name}: {gender}, {age}"
         if appearance:
             line += f". {appearance}"
+        if c.get("outfit"):
+            line += f". Wears: {c['outfit']}"
         char_lines.append(line)
     char_block = "\n".join(char_lines) if char_lines else "unspecified characters"
+
+    # Series episodes carry a season: the background shows that time of year and the
+    # characters wear their outfit for it (listed above), not the clothes in their portrait.
+    season = idea.get("season") or {}
+    season_clause = ""
+    if season.get("look"):
+        when = f"{season['when']} ({season['name']})" if season.get("when") else season["name"]
+        season_clause = (
+            f"TIME OF YEAR: {when} in Helsinki, Finland. Show it clearly in the light, sky, weather, "
+            f"plants and anything seen through windows: {season['look']} "
+            f"Everyone is dressed for this season as listed under Characters. Indoors, coats, hats, "
+            f"scarves and gloves are off (hung up or over a chair) unless the person is just arriving "
+            f"or leaving.\n"
+        )
 
     n = len(names)
 
@@ -117,6 +133,7 @@ def create_generic_prompt(data: dict) -> str:
             f"appears in their OWN panel with their OWN background/environment. "
             f"Do NOT place them in the same room or scene.\n\n"
             f"Scene context: {scene or 'A remote conversation between the characters.'}\n"
+            f"{season_clause}"
             f"Characters (each must look visually DISTINCT — different hair, clothing, build):\n"
             f"{char_block}\n\n"
             f"Each panel should have a rich, detailed background that fits THAT character's location. "
@@ -134,6 +151,7 @@ def create_generic_prompt(data: dict) -> str:
             f"{ILLUSTRATION_STYLE}\n\n"
             f"Scene: {scene or 'A simple moment between the characters.'}\n"
             f"{setting_clause}\n"
+            f"{season_clause}"
             f"Characters (each must look visually DISTINCT — different hair, clothing, build):\n"
             f"{char_block}\n\n"
             f"Draw a single illustration of one moment. Rich background with environmental details "
@@ -184,6 +202,7 @@ def count_people(image) -> int:
             contents=[
                 "Count the distinct human figures (people/characters) visible in this illustration. "
                 "If the same person appears more than once, count each appearance separately. "
+                "Do NOT count people shown inside paintings, portraits, framed pictures, posters, photographs or screens. "
                 "Reply with ONLY a single integer.",
                 image,
             ],
@@ -194,6 +213,19 @@ def count_people(image) -> int:
     except Exception as e:
         print(f"   ⚠️  headcount check failed: {e}")
         return -1
+
+
+def blank_bottom_fraction(image) -> float:
+    """Share of the image height, counted from the bottom, that is one flat colour (a blank strip)."""
+    import numpy as np
+    a = np.asarray(image.convert("L"), dtype=float)
+    blank = 0
+    for row in a[::-1]:
+        if row.std() < 3.0:
+            blank += 1
+        else:
+            break
+    return blank / max(1, a.shape[0])
 
 
 def has_visible_text(image) -> bool:
@@ -281,9 +313,14 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
     # the model from duplicating a character or adding extra bystanders.
     if ref_pairs:
         n = len(ref_pairs)
+        # A seasonal outfit replaces the portrait's clothes; face, hair and build still come
+        # from the portrait so the character stays recognisable in a winter coat.
+        dressed = any(c.get("outfit") for c in data.get("idea", {}).get("characters", []))
+        looks = ("face, hair, skin tone and build; their CLOTHES come from the 'Wears:' outfit in the "
+                 "Characters list, not from the portrait" if dressed else "face, hair, clothing")
         contents = [
             f"Below are {n} reference portrait(s), one per character. Each defines the EXACT "
-            f"appearance (face, hair, clothing) of ONE person. Render each of these {n} people "
+            f"appearance ({looks}) of ONE person. Render each of these {n} people "
             f"EXACTLY ONCE in the scene and include NO other people — no duplicates, no extra "
             f"figures, no background crowd:",
         ]
@@ -304,15 +341,12 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
     expected = len(data.get("idea", {}).get("characters", []))
     MAX_ATTEMPTS = 6
     best_image, best_diff = None, None
-    text_found = False
+    problem = ""
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
         # On retries, prepend a correction hint to help the model self-correct
-        if attempt > 1 and text_found:
-            retry_hint = (
-                "IMPORTANT: Your previous illustration contained text or speech bubbles. Draw NO text of any kind: "
-                "no speech bubbles, no captions, no letters, no numbers, no writing on signs, books or screens."
-            )
+        if attempt > 1 and problem:
+            retry_hint = problem
             retry_contents = [retry_hint] + contents if not isinstance(contents[0], Image.Image) else contents[:1] + [retry_hint] + contents[1:]
         elif attempt > 1 and best_diff is not None:
             retry_hint = (
@@ -327,9 +361,17 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
         image = _render_once(retry_contents, config, label)
         if image is None:
             continue
-        text_found = has_visible_text(image)
-        if text_found:
-            print(f"   🔁 attempt {attempt}/{MAX_ATTEMPTS}: the image contains text or a speech bubble — regenerating")
+        problem, reason = "", ""
+        if has_visible_text(image):
+            reason = "contains text or a speech bubble"
+            problem = ("IMPORTANT: Your previous illustration contained text or speech bubbles. Draw NO text of any kind: "
+                       "no speech bubbles, no captions, no letters, no numbers, no writing on signs, books or screens.")
+        elif blank_bottom_fraction(image) > 0.06:
+            reason = "has a blank strip at the bottom"
+            problem = ("IMPORTANT: Your previous illustration left a blank strip at the bottom. The artwork must fill the ENTIRE "
+                       "tall frame, edge to edge, with the floor or ground continuing all the way to the very bottom edge.")
+        if problem:
+            print(f"   🔁 attempt {attempt}/{MAX_ATTEMPTS}: the image {reason} — regenerating")
             if best_image is None:
                 best_image, best_diff = image, 98      # last resort only
             continue

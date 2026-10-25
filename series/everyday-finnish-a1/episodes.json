@@ -4,7 +4,25 @@
     "title": "Everyday Finnish",
     "language": "Finnish",
     "default_language_level": "A1",
-    "default_length": "Short"
+    "default_length": "Short",
+    "seasons": {
+      "summer": {
+        "look": "late summer: full green leafy trees, bright sunshine, long light evenings, flowers in yards and planters.",
+        "sounds": "birdsong, a light breeze in the leaves"
+      },
+      "autumn": {
+        "look": "trees turning yellow, orange and red, fallen leaves on paths and pavements, grey skies or low golden light, wet streets and puddles after rain, dusk coming early.",
+        "sounds": "rain on umbrellas or windows, leaves rustling underfoot, gusts of wind"
+      },
+      "winter": {
+        "look": "snow on the ground, roofs and bare trees, short days under a dark-blue sky with warm yellow street lights and lit windows already in the afternoon, breath steaming in the cold, candles in windows.",
+        "sounds": "snow crunching underfoot, cold wind, a door shutting out the cold, boots stamped off on a mat"
+      },
+      "spring": {
+        "look": "the last snow melting into puddles, bare trees with the first light-green buds and leaves, bright sun, long light evenings returning, early flowers.",
+        "sounds": "meltwater dripping, birdsong returning, bicycles on the street"
+      }
+    }
   },
   "episodes": [
     {
@@ -33,7 +51,9 @@
       "chapter": "Survival Basics",
       "level": "Beginner",
       "language_level": "A1",
-      "illustration_scene": "A sunny late-summer morning in the leafy courtyard of a Helsinki apartment building. Alex, a young man in a hoodie, stands chatting with Linnea, a student about to cycle to the university; her bicycle is beside her with books in the basket. Both smile and use friendly gestures. A path, flowers and the building entrance are in the background."
+      "illustration_scene": "A sunny late-summer morning in the leafy courtyard of a Helsinki apartment building. Alex, a young man in a hoodie, stands chatting with Linnea, a student about to cycle to the university; her bicycle is beside her with books in the basket. Both smile and use friendly gestures. A path, flowers and the building entrance are in the background.",
+      "season": "summer",
+      "when": "late August"
     },
     {
       "id": 2,
@@ -64,7 +84,226 @@
       "chapter": "Survival Basics",
       "level": "Beginner",
       "language_level": "A1",
-      "illustration_scene": "The counter of a cosy Helsinki café on a bright morning. Linnea, a student with glasses and a blonde ponytail, stands beside Alex, a young man in a hoodie, who is holding a coffee cup and looks slightly unsure; she smiles encouragingly. Sanni, the barista, stands behind the counter with a friendly smile. Behind them are coffee machines, pastries under glass and a small sugar stand at the end of the counter."
+      "illustration_scene": "The counter of a cosy Helsinki café on a bright morning. Linnea, a student with glasses and a blonde ponytail, stands beside Alex, a young man in a hoodie, who is holding a coffee cup and looks slightly unsure; she smiles encouragingly. Sanni, the barista, stands behind the counter with a friendly smile. Behind them are coffee machines, pastries under glass and a small sugar stand at the end of the counter.",
+      "season": "summer",
+      "when": "late August"
+    },
+    {
+      "id": 3,
+      "lessons_covered": [
+        "Saving the Conversation"
+      ],
+      "title": "Hitaammin, kiitos!",
+      "title_en": "Slower, please!",
+      "description": "Alex ja Linnea istuvat aamulla bussissa matkalla keskustaan. Linnea alkaa innoissaan kertoa viikonlopustaan nopeasti suomeksi, eikä Alex ymmärrä melkein mitään. Linnea opettaa Alexille, miten hän voi pelastaa keskustelun: sanomalla en ymmärrä, pyytämällä puhumaan hitaammin ja pyytämällä vielä kerran. Alex kokeilee kaikkia kolmea, ja Linnea toistaa kertomuksensa hitaasti.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "bus",
+      "tone": "Warm, funny, patient",
+      "key_phrases": [
+        "En ymmärrä",
+        "Hitaammin, kiitos",
+        "Vielä kerran"
+      ],
+      "notes": "Alex and Linnea already know each other from episode 1 (same building): no introductions. Linnea is the guide and also the fast talker: she chats in quick puhekieli, Alex gets lost, then learns three rescue phrases and uses them. Alex has already learned 'Anteeksi' (episode 2) and may use it, but it is not retaught. A morning bus ride into the city, early September.",
+      "illustration_scene": "Two friends side by side on a city bus seat on a bright morning. Linnea, a student with glasses and a blonde ponytail, talks animatedly with both hands in the air; Alex, a young man in a hoodie, listens with a puzzled, polite smile and raised eyebrows. Other seats, handrails and a window with city buildings passing by are visible. No other passengers.",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Asking & Buying",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "summer",
+      "when": "early September"
+    },
+    {
+      "id": 4,
+      "lessons_covered": [
+        "Basic Questions (mikä, missä, kuka)"
+      ],
+      "title": "Mikä tämä on?",
+      "title_en": "What is this?",
+      "description": "Alex tulee Linnean kanssa samaan kahvilaan kuin viimeksi, ja Sanni tunnistaa hänet. Alex osoittaa lasin alla olevaa leivonnaista ja kysyy Linnean opastamana: Mikä tämä on? Sitten hän kysyy, missä vessa on, ja lopuksi hän osoittaa seinällä olevaa muotokuvaa ja kysyy: Kuka tuo on? Sanni vastaa lyhyesti, ja Linnea selittää, mitä kukin kysymyssana tarkoittaa.",
+      "characters": [
+        "alex",
+        "linnea",
+        "sanni"
+      ],
+      "ambient_setting": "cafe",
+      "tone": "Curious, light, friendly",
+      "key_phrases": [
+        "Mikä tämä on?",
+        "Missä on vessa?",
+        "Kuka tuo on?"
+      ],
+      "notes": "Linnea is the guide. Sanni, the barista, has short service answers only and never teaches; she recognises Alex from episode 2 and already knows Linnea. Each question word is taught on a real thing in the café: a pastry (mikä), the toilet (missä), a framed portrait of the composer Sibelius on the wall (kuka; Sanni says it is Sibelius, Finland's famous composer).",
+      "illustration_scene": "The inside of a cosy Helsinki café. Alex, a young man in a hoodie, stands at the glass pastry display pointing at one round cinnamon bun with a curious look; Linnea, a student with glasses and a blonde ponytail, stands beside him smiling and encouraging; Sanni, the barista with a dark bob haircut and a black top, is clearly visible behind the counter with a friendly nod. The pastries sit on plain trays with NO labels, NO price tags, no menu boards, no chalkboards and no signs anywhere. On the wall behind them hangs one framed painted portrait of a stern elderly man with white hair (a painting, with no plaque or caption). A door to the side leads towards the toilets.",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Asking & Buying",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "summer",
+      "when": "early September"
+    },
+    {
+      "id": 5,
+      "lessons_covered": [
+        "Making Your First Purchase"
+      ],
+      "title": "Yksi vesi, kiitos",
+      "title_en": "One water, please",
+      "description": "Linnea ja Alex kävelevät kadulla, ja Alex on janoinen. Linnea vie hänet pieneen kioskiin, jossa myyjä Markku on kiireinen ja puhuu nopeasti. Linnea opettaa Alexille, miten ostetaan yksi asia: yksi vesi, kiitos, kysytään hinta sanalla paljonko ja maksetaan sanoen tässä. Alex tekee ostoksen itse, ja Markku vastaa lyhyesti ja nopeasti.",
+      "characters": [
+        "alex",
+        "linnea",
+        "markku"
+      ],
+      "ambient_setting": "street",
+      "tone": "Lively, a little rushed, encouraging",
+      "key_phrases": [
+        "Yksi vesi, kiitos",
+        "Paljonko?",
+        "Tässä"
+      ],
+      "notes": "Linnea is the guide. Markku, the kiosk vendor, is busy and clipped with short service lines only, and never teaches; he and Alex have never met and no names are exchanged. Markku says the price in Finnish ('kaksi euroa'); Linnea glosses it in English, numbers are not taught yet (episode 8). Alex has learned 'Kiitos' in episode 2 and uses it at the end, but it is not retaught.",
+      "illustration_scene": "A small street kiosk on a sunny Helsinki street. Markku, the kiosk vendor, leans out of the kiosk window handing over a bottle of water, looking busy. Alex, a young man in a hoodie, holds out a coin; Linnea, a student with glasses and a blonde ponytail, stands next to Alex with an encouraging smile. Drinks and snacks are on shelves inside the kiosk, a bicycle leans against the wall. No signs, prices or writing.",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Asking & Buying",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "summer",
+      "when": "a warm day in early September"
+    },
+    {
+      "id": 6,
+      "lessons_covered": [
+        "The Spoken Pronouns",
+        "Introducing Yourself"
+      ],
+      "title": "Mä oon Anna",
+      "title_en": "I'm Anna",
+      "description": "Alex kantaa iltapäivällä isoa pahvilaatikkoa kotitalonsa ovelle, ja yläkerran naapuri Anna pitää ovea auki hänelle. He eivät ole tavanneet ennen. Alex on harjoitellut esittäytymistä yksin ja kysyy Annalta, saako hän kokeilla: Minä olen Alex. Mikä sinun nimi on? Anna vastaa iloisesti puhekielellä: Mä oon Anna. Hauska tutustua! Alex huomaa, että Anna sanoo mä ja oon eikä minä ja olen, ja Anna selittää englanniksi, että kirjassa sanotaan minä olen, mutta arjessa suomalaiset sanovat mä oon. Lopuksi he kantavat laatikon yhdessä hissille.",
+      "characters": [
+        "alex",
+        "anna"
+      ],
+      "ambient_setting": "street",
+      "tone": "Warm, gently funny, welcoming",
+      "key_phrases": [
+        "Minä olen Alex",
+        "Mikä sinun nimi on?",
+        "Mä oon Anna",
+        "Hauska tutustua"
+      ],
+      "notes": "First meeting of Alex and Anna: they have never met and neither knows the other's name until they say it here. Anna is the guide (a friendly neighbour in her fifties, patient and clear). The reason for the scene is the heavy box, not a lesson: Alex has been practising his introduction from a book and wants to try it on a real person, so he asks Anna to check it; she answers naturally in spoken Finnish and that contrast (minä olen / mä oon) is the point. Label the forms right: 'minä olen' is the book/standard form, 'mä oon' the everyday spoken one. Alex keeps speaking careful standard Finnish; he does not switch to mä/oon. 'Moi' (episode 1) may be used as a callback but is not retaught. Early September, a sunny late afternoon.",
+      "illustration_scene": "The front door of a Helsinki apartment building on a sunny late afternoon. Alex, a young man, carries a big plain cardboard box with both arms and peeks round it; Anna, a friendly neighbour in her fifties with shoulder-length brown hair, holds the heavy wooden door open for him with one hand and a cloth shopping bag in the other, smiling. Green trees, a bicycle rack and flower planters in the courtyard behind them. The box is plain with no print or writing.",
+      "season": "summer",
+      "when": "early September",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Who Am I?",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 7,
+      "lessons_covered": [
+        "Sharing Your Origins"
+      ],
+      "title": "Mistä sä oot?",
+      "title_en": "Where are you from?",
+      "description": "On sateinen syyskuun iltapäivä, ja Alex ja Linnea juoksevat sadetta pakoon kaupungin kirjastoon. He ripustavat märät sadetakit ja istuvat ikkunan viereen. Linnea kertoo, että hänen opiskelijakavereillaan on lauantaina ilta, ja Alex on kutsuttu. Siellä kaikki kysyvät häneltä suomeksi: Mistä sä oot? Linnea näyttää, miten Alex voi vastata: Minä olen Brasiliasta ja Minä asun Helsingissä, ja miten hän voi kysyä takaisin: Entä sinä? Linnea kertoo olevansa Oulusta.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "library",
+      "tone": "Cosy, friendly, playful",
+      "key_phrases": [
+        "Mistä sä oot?",
+        "Minä olen Brasiliasta",
+        "Minä asun Helsingissä",
+        "Entä sinä?"
+      ],
+      "notes": "Alex and Linnea are friends (episodes 1-5): no introductions. Linnea is the guide. The reason is the student party on Saturday, where people will ask him where he is from; they practise it as a quick, fun rehearsal, Linnea playing a curious partygoer. Alex is from Brazil and lives in Helsinki; Linnea is from Oulu and moved to Helsinki for university ('Mä oon Oulusta' may come up as her answer, glossed). Linnea asks in spoken Finnish ('Mistä sä oot?'), Alex answers in careful standard Finnish ('Minä olen...'); name the difference once in passing, it was explained in episode 6. Late September: they come in from the rain with wet jackets; it is the first properly autumn day of the series. Quiet voices: they are in a library.",
+      "illustration_scene": "A big bright modern city library on a rainy late-September afternoon. Alex and Linnea sit side by side at a long wooden table by a huge window streaked with rain; outside, trees are turning yellow and orange in the rain, with wet leaves on an empty square. Their wet raincoats hang on the backs of their chairs. Linnea, a student with glasses and a blonde braid, leans in playfully as if asking a question; Alex, a young man with short black curly hair, answers with a shy grin. Shelves of books with plain spines, no titles, no writing.",
+      "season": "autumn",
+      "when": "late September",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Who Am I?",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 8,
+      "lessons_covered": [
+        "Numbers 0 -10"
+      ],
+      "title": "Yksi, kaksi, kolme",
+      "title_en": "One, two, three",
+      "description": "Sateinen lokakuun ilta. Anna tulee kauppakassien kanssa kotitalon ovelle samaan aikaan kuin Alex, eikä hän saa käsiään vapaaksi. Hän pyytää Alexia näppäilemään ovikoodin ja sanoo numerot suomeksi: kaksi, nolla, viisi, yhdeksän. Hississä Anna painaa nappia neljä, ja Alex asuu kuudennessa kerroksessa: kuusi. Annan ovella Anna antaa Alexille pussillisen omenoita kesämökkinsä puusta, ja he laskevat ne yhdessä yhdestä kymmeneen.",
+      "characters": [
+        "alex",
+        "anna"
+      ],
+      "ambient_setting": "quiet",
+      "tone": "Warm, playful, cosy",
+      "key_phrases": [
+        "Nolla",
+        "Yksi, kaksi, kolme",
+        "Neljä, viisi, kuusi",
+        "Seitsemän, kahdeksan, yhdeksän, kymmenen"
+      ],
+      "notes": "Alex and Anna are neighbours who met in episode 6: no introductions, they use each other's names. Anna is the guide. Every number comes from a real need: the door code (her hands are full of grocery bags), the lift buttons (she lives on floor 4, he on floor 6), then counting the apples she gives him from her summer cottage tree, where Alex says seven to ten himself. Teach the standard numbers; Anna may mention once that in quick speech people say 'yks, kaks' (glossed, not drilled). Alex says 'Kiitos' (episode 2) for the apples, not retaught. The door code is invented and harmless. Early October evening, already dark outside, rain; they shake off umbrellas in the entrance.",
+      "illustration_scene": "Inside a small apartment-building lift on a dark, rainy October evening. Anna, a neighbour in her fifties, holds two full paper grocery bags with apples and a baguette poking out and a wet folded umbrella hooked on her arm; Alex, a young man with short black curly hair, reaches out to press a round button on the button panel, which shows only plain round buttons with no numbers or symbols. Both smile. Raindrops glisten on their coats. Warm lift light.",
+      "season": "autumn",
+      "when": "a rainy evening in early October",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Who Am I?",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 9,
+      "lessons_covered": [
+        "Talk About Work"
+      ],
+      "title": "Mitä sä teet?",
+      "title_en": "What do you do?",
+      "description": "Aurinkoinen lokakuun lauantai. Alex ja Linnea kävelevät puistossa, jossa puut ovat keltaisia ja punaisia ja lehdet rapisevat jalkojen alla. Alex kertoo, että maanantaina hänen tiiminsä syö yhdessä lounasta ja suomalaiset kollegat varmasti kysyvät häneltä suomeksi: Mitä sä teet? Linnea neuvoo, miten hän vastaa: Minä olen ohjelmoija. Linnea kertoo itsestään: Mä opiskelen. Alex kysyy Linnealta, mitä hän opiskelee, ja Linnea vastaa englanniksi, että biologiaa.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "park",
+      "tone": "Bright, relaxed, friendly",
+      "key_phrases": [
+        "Mitä sä teet?",
+        "Minä olen ohjelmoija",
+        "Mä opiskelen",
+        "Missä sä oot töissä?"
+      ],
+      "notes": "Alex and Linnea are good friends by now: relaxed banter, no introductions. Linnea is the guide. The reason is the team lunch on Monday at Alex's new job (a small tech company, he is a programmer); Linnea also asks about how the job is going in English. 'Missä sä oot töissä?' (where do you work) is the follow-up question colleagues ask; Alex answers that he works at a small tech company, in English or with a short Finnish answer only if it is taught. Linnea studies biology at the university. Callbacks: 'Mistä sä oot?' (episode 7) may come back. Mid-October, the autumn colours (ruska) are at their best, a crisp sunny day; they kick through leaves.",
+      "illustration_scene": "A Helsinki park on a crisp, sunny mid-October Saturday. The trees blaze yellow, orange and red and fallen leaves cover the path. Alex, a young man with short black curly hair, walks beside Linnea, a student with glasses and a blonde braid; Alex gestures as if describing something with his hands, Linnea laughs. A wooden bench and a lamp post beside the path, the low autumn sun behind the trees.",
+      "season": "autumn",
+      "when": "a sunny Saturday in mid-October",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Who Am I?",
+      "level": "Beginner",
+      "language_level": "A1"
     }
   ]
 }

@@ -5,7 +5,7 @@
     "alex": {
       "name": "Alex",
       "role": "The learner; a recent arrival in Finland exploring daily life.",
-      "voice_id": "lOPf5yCKGVCTYSpGXgQr",
+      "voice_id": "2CECaLAGTS5NRGxgbcxr",
       "gender": "Male",
       "age": "Young Adult",
       "default_tone": "Curious, slightly hesitant, friendly",
@@ -13,7 +13,13 @@
       "speech_style": "Careful, clear standard Finnish (kirjakieli pronunciation), using 'Minä' and 'Sinä'. Asks for clarification often.",
       "personality": "Eager to learn and connect, observant, sometimes a bit overwhelmed but always polite.",
       "appearance": "Slender build, light brown skin, short black curly hair. Wears practical, comfortable clothes like hoodies and jeans.",
-      "reference_image": "series/everyday-finnish-a1/characters/alex.png"
+      "reference_image": "series/everyday-finnish-a1/characters/alex.png",
+      "wardrobe": {
+        "summer": "his light-blue hoodie, pink trousers and white sneakers (as in his portrait)",
+        "autumn": "a mustard-yellow rain jacket open over his light-blue hoodie, pink trousers and white sneakers",
+        "winter": "a long dark-navy padded winter parka, a red knitted beanie, a grey scarf, black gloves, dark trousers and brown winter boots, his light-blue hoodie underneath",
+        "spring": "a light beige windbreaker open over his light-blue hoodie, pink trousers and white sneakers"
+      }
     },
     "linnea": {
       "name": "Linnea",
@@ -26,7 +32,13 @@
       "speech_style": "Natural, relaxed spoken Finnish (puhekieli), uses 'mä'/'sä'. Sometimes slows down or simplifies for Alex.",
       "personality": "Kind, empathetic, and sociable. Enjoys explaining things about Finnish culture and language.",
       "appearance": "Medium build with fair skin and freckles. Long, straight blonde hair, often in a ponytail. Wears colorful sweaters and glasses.",
-      "reference_image": "series/everyday-finnish-a1/characters/linnea.png"
+      "reference_image": "series/everyday-finnish-a1/characters/linnea.png",
+      "wardrobe": {
+        "summer": "her pastel striped sweater, rolled-up light-blue jeans and white sneakers (as in her portrait)",
+        "autumn": "a lilac raincoat over her pastel striped sweater, a soft mint knitted scarf, light-blue jeans and white sneakers",
+        "winter": "a lilac padded winter jacket, a cream knitted pompom hat over her blonde braid, a pastel striped scarf, mittens, light-blue jeans and white winter boots",
+        "spring": "a light denim jacket over her pastel striped sweater, light-blue jeans and white sneakers"
+      }
     },
     "markku": {
       "name": "Markku",
@@ -39,7 +51,13 @@
       "speech_style": "Fast, clipped puhekieli. Uses minimal words and expects the same. 'Mitäs sulle sais olla?'",
       "personality": "Not unfriendly, but perpetually in a hurry and focused on his work. Impatient but fair.",
       "appearance": "Broad-shouldered, stocky build with a weathered face. Bald on top with short grey hair on the sides. Wears a worn-out fleece vest.",
-      "reference_image": "series/everyday-finnish-a1/characters/markku.png"
+      "reference_image": "series/everyday-finnish-a1/characters/markku.png",
+      "wardrobe": {
+        "summer": "his green fleece vest over a cream long-sleeved shirt, brown cargo trousers and work boots (as in his portrait)",
+        "autumn": "his green fleece vest over a brown flannel shirt, a dark knitted beanie, brown cargo trousers and work boots",
+        "winter": "a thick navy work parka with a fur-trimmed hood down, a black knitted beanie, fingerless gloves, brown cargo trousers and winter work boots",
+        "spring": "his green fleece vest over a cream long-sleeved shirt, brown cargo trousers and work boots"
+      }
     },
     "sanni": {
       "name": "Sanni",
@@ -52,7 +70,13 @@
       "speech_style": "Standard Helsinki puhekieli. Speaks clearly and confidently. Switches between formal and informal greetings depending on the context.",
       "personality": "Efficient, organized, and helpful in a professional capacity. Keeps conversations focused but is friendly and approachable.",
       "appearance": "Tall and slim build, olive skin tone. Dark brown hair cut in a sharp bob. Wears stylish but practical clothes, like a black turtleneck.",
-      "reference_image": "series/everyday-finnish-a1/characters/sanni.png"
+      "reference_image": "series/everyday-finnish-a1/characters/sanni.png",
+      "wardrobe": {
+        "summer": "her black turtleneck with a light-blue shirt tied round the waist, cream cargo trousers and white sneakers (as in her portrait)",
+        "autumn": "her black turtleneck, cream cargo trousers and white sneakers; outdoors a black leather jacket",
+        "winter": "her black turtleneck, cream cargo trousers and black boots; outdoors a long black wool coat and a light-blue scarf",
+        "spring": "her black turtleneck with a light-blue shirt tied round the waist, cream cargo trousers and white sneakers; outdoors a beige trench coat"
+      }
     },
     "leo": {
       "name": "Leo",
@@ -65,7 +89,13 @@
       "speech_style": "Very casual, fast puhekieli with modern slang. Often shortens words. 'Moro! Mitä äijä?'",
       "personality": "Extroverted, spontaneous, and always suggesting activities. He's friendly but sometimes forgets to slow down for Alex.",
       "appearance": "Athletic build, fair skin. Short, messy reddish-brown hair. Typically wears band t-shirts, a beanie, and sneakers.",
-      "reference_image": "series/everyday-finnish-a1/characters/leo.png"
+      "reference_image": "series/everyday-finnish-a1/characters/leo.png",
+      "wardrobe": {
+        "summer": "his cream wolf t-shirt, grey beanie, dark-blue jeans and grey sneakers (as in his portrait)",
+        "autumn": "a faded denim jacket over his wolf t-shirt, grey beanie, dark-blue jeans and grey sneakers",
+        "winter": "a bright orange puffer jacket, his grey beanie, a black neck warmer, dark-blue jeans and black winter boots",
+        "spring": "an olive bomber jacket over his wolf t-shirt, grey beanie, dark-blue jeans and grey sneakers"
+      }
     },
     "anna": {
       "name": "Anna",
@@ -78,7 +108,13 @@
       "speech_style": "Clear spoken Finnish, uses common puhekieli forms but speaks at a moderate pace. Avoids very modern slang.",
       "personality": "Patient, wise, and enjoys small talk. Has a quiet sense of humor and likes to help.",
       "appearance": "Medium build with fair skin and a warm, kind smile with soft laugh lines. Shoulder-length brown hair with a few silver streaks, neatly tucked behind the ears. Often wears a cozy knitted cardigan over a simple blouse.",
-      "reference_image": "series/everyday-finnish-a1/characters/anna.png"
+      "reference_image": "series/everyday-finnish-a1/characters/anna.png",
+      "wardrobe": {
+        "summer": "her cream knitted cardigan over a light-blue blouse, green trousers and brown boots (as in her portrait)",
+        "autumn": "a camel-brown wool coat over her cream cardigan, a rust-orange scarf, green trousers and brown boots",
+        "winter": "a long dark-green wool winter coat, a cream knitted hat and matching scarf, brown gloves, green trousers and brown winter boots",
+        "spring": "a light beige trench coat over her cream cardigan, green trousers and brown boots"
+      }
     }
   }
 }

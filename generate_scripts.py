@@ -47,6 +47,52 @@ def _continuity_block(idea):
     return f"\n\n        {text}\n" if text else ""
 
 
+# English lines in a guided scene that announce or label the teaching ("This is a perfect time
+# to learn...", "our first lesson for today", "Your turn"). A friend helping in the moment never
+# talks like this, so a draft with them is rewritten (see generate_guided_lesson).
+_ANNOUNCED_TEACHING = re.compile(
+    r"\blessons?\b"
+    r"|\b(perfect|good|great|best|nice)\s+(time|moment|chance|opportunity)\s+(to|for)\b"
+    r"|\b(let me|i can|i'll|i will|i could)\s+teach\b"
+    r"|\byour turn\b|\brepeat after me\b|\blet'?s (practi[cs]e|review|recap)\b"
+    r"|\b(first|next|new) (\w+ )?(word|phrase)s?\b"
+    r"|\bready for (the )?(next|another)\b|\bquiz\b",
+    re.IGNORECASE,
+)
+
+
+def _announced_teaching(dialogue):
+    """English lines of a guided scene that announce or label the teaching."""
+    hits = []
+    for entry in dialogue:
+        if entry.get("type") == "sfx" or entry.get("lang") not in (None, "en"):
+            continue
+        text = re.sub(r"^\s*\[[^\]]*\]\s*", "", entry.get("text", ""))
+        if _ANNOUNCED_TEACHING.search(text):
+            hits.append(text)
+    return hits
+
+
+def _season_block(idea):
+    """Time of year for a series episode (empty when the idea has no season).
+
+    The season should be felt in the scene (a coat, the rain, the early dark, snow underfoot),
+    not become its topic: only an episode ABOUT the weather talks about it at length.
+    """
+    season = idea.get("season") or {}
+    if not season.get("name"):
+        return ""
+    when = f"{season['when']} ({season['name']})" if season.get("when") else season["name"]
+    sounds = f" Sounds that fit: {season['sounds']}." if season.get("sounds") else ""
+    return (
+        f"\n\n        TIME OF YEAR: {when} in Helsinki. What it is like: {season.get('look', '')}\n"
+        f"        Let the season colour the scene lightly: one or two small, natural touches in the English "
+        f"chat or the action (shaking off rain, the early dark, cold hands, a sunny bench), and sound "
+        f"effects that fit.{sounds} Do not make the weather a topic unless the lesson is about it, and "
+        f"teach no extra words for it."
+    )
+
+
 def _repair_voice_ids(dialogue_list, characters):
     """Fix voice_ids that the LLM may have subtly altered (e.g. changed casing).
 
@@ -105,7 +151,7 @@ def generate_conversation(idea, metadata):
         ambient_note = f"\n        Ambient Setting: {ambient_setting} (This describes the environment — use it to inspire contextually appropriate sound effects.)"
 
     level_block = conversation_level_block(metadata.get('language_level'), language)
-    continuity_block = _continuity_block(idea)
+    continuity_block = _continuity_block(idea) + _season_block(idea)
 
     prompt = f"""
         You are a {language} dialogue writer specializing in NATURAL {spoken_label.upper()}.
@@ -352,7 +398,7 @@ def generate_guided_lesson(idea, metadata):
         )
 
     level_block = conversation_level_block(metadata.get('language_level'), language)
-    continuity_block = _continuity_block(idea)
+    continuity_block = _continuity_block(idea) + _season_block(idea)
 
     # Episode 1 starts from zero. Every later episode is a learner who has already had lessons
     # and people who already know each other — writing them as a blank slate is what made
@@ -410,12 +456,32 @@ def generate_guided_lesson(idea, metadata):
 
         {language} appears ONLY as the small, deliberate phrases being TAUGHT. Every single piece of
         {language} the learner hears MUST be one the guide is explicitly teaching in that moment.
-        There must be ZERO untranslated {language}.{callback_rule} If a {language} phrase is spoken, it is ALWAYS:
-          1. Framed first in English  — e.g. 'In {language}, "thank you" is...'
-          2. Said slowly in {language} — the short target phrase only.
-          3. Glossed/confirmed in English right away — e.g. 'That means "thank you".'
-          4. Repeated by the learner in {language}, and the guide reacts in English ('Perfect!').
+        There must be ZERO untranslated {language}.{callback_rule} If a {language} phrase is spoken:
+          - its English meaning comes right before or right after it, in the guide's own casual words
+            ('Just say "Kiitos". It's "thanks".' / 'She asked "Maitoa?", milk?');
+          - it is said slowly, as the short target phrase on its own line;
+          - the learner says it at least once, ideally by USING it for real in the scene.
         Never let a {language} phrase go by without its English meaning attached.
+
+        THE SCENE COMES FIRST; THE {language.upper()} IS SOMETHING A FRIEND HELPS WITH, NOT A LESSON:
+        - Nobody in the scene knows they are in a lesson. NEVER have anyone announce, label or set up
+          the teaching. Banned: "lesson", "lesson for today", "a perfect/good/great time (moment, chance)
+          to learn/practise", "let me teach you", "I can teach you", "your first/next word", "let's
+          practise", "let's review", "quiz", "repeat after me", "your turn", "ready for the next one?".
+        - Each phrase is pulled in by the moment: the learner is about to speak to someone, hears a word
+          and asks what it was, or wants to say something and asks how. The guide answers the way a friend
+          gives a quick tip in passing, then the talk moves on.
+        - Avoid drill loops (guide says it, learner repeats, guide praises, next). The learner tries the
+          phrase, often straight on the person it is for; a quiet try under his breath first is fine.
+        - Between the phrases the two talk like friends, in English, about the situation and their lives
+          (where they are going, plans, something they see, a small joke). Most lines are this, not
+          talk about {language}.
+        - Vary reactions and keep praise rare ('Perfect!', 'Exactly!', 'Great job!' once or twice in the
+          whole scene at most). Often the best reaction is the real result: the barista understands and
+          hands over the coffee, the neighbour smiles and answers.
+        - Callbacks happen in use, not as a recap: later in the scene the learner reaches for an earlier
+          phrase on their own. The scene ends when the situation ends (they arrive, the bus comes, they part),
+          never with a summary of what was learned.
 
         ACCURACY — GET THE TEACHING FACTS RIGHT (these mistakes ruin the lesson):
         - The {language} line and its English framing/gloss MUST match EXACTLY. If you frame a line as
@@ -438,18 +504,19 @@ def generate_guided_lesson(idea, metadata):
         COVERAGE & PACING (cover the whole lesson, but never overwhelm):
         - Teach EVERY target phrase in the REQUIRED CURRICULUM below — do not drop any. The scene can
           be as long as it needs to be to fit them all naturally.
-        - Introduce ONE phrase at a time: teach it, have the learner repeat it, react, then move on.
+        - Introduce ONE phrase at a time: give it, let the learner use it, then let the scene move on.
           Don't dump several new phrases at once — a beginner still needs each one handled slowly.
-        - Reuse phrases: bring earlier phrases back later in the scene (e.g. in a short recap or a
-          natural callback) so they stick, not just taught once and forgotten.
+        - Reuse phrases: bring earlier phrases back later in the scene as natural callbacks (the learner
+          using them again), so they stick, not just taught once and forgotten.
         - Each {language} phrase is short and clear. The MAJORITY of the words are still ENGLISH (the
           teaching/glue); {language} is the precious part being learned.
         - Keep every {language} phrase within the CEFR level below; use the simpler in-level form if
           natural phrasing would exceed it.
 
-        Give the scene a natural arc: a reason it starts, the guide teaching the phrases one at a time
-        (grouping ones that pair up), with repetition and a brief recap, and a warm close where the
-        learner uses several of the phrases they just learned.{curriculum_block}
+        Give the scene a natural arc: a reason it starts that has nothing to do with learning
+        {language} (they are going somewhere, need something, bump into each other), the phrases coming
+        up one at a time as the situation needs them (grouping ones that pair up), and a close where the
+        situation resolves and the learner uses some of the phrases on their own.{curriculum_block}
 
         Characters:
         {char_info_text}
@@ -499,6 +566,7 @@ def generate_guided_lesson(idea, metadata):
 
     max_retries = 3
     retry_delay = 2
+    attempt_prompt = prompt
 
     for attempt in range(max_retries):
         try:
@@ -506,16 +574,17 @@ def generate_guided_lesson(idea, metadata):
                 temperature=0.7,
                 response_mime_type="application/json",
                 system_instruction=(
-                    f"You are a patient {language} teacher who writes warm, realistic guided lesson "
-                    f"scenes for absolute beginners. You scaffold with English glosses used sparingly "
-                    f"(gloss-once), keep the {language} short and in-level, and have the learner repeat "
-                    f"each new chunk. You strictly output only valid JSON."
+                    f"You write warm, realistic everyday scenes in which a friend helps an absolute "
+                    f"beginner with a few {language} phrases the moment calls for. The scene is life, "
+                    f"not a lesson: nobody announces teaching. Every {language} phrase gets its English "
+                    f"meaning once, stays short and in-level, and the learner tries it, ideally for real. "
+                    f"You strictly output only valid JSON."
                 ),
             )
 
             response = client.models.generate_content(
                 model='gemini-2.5-pro',
-                contents=prompt,
+                contents=attempt_prompt,
                 config=config,
             )
 
@@ -530,6 +599,21 @@ def generate_guided_lesson(idea, metadata):
                 for entry in dialogue:
                     if entry.get("type") != "sfx" and not entry.get("lang"):
                         entry["lang"] = lang_code
+                # A scene that announces the lesson ("a perfect time to learn...") is rewritten;
+                # the last attempt is kept either way, with a warning.
+                announced = _announced_teaching(dialogue)
+                if announced and attempt < max_retries - 1:
+                    print(f"   🔁 The scene announces the teaching ({len(announced)} line(s), e.g. "
+                          f"{announced[0]!r}); rewriting... ({attempt + 1}/{max_retries})")
+                    attempt_prompt = prompt + (
+                        "\n\n        Your previous draft announced or labelled the teaching in these lines:\n"
+                        + "\n".join(f"          - {line}" for line in announced)
+                        + "\n        Write the scene again so the phrases come up through the situation, "
+                          "with no line like these."
+                    )
+                    continue
+                if announced:
+                    print(f"   ⚠️  Kept, but it still announces the teaching: {announced}")
                 return json_output
             else:
                 print(f"   ⚠️  Empty dialogue received, retrying... ({attempt + 1}/{max_retries})")

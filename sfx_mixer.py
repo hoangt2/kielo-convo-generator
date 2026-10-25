@@ -22,6 +22,8 @@ import random
 from pathlib import Path
 from pydub import AudioSegment
 
+from generate_sfx import ambient_name
+
 # --- Configuration ---
 SCRIPTS_DIR = Path("scripts")
 SFX_DIR = Path("sfx")
@@ -245,7 +247,7 @@ def mix_sfx_into_audio(mp3_path: Path, script_path: Path, sfx_folder: Path) -> b
     
     dialogue_list = data.get("dialogue_list", [])
     idea = data.get("idea", {})
-    ambient_setting = idea.get("ambient_setting", "")
+    ambient_setting = ambient_name(idea)
     language = data.get("metadata", {}).get("language", "Finnish")
     
     # Check if there are any SFX entries

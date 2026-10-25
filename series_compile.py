@@ -54,13 +54,37 @@ def resolve_character(char_ref, cast):
     return char
 
 
-def build_idea(episode, cast, episodes=(), language="Finnish"):
+def resolve_season(episode, seasons):
+    """The episode's season as {name, when, look, sounds}, or None when the episode has none.
+
+    `episode["season"]` is a key of the series' `seasons` (episodes.json -> series.seasons);
+    `episode["when"]` is the time of year in words ("mid-September"). The look and sounds are
+    what the illustrator and the script writer use to show that time of year.
+    """
+    name = episode.get("season")
+    if not name:
+        return None
+    info = (seasons or {}).get(name)
+    if info is None:
+        sys.exit(f"❌ Episode {episode['id']}: season '{name}' is not in series.seasons of episodes.json.")
+    return {
+        "name": name,
+        "when": episode.get("when", ""),
+        "look": info.get("look", ""),
+        "sounds": info.get("sounds", ""),
+    }
+
+
+def build_idea(episode, cast, episodes=(), language="Finnish", seasons=None):
     """Turn one episode definition into a pipeline `idea` object.
 
     `episodes` is the whole series in order; it is what lets the script writer know who has
-    already met and what has already been taught (see series_continuity.py).
+    already met and what has already been taught (see series_continuity.py). `seasons` is
+    the series' season table; an episode with a `season` gets its look, and each character
+    the outfit their cast `wardrobe` gives for that season.
     """
     chars = [resolve_character(ref, cast) for ref in episode["characters"]]
+    season = resolve_season(episode, seasons)
 
     # Characters in the shape generate_scripts.py / generate_illustrations.py expect.
     idea_characters = [
@@ -73,6 +97,8 @@ def build_idea(episode, cast, episodes=(), language="Finnish"):
             "voice_id": c.get("voice_id", "REPLACE_WITH_ELEVENLABS_VOICE_ID"),
             "role": c.get("role", ""),
             "reference_image": c.get("reference_image", ""),
+            # What this character wears in the episode's season ("" = as in the reference).
+            "outfit": (c.get("wardrobe") or {}).get(season["name"], "") if season else "",
         }
         for ref, c in zip(episode["characters"], chars)
     ]
@@ -108,6 +134,9 @@ def build_idea(episode, cast, episodes=(), language="Finnish"):
         # A picture-only scene (what can be SEEN, no spoken words) for the illustrator. The
         # description quotes the lesson words, which the image model draws as speech bubbles.
         "illustration_scene": episode.get("illustration_scene", ""),
+        # Time of year: the illustrator draws its light, weather and clothes; the script writer
+        # lets it colour the scene. None for episodes (and series) without seasons.
+        "season": season,
         "language_level": episode.get("language_level", ""),
         # Script format: "guided" routes generate_scripts.py to the bilingual,
         # teacher-led lesson for true beginners; anything else = normal conversation.
@@ -162,7 +191,8 @@ def main():
             selected.append(episodes[int(a)])
 
     language = series.get("language", "Finnish")
-    ideas = [build_idea(ep, cast, episodes_data["episodes"], language) for ep in selected]
+    seasons = series.get("seasons", {})
+    ideas = [build_idea(ep, cast, episodes_data["episodes"], language, seasons) for ep in selected]
 
     # One shared level for the run (single episode = that episode's level).
     if len(selected) == 1 and selected[0].get("language_level"):

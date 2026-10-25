@@ -92,20 +92,66 @@ def _detect_language():
     return "Finnish"
 
 
-def _run_grammar_check(dialogue_texts: list[str], language: str = "Finnish") -> dict:
-    """Run a single grammar check pass and return the parsed result."""
-    dialogue_json = json.dumps(dialogue_texts, ensure_ascii=False, indent=2)
-    
+def _speaker_context(data: dict) -> tuple[dict, str]:
+    """Who says what, and what must not change, for a series script.
+
+    Returns ({voice_id: name}, a prompt block). The block gives each character's register
+    (a learner who speaks careful standard Finnish must not be "fixed" into mä/sä) and, for a
+    guided lesson, the target phrases, which are the curriculum and keep their exact wording.
+    Empty for scripts without that information.
+    """
+    idea = data.get("idea", {})
+    names = {c.get("voice_id"): c.get("name") for c in idea.get("characters", []) if c.get("voice_id")}
+    parts = []
+    description = idea.get("description", "")
+    if "Character speech styles:" in description:
+        styles = description.split("Character speech styles:", 1)[1].split("\n\n", 1)[0].strip()
+        parts.append(
+            "## EACH SPEAKER'S REGISTER (authoritative)\n" + styles + "\n"
+            "Keep every speaker in the register described above. A speaker described as using careful "
+            "standard forms (e.g. 'minä/sinä', 'olen') KEEPS them: do NOT change them to spoken forms "
+            "(mä/sä/oon). Only fix real errors in their lines."
+        )
+    if idea.get("format") == "guided" and idea.get("key_phrases"):
+        parts.append(
+            "## TARGET PHRASES (fixed curriculum)\n" + "\n".join(f"- {p}" for p in idea["key_phrases"]) + "\n"
+            "These are the phrases this lesson teaches, in exactly this form (including standard vs "
+            "spoken forms, which the lesson may contrast on purpose). Never change their wording in any "
+            "line; fix only a clear grammar error elsewhere in the line."
+        )
+    return names, "\n\n".join(parts)
+
+
+def _run_grammar_check(dialogue_texts: list[str], language: str = "Finnish",
+                       speakers: "list[str] | None" = None, context: str = "") -> dict:
+    """Run a single grammar check pass and return the parsed result.
+
+    `speakers` (one name per line) and `context` (registers, fixed phrases) come from
+    _speaker_context(); without them every line is judged as generic casual speech.
+    """
+    if speakers and len(speakers) == len(dialogue_texts):
+        dialogue_json = json.dumps(
+            [{"speaker": s, "text": t} for s, t in zip(speakers, dialogue_texts)], ensure_ascii=False, indent=2
+        )
+        lines_note = ("Each line is given with its speaker; \"fixed_lines\" holds only the corrected TEXT of "
+                      "each line, without the speaker.")
+    else:
+        dialogue_json = json.dumps(dialogue_texts, ensure_ascii=False, indent=2)
+        lines_note = ""
+
     # Use Finnish-specific anti-patterns when available, generic prompt otherwise
     anti_patterns = ANTI_PATTERNS_PROMPT if language == "Finnish" else ""
-    
+
     prompt = f"""
 Review the following {language} dialogue lines. Check EVERY line for grammar errors, unnatural phrasing,
 and non-native patterns. Be VERY strict — if a line could be said more naturally, it MUST be fixed.
 
 {anti_patterns}
 
+{context}
+
 ## DIALOGUE LINES TO REVIEW:
+{lines_note}
 {dialogue_json}
 
 ## OUTPUT FORMAT
@@ -142,13 +188,17 @@ Rules:
     return json.loads(response.text.strip())
 
 
-def _verify_fixes(original_texts: list[str], fixed_texts: list[str], language: str = "Finnish") -> dict:
+def _verify_fixes(original_texts: list[str], fixed_texts: list[str], language: str = "Finnish",
+                  speakers: "list[str] | None" = None, context: str = "") -> dict:
     """Pass 2: Verify that the fixes themselves are natural."""
-    
+
     pairs = []
     for i, (orig, fixed) in enumerate(zip(original_texts, fixed_texts)):
         if orig != fixed:
-            pairs.append({"index": i, "original": orig, "fixed": fixed})
+            pair = {"index": i, "original": orig, "fixed": fixed}
+            if speakers and i < len(speakers):
+                pair["speaker"] = speakers[i]
+            pairs.append(pair)
     
     if not pairs:
         return {"all_valid": True, "corrections": []}
@@ -163,7 +213,10 @@ CRITICAL: Your job is NOT to debate whether the original was "acceptable".
 The original was ALREADY flagged as problematic by a native {language} expert.
 Your ONLY job is to ensure the fix itself does not introduce NEW errors.
 
+{context}
+
 You should REJECT a fix ONLY if:
+- The fix moves a speaker out of the register described above, or changes a target phrase
 - The fix introduces a new grammatical error that wasn't in the original
 - The fix changes the meaning in a way that contradicts the scene context
 - The fix removes the emotion tag in brackets
@@ -209,7 +262,8 @@ Rules:
     return json.loads(response.text.strip())
 
 
-def check_and_fix_grammar(dialogue_list: list, language: str = "Finnish") -> tuple[list, bool]:
+def check_and_fix_grammar(dialogue_list: list, language: str = "Finnish",
+                          voice_names: "dict | None" = None, context: str = "") -> tuple[list, bool]:
     """
     Two-pass grammar and naturalness checker.
     Pass 1: Check and fix issues.
@@ -228,11 +282,14 @@ def check_and_fix_grammar(dialogue_list: list, language: str = "Finnish") -> tup
             dialogue_indices.append(i)
     
     dialogue_texts = [dialogue_list[i].get("text", "") for i in dialogue_indices]
-    
+    speakers = None
+    if voice_names:
+        speakers = [voice_names.get(dialogue_list[i].get("voice_id"), "?") for i in dialogue_indices]
+
     try:
         # --- PASS 1: Check and fix ---
         print("   Pass 1: Checking grammar and naturalness...")
-        result = _run_grammar_check(dialogue_texts, language)
+        result = _run_grammar_check(dialogue_texts, language, speakers, context)
         
         if not result.get("has_issues", False):
             print("   ✓ Pass 1: No issues found.")
@@ -257,7 +314,7 @@ def check_and_fix_grammar(dialogue_list: list, language: str = "Finnish") -> tup
         
         # --- PASS 2: Verify fixes ---
         print("   Pass 2: Verifying fixes are natural...")
-        verification = _verify_fixes(dialogue_texts, fixed_lines, language)
+        verification = _verify_fixes(dialogue_texts, fixed_lines, language, speakers, context)
         
         # Apply verification corrections
         corrections = verification.get("corrections", [])
@@ -317,7 +374,8 @@ def process_script_file(file_path: Path) -> tuple[bool, bool]:
     
     # Check and fix
     try:
-        fixed_dialogue, was_modified = check_and_fix_grammar(dialogue_list, language)
+        voice_names, context = _speaker_context(data)
+        fixed_dialogue, was_modified = check_and_fix_grammar(dialogue_list, language, voice_names, context)
     except RuntimeError as e:
         print(f"   ❌ {e}")
         return False, False
