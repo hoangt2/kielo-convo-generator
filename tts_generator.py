@@ -486,6 +486,26 @@ def redo_cached_line(fragment):
 # the whole word often enough to pass the check, so very short audio is retried too.
 MIN_SECONDS_PER_LETTER = 0.045
 
+# eleven_v3 sometimes returns a take cut off in the middle of the last sound ("Mä opiskelen"
+# ended at 0.64 s on "-ske", still at full loudness). Such a take still transcribes as the full
+# line, so the end itself is checked: a finished take fades out (median last 20 ms around 40 dB
+# under the line), a cut one ends at least as loud as the line's average. Applies to every
+# line, English included (15 of 357 lines in Everyday Finnish A1 episodes 1-9 were cut).
+CLIPPED_TAIL_MS = 20
+CLIPPED_TAIL_DB = 0.0
+
+
+def _ends_mid_sound(pcm_bytes):
+    """True when a take's last few milliseconds are nearly as loud as the line: it was cut off."""
+    from pydub import AudioSegment
+    if not pcm_bytes:
+        return False
+    seg = AudioSegment(data=pcm_bytes, sample_width=PCM_SAMPLE_WIDTH, frame_rate=PCM_SAMPLE_RATE,
+                       channels=PCM_CHANNELS)
+    if len(seg) <= CLIPPED_TAIL_MS * 2 or seg.dBFS == float("-inf"):
+        return False
+    return seg[-CLIPPED_TAIL_MS:].dBFS - seg.dBFS > CLIPPED_TAIL_DB
+
 
 # --- Per-line synthesis ------------------------------------------------------
 
@@ -564,7 +584,7 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
             (gemini_voice if use_gemini else voice_id) or "", iso, text + "|" + "|".join(gemini_extra),
         )
         cached = _cache_get(cache_key)
-        if cached is not None:
+        if cached is not None and not _ends_mid_sound(cached):
             return cached, None
 
     max_attempts = int(settings.get("max_attempts", MAX_ATTEMPTS))
@@ -574,7 +594,14 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
         else:
             audio = b"".join(elevenlabs_client.text_to_speech.convert(**kwargs))
 
+        clipped = _ends_mid_sound(audio)
         if not should_verify:
+            if clipped:
+                if best_audio is None:
+                    best_audio, best_heard = audio, "(ends mid-sound: clipped?)"
+                print(f"   ↻ [{index}/{total}] Attempt {attempt}: the take ends mid-sound (clipped?): "
+                      f"{spoken_text(expected)!r}")
+                continue
             if cache_key:
                 _cache_put(cache_key, audio, text, voice_id)
             return audio, None
@@ -592,6 +619,9 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
         if ok and seconds < letters * MIN_SECONDS_PER_LETTER:
             ok = False
             heard = f"{heard} (only {seconds:.2f}s: clipped?)"
+        elif ok and clipped:
+            ok = False
+            heard = f"{heard} (ends mid-sound: clipped?)"
         if ok:
             if cache_key:
                 _cache_put(cache_key, audio, text, voice_id)
