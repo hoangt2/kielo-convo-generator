@@ -137,6 +137,8 @@ def build_idea(episode, cast, episodes=(), language="Finnish", seasons=None):
         # Time of year: the illustrator draws its light, weather and clothes; the script writer
         # lets it colour the scene. None for episodes (and series) without seasons.
         "season": season,
+        # false = no background music even on a quiet episode (music_mixer.py).
+        "background_music": episode.get("background_music", True),
         "language_level": episode.get("language_level", ""),
         # Script format: "guided" routes generate_scripts.py to the bilingual,
         # teacher-led lesson for true beginners; anything else = normal conversation.

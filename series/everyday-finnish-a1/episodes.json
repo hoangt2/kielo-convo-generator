@@ -250,7 +250,7 @@
       ],
       "title": "Yksi, kaksi, kolme",
       "title_en": "One, two, three",
-      "description": "Sateinen lokakuun ilta. Anna tulee kauppakassien kanssa kotitalon ovelle samaan aikaan kuin Alex, eikä hän saa käsiään vapaaksi. Hän pyytää Alexia näppäilemään ovikoodin ja sanoo numerot suomeksi: kaksi, nolla, viisi, yhdeksän. Hississä Anna painaa nappia neljä, ja Alex asuu kuudennessa kerroksessa: kuusi. Annan ovella Anna antaa Alexille pussillisen omenoita kesämökkinsä puusta, ja he laskevat ne yhdessä yhdestä kymmeneen.",
+      "description": "Sateinen lokakuun ilta. Anna tulee kauppakassien kanssa kotitalon ovelle samaan aikaan kuin Alex, eikä hän saa käsiään vapaaksi. Hän pyytää Alexia näppäilemään ovikoodin ja sanoo numerot ääneen suomeksi: kaksi, nolla, viisi, yhdeksän. Alex kuuntelee tarkasti ja näppäilee koodin. He menevät hissillä ylös ja juttelevat sateesta. Annan ovella Anna tarjoaa Alexille omenoita kesämökkinsä puusta ja kysyy: Montako? Alex vastaa varovasti suomeksi, Anna nauraa ja antaa kymmenen, ja he laskevat omenat yhdessä pussiin yhdestä kymmeneen.",
       "characters": [
         "alex",
         "anna"
@@ -263,7 +263,7 @@
         "Neljä, viisi, kuusi",
         "Seitsemän, kahdeksan, yhdeksän, kymmenen"
       ],
-      "notes": "Alex and Anna are neighbours who met in episode 6: no introductions, they use each other's names. Anna is the guide. Every number comes from a real need: the door code (her hands are full of grocery bags), the lift buttons (she lives on floor 4, he on floor 6), then counting the apples she gives him from her summer cottage tree, where Alex says seven to ten himself. Teach the standard numbers; Anna may mention once that in quick speech people say 'yks, kaks' (glossed, not drilled). Alex says 'Kiitos' (episode 2) for the apples, not retaught. The door code is invented and harmless. Early October evening, already dark outside, rain; they shake off umbrellas in the entrance.",
+      "notes": "Alex and Anna are neighbours who met in episode 6: no introductions, they use each other's names. Anna is the guide. Numbers come up only where Alex has to HEAR or SAY them, never where he could just read digits: (1) the door code, which Anna says aloud in Finnish because her hands are full, so he must understand each number to type it; (2) the apples from her summer cottage tree at her door: she asks 'Montako?' (how many?, glossed once, not drilled), he answers with a small number in Finnish, she laughs and gives him ten, and they count them into his bag together, Alex saying seven to ten himself. The lift ride is small talk about the rain in English: no numbers are taught on the lift buttons (the buttons show digits, so there would be no reason). Teach the standard numbers; Anna may mention once that in quick speech people say 'yks, kaks' (glossed, not drilled). Alex says 'Kiitos' (episode 2) for the apples, not retaught. The door code is invented and harmless. Early October evening, already dark outside, rain; they shake off umbrellas in the entrance.",
       "illustration_scene": "Inside a small apartment-building lift on a dark, rainy October evening. Anna, a neighbour in her fifties, holds two full paper grocery bags with apples and a baguette poking out and a wet folded umbrella hooked on her arm; Alex, a young man with short black curly hair, reaches out to press a round button on the button panel, which shows only plain round buttons with no numbers or symbols. Both smile. Raindrops glisten on their coats. Warm lift light.",
       "season": "autumn",
       "when": "a rainy evening in early October",
@@ -272,7 +272,8 @@
       "track": "Everyday Finnish",
       "chapter": "Who Am I?",
       "level": "Beginner",
-      "language_level": "A1"
+      "language_level": "A1",
+      "background_music": false
     },
     {
       "id": 9,

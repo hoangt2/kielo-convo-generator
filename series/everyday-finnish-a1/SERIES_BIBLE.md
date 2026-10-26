@@ -45,7 +45,7 @@ Rule from the script writer: in an English-led (guided) lesson the teacher must 
 | 5 | Making your first purchase | Alex, Linnea, Markku | street kiosk | Linnea guides; Markku is a stranger, no names |
 | 6 | The spoken pronouns; introducing yourself | Alex, Anna | courtyard/stairs | first meeting with the older neighbour |
 | 7 | Sharing your origins | Alex, Linnea | library | friends already; rehearsing for a student party |
-| 8 | Numbers 0-10 | Alex, Anna | front door, lift | neighbours; door code, floors, apples from her cottage |
+| 8 | Numbers 0-10 | Alex, Anna | front door, lift | neighbours; the door code she says aloud, then counting apples from her cottage (no lift-button numbers: the buttons show digits) |
 | 9 | Talk about work | Alex, Linnea | park | good friends; his team lunch on Monday |
 | 10 | Finding where things are; getting around town | Alex, Linnea | street | Linnea shows him the city |
 | 11 | Asking for the price; numbers 10-100 | Alex, Anna, Markku | kiosk | Anna guides; Markku recognises Alex, says his name |

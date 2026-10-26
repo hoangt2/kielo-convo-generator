@@ -190,10 +190,23 @@ def add_background_music(
         if temp_output_path.exists():
             os.remove(temp_output_path)
 
+def wants_background_music(video_path: Path) -> bool:
+    """False when the video's idea opts out ("background_music": false in its episode)."""
+    import json
+    stem = video_path.stem
+    slug = stem.replace("conversation_", "", 1) if stem.startswith("conversation_") else stem
+    script_path = Path("scripts") / f"{slug}.json"
+    try:
+        idea = json.loads(script_path.read_text(encoding="utf-8")).get("idea", {})
+    except Exception:
+        return True
+    return idea.get("background_music", True) is not False
+
+
 def get_ambient_setting(video_path: Path) -> str:
     """Look up the ambient_setting for a video from its corresponding script JSON."""
     import json
-    
+
     scripts_dir = Path("scripts")
     # Video name is like "conversation_slug.mp4", script is "slug.json"
     stem = video_path.stem
@@ -257,6 +270,9 @@ def batch_process_videos(targets=None):
         ambient = get_ambient_setting(video_file_path)
         if ambient and ambient != "quiet":
             print(f"   ⏭️  Skipping BGM — video has ambient sound [{ambient}]")
+            continue
+        if not wants_background_music(video_file_path):
+            print("   ⏭️  Skipping BGM — the episode has background_music: false")
             continue
         
         # Process in-place (the function handles the temp file)
