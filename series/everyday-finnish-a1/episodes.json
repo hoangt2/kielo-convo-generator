@@ -305,6 +305,71 @@
       "chapter": "Who Am I?",
       "level": "Beginner",
       "language_level": "A1"
+    },
+    {
+      "id": 10,
+      "lessons_covered": [
+        "Finding Where Things Are",
+        "Getting Around Town"
+      ],
+      "title": "Missä on apteekki?",
+      "title_en": "Where is the pharmacy?",
+      "description": "Harmaa lokakuun lauantai. Alexilla on flunssa: hän aivastelee ja tarvitsee nenäsuihkeen. Hän ja Linnea nousevat ratikasta keskustassa, ja Alex haluaa löytää apteekin. Linnea näyttää, miten kysytään: Missä on apteekki? ja miten suomalaiset vastaavat: tuolla ja lähellä. Apteekki on lähellä, joten Linnea ehdottaa, että kävellään eikä mennä ratikalla. Apteekin jälkeen he miettivät, miten mennään kotiin, ja Alex sanoo itse: Mennään ratikalla.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "street",
+      "tone": "Warm, light, a little sniffly",
+      "key_phrases": [
+        "Missä on apteekki?",
+        "Tuolla",
+        "Lähellä",
+        "Mennään ratikalla"
+      ],
+      "notes": "Alex and Linnea are good friends: relaxed banter, no introductions. Linnea is the guide. The reason for the scene is Alex's cold, not a lesson: he needs a pharmacy now. Each phrase is needed in the moment: Alex asks where the pharmacy is ('Missä on vessa?' from episode 4 is the model: 'Missä on...?' is a callback, glossed briefly); Linnea answers the way a Finn would, pointing: 'Tuolla' (over there) and 'Lähellä' (near), so Alex learns to understand the answer; because it is near they walk instead of taking the tram; on the way home Alex suggests the tram himself: 'Mennään ratikalla' (let's take the tram), and Linnea explains that 'ratikka' is what Helsinki people call the tram. No passers-by speak: only Alex and Linnea. Late October: grey, damp, early dusk, wet leaves; Alex has a scarf and a red nose.",
+      "illustration_scene": "A Helsinki city-centre street on a grey late-October afternoon, just after rain. A green city tram is pulling away from a stop behind them. Linnea, a student with glasses and a blonde braid, points down the street; Alex, a young man with short black curly hair and a slightly red nose, holds a tissue and looks where she points. Down the street, a pharmacy with a plain green cross sign; wet pavement with fallen yellow leaves. Tram, signs and shop fronts carry NO letters, numbers or writing.",
+      "season": "autumn",
+      "when": "a grey Saturday in late October",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Out and About",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 11,
+      "lessons_covered": [
+        "Asking for the Price",
+        "Numbers 10 - 100"
+      ],
+      "title": "Taas sä!",
+      "title_en": "You again!",
+      "description": "Kylmä lokakuun ilta. Alex ja Anna kävelevät kaupasta kotiin, ja Alexin pitää ladata matkakorttiinsa kuukauden lippu kulman kioskista. Myyjä on Markku, joka tunnistaa Alexin: Taas sä! ja kertoo nimensä. Alex kysyy Annan neuvosta: Paljonko kuukausilippu maksaa? Markku vastaa nopeasti: kuusikymmentäneljä euroa. Anna selittää kymmenet: kymmenen, kaksikymmentä, kolmekymmentä ja niin edelleen sataan asti, ja Alex maksaa.",
+      "characters": [
+        "alex",
+        "anna",
+        "markku"
+      ],
+      "ambient_setting": "street",
+      "tone": "Brisk, warm, a little funny",
+      "key_phrases": [
+        "Paljonko tämä maksaa?",
+        "Kaksikymmentä, kolmekymmentä, neljäkymmentä",
+        "Kuusikymmentäneljä",
+        "Sata"
+      ],
+      "notes": "Anna is the guide (neighbour, patient, clear). Markku, the kiosk vendor, has short, fast service lines only and never teaches. He recognises Alex from episode 5 ('Taas sä!', glossed by Anna) and tells his name this time ('Mä oon Markku'); Alex answers with his own name (episode 6). The numbers are needed because Markku SAYS the price aloud, fast, and Alex must understand it to pay; there is no price display. Alex asks 'Paljonko tämä maksaa?' ('Paljonko?' is from episode 5, now as a full question). Markku says 'kuusikymmentäneljä euroa' (64, an invented price for a month's travel ticket); Alex does not catch it, so Anna breaks it down: tens 'kymmenen, kaksikymmentä, kolmekymmentä...' up to 'sata' (a hundred), then 'kuusikymmentä' + 'neljä'. Alex repeats the price and pays with a card. Numbers 0-10 are from episode 8 (callbacks, not retaught). Markku may say the casual 'kuuskyt' once; Anna glosses it. Late October evening, cold, dark at five; breath steams, warm kiosk light.",
+      "illustration_scene": "A small street kiosk lit warmly on a cold, dark late-October evening. Markku, the kiosk vendor, leans out of the kiosk window holding a small card reader; Alex, a young man with short black curly hair, holds out a plain travel card; Anna, a neighbour in her fifties with shoulder-length brown hair, stands beside him with a cloth shopping bag, smiling. Street lamps glow, wet leaves on the pavement, their breath steams. No signs, prices, numbers or writing anywhere.",
+      "season": "autumn",
+      "when": "a cold evening in late October",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Out and About",
+      "level": "Beginner",
+      "language_level": "A1"
     }
   ]
 }

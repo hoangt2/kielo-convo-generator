@@ -24,7 +24,7 @@ The Finnish comes out of the situation, the way a friend helps in passing. Nobod
 |---|---|---|
 | Anna (middle-aged neighbour) | Ep 6, the stairs. First names and introductions; Linnea may introduce them. | Friendly neighbours; she is the patient teacher. Invites him for coffee in ep 23. |
 | Sanni (barista) | Ep 2, café. She says her name in English. | Stranger, then recognises him (ep 4), regular (ep 16), knows his order (ep 18). |
-| Markku (kiosk, shop) | Ep 5, kiosk. No names; a rushed purchase. | Recognises him in ep 11 ("Taas sinä!") and gives his name; warmer by ep 19. |
+| Markku (kiosk, shop) | Ep 5, kiosk. No names; a rushed purchase. | Recognises him in ep 11 ("Taas sä!") and gives his name; warmer by ep 19. |
 | Linnea (student) | Ep 1, the courtyard: she lives in the same building. Names in English. | First friend: asks where he is from (7), shows him the city (10), study meetings (14), friends by 17. |
 | Leo (outgoing friend) | Ep 21, introduced by Linnea. | Invites Alex to things from ep 26 on. |
 
@@ -47,8 +47,8 @@ Rule from the script writer: in an English-led (guided) lesson the teacher must 
 | 7 | Sharing your origins | Alex, Linnea | library | friends already; rehearsing for a student party |
 | 8 | Numbers 0-10 | Alex, Anna | front door, lift | neighbours; the door code she says aloud, then counting apples from her cottage (no lift-button numbers: the buttons show digits) |
 | 9 | Talk about work | Alex, Linnea | park | good friends; his team lunch on Monday |
-| 10 | Finding where things are; getting around town | Alex, Linnea | street | Linnea shows him the city |
-| 11 | Asking for the price; numbers 10-100 | Alex, Anna, Markku | kiosk | Anna guides; Markku recognises Alex, says his name |
+| 10 | Finding where things are; getting around town | Alex, Linnea | street | good friends; Alex has a cold and needs a pharmacy; they walk, then take the tram home |
+| 11 | Asking for the price; numbers 10-100 | Alex, Anna, Markku | kiosk | Anna guides; Markku recognises Alex, says his name; Alex loads a month's tram ticket and must understand the price Markku says aloud |
 | 12 | What time is it? | Alex, Linnea, Sanni | café | Linnea guides; he is becoming a regular |
 | 13 | Days of the week; parts of the day | Alex, Anna | home/courtyard | her weekly routine |
 | 14 | When shall we meet?; bigger numbers in time & dates | Alex, Linnea | library | arranging to study together |
@@ -73,7 +73,7 @@ Rule from the script writer: in an English-led (guided) lesson the teacher must 
 | 33 | On the phone | Alex, Linnea | split (call) | |
 | 34 | Making plans; "See you soon!" | Alex, Linnea, Leo | park | ends with a goodbye to Anna |
 
-Episodes are written chapter by chapter with Tung. Episodes 1-9 are written (chapters Survival Basics, Asking & Buying, Who Am I?); the rest wait for their chapter. Episodes 6-9 settle details for later ones: Alex is from Brazil and a programmer; Linnea is from Oulu and studies biology; Anna lives on floor 4, Alex on floor 6, and she has a summer cottage with an apple tree.
+Episodes are written chapter by chapter with Tung. Episodes 1-11 are written (chapters Survival Basics, Asking & Buying, Who Am I?, Out and About); the rest wait for their chapter. Episodes 6-9 settle details for later ones: Alex is from Brazil and a programmer; Linnea is from Oulu and studies biology; Anna lives on floor 4, Alex on floor 6, and she has a summer cottage with an apple tree.
 
 ## Cast voices
 Linnea = Aurora, Sanni = Aava, Markku = Petteri, Leo = Jussi and Anna = Soili are native Finnish voices from the ElevenLabs library. Alex = Davi Andrei (library voice 2CECaLAGTS5NRGxgbcxr), a young Brazilian Portuguese voice: Alex is from Brazil, so he speaks English and Finnish with a Brazilian accent (Tung, 2026-10-25, picked by ear from six Brazilian voices; it says 'Moi' correctly, unlike the old French voice). He replaced Matias, and episodes 1-9 were revoiced. Anna is middle-aged (the library has no native elderly woman), so she is a friendly neighbour in her fifties, no longer 'retired'.

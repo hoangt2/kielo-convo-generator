@@ -83,59 +83,127 @@ def _taught_phrases(idea):
     return [p.strip() for p in (lines[1] if len(lines) > 1 else "").split(";") if p.strip()]
 
 
-# Words that are both English and Finnish ("on", "sit", "me"): never a reason to split a line.
-_ALSO_ENGLISH = {"okay", "ok", "on", "sit", "me", "uh", "no", "a", "i"}
+# Words that are both English and Finnish ("on", "sit", "me") never decide a language.
+_AMBIGUOUS = {"on", "sit", "me", "no", "he", "a", "i", "uh", "hmm", "aa"}
+_ENGLISH_ALWAYS = {"okay", "ok"}
 _WORD_RE = re.compile(r"[A-Za-zÄÖÅäöå]+")
+# A quoted part ('Mä oon', "Moi") is its own piece; an apostrophe inside a word (I'll) is not
+# a quote. The rest is cut after each sentence end; punctuation stays with its piece.
+_QUOTED_RE = re.compile(r"""(?<![A-Za-zÄÖÅäöå])['‘"“][^'’"”]+?['’"”](?![A-Za-zÄÖÅäöå])[.!?…,]*""")
+_SENTENCE_END_RE = re.compile(r"(?<=[.!?…])\s+")
+
+
+def _chunks(body):
+    """Sentences and quoted parts of a line, in order."""
+    out, pos = [], 0
+    for m in _QUOTED_RE.finditer(body):
+        out += [c for c in _SENTENCE_END_RE.split(body[pos:m.start()]) if c.strip()]
+        out.append(m.group(0))
+        pos = m.end()
+    out += [c for c in _SENTENCE_END_RE.split(body[pos:]) if c.strip()]
+    return out
+_ENGLISH_DICT = None
+
+
+def _english_dictionary():
+    """Lower-case English words from the system word list (empty when there is none)."""
+    global _ENGLISH_DICT
+    if _ENGLISH_DICT is None:
+        _ENGLISH_DICT = set()
+        for path in ("/usr/share/dict/words", "/usr/dict/words"):
+            if os.path.exists(path):
+                with open(path, encoding="utf-8", errors="ignore") as f:
+                    _ENGLISH_DICT = {w.strip().lower() for w in f if w.strip()}
+                break
+    return _ENGLISH_DICT
+
+
+def _words(text):
+    return [w.lower() for w in _WORD_RE.findall(re.sub(r"\[[^\]]*\]", "", text or ""))]
 
 
 def _split_mixed_lines(dialogue, learner_voice_id, lang_code, target_phrases=(), names=()):
-    """Split the learner's English lines that contain target-language words into en/xx pieces.
+    """Split lines that mix English and the target language into single-language pieces.
 
     Each entry is voiced with ONE language code, so a Finnish word inside an "en" line is read
-    with English pronunciation ("Anna, moi!" came out as "Mooaa" with a non-native voice).
-    A word counts as target language when it appears in the scene's target-language lines or
-    `target_phrases`, or has å/ä/ö; `names` never decide a split. Native speakers' lines are
-    left alone: their voices read the odd Finnish word fine.
-    """
-    target = {w.lower() for p in target_phrases for w in _WORD_RE.findall(p)}
-    for e in dialogue:
-        if e.get("type") != "sfx" and e.get("lang") == lang_code:
-            target |= {w.lower() for w in _WORD_RE.findall(re.sub(r"\[[^\]]*\]", "", e.get("text", "")))}
-    neutral = {w.lower() for n in names for w in _WORD_RE.findall(n)}
+    with English pronunciation ("Anna, moi!" came out as "Mooaa" with a non-native voice), and
+    an English word inside a target-language line gets "fixed" into untaught Finnish by the
+    grammar check ("Okay. I get it." became "Okei. Ymmärrän.").
 
-    def lang_of(token):
-        words = [w.lower() for w in _WORD_RE.findall(token)]
-        if not words or all(w in neutral for w in words):
-            return None
-        if all(w in neutral or ((w in target or re.search("[äöå]", w)) and w not in _ALSO_ENGLISH)
-               for w in words):
-            return lang_code
-        return "en"
+    - Every speaker's target-language lines and the learner's English lines are split into
+      sentences and quoted parts; each part takes the language most of its words belong to.
+      Native speakers' English lines are left alone: their voices read the odd Finnish word fine.
+    - Inside the learner's English parts, phrases already taught (`target_phrases`, this and
+      earlier episodes) are split out too ("Kiitos again for these" -> "Kiitos" + the rest).
+
+    A word is English when it is in the system dictionary AND occurs in the scene's English
+    lines (the dictionary alone lists "moi", "se", "hei" as rare English words); it is the target
+    language when it is in `target_phrases`, has å/ä/ö, or occurs in a target-language line and is
+    not English. Names and two-language words ("on", "me") count for neither side.
+    """
+    neutral = {w for n in names for w in _WORD_RE.findall(n.lower())}
+    taught = {w for p in target_phrases for w in _words(p)}
+    in_english_lines, in_target_lines = set(), set()
+    for e in dialogue:
+        if e.get("type") == "sfx":
+            continue
+        if e.get("lang") == "en":
+            in_english_lines |= set(_words(e.get("text")))
+        elif e.get("lang") == lang_code:
+            in_target_lines |= set(_words(e.get("text")))
+    dictionary = _english_dictionary()
+    english = {w for w in in_english_lines if (w in dictionary if dictionary else w not in in_target_lines)}
+    english = (english | _ENGLISH_ALWAYS) - taught - neutral - _AMBIGUOUS
+
+    def is_target(w):
+        return w in taught or re.search("[äöå]", w) or (w in in_target_lines and w not in english)
+
+    def chunk_lang(chunk, own):
+        ws = [w for w in _words(chunk) if w not in neutral and w not in _AMBIGUOUS]
+        fi = sum(1 for w in ws if is_target(w))
+        en = sum(1 for w in ws if w in english and not is_target(w))
+        return lang_code if fi > en else "en" if en > fi else None
+
+    def pieces_of(body, own, learner_english):
+        parts = []
+        for chunk in _chunks(body):
+            lang = chunk_lang(chunk, own)
+            if lang != lang_code and learner_english and any(w in taught for w in _words(chunk)):
+                # taught words inside an English sentence of the learner get their own piece
+                for tok in chunk.split():
+                    ws = [w for w in _words(tok) if w not in neutral]
+                    parts.append([lang_code if ws and all(w in taught for w in ws) else
+                                  None if not ws else "en", tok + " "])
+                parts[-1][1] = parts[-1][1].rstrip()
+                continue
+            parts.append([lang, chunk + " "])
+        for i, part in enumerate(parts):              # undecided parts join a neighbour
+            if part[0] is None:
+                part[0] = (next((parts[j][0] for j in range(i - 1, -1, -1) if parts[j][0]), None)
+                           or next((parts[j][0] for j in range(i + 1, len(parts)) if parts[j][0]), None) or own)
+        merged = []
+        for lang, text in parts:
+            if merged and merged[-1][0] == lang:
+                merged[-1][1] += text
+            else:
+                merged.append([lang, text])
+        return [(lang, " ".join(text.split())) for lang, text in merged if text.strip()]
 
     out = []
     for e in dialogue:
-        if e.get("type") == "sfx" or e.get("lang") != "en" or e.get("voice_id") != learner_voice_id:
+        own = e.get("lang")
+        learner_english = own == "en" and e.get("voice_id") == learner_voice_id
+        if e.get("type") == "sfx" or not (own == lang_code or learner_english):
             out.append(e)
             continue
         m = re.match(r"^\s*(\[[^\]]*\])\s*(.*)$", e.get("text", ""), re.S)
         tag, body = (m.group(1), m.group(2)) if m else ("", e.get("text", ""))
-        tokens = body.split()
-        langs = [lang_of(t) for t in tokens]
-        for i, l in enumerate(langs):            # a name joins the piece next to it
-            if l is None:
-                langs[i] = (next((langs[j] for j in range(i - 1, -1, -1) if langs[j]), None)
-                            or next((langs[j] for j in range(i + 1, len(langs)) if langs[j]), None) or "en")
-        pieces = []
-        for tok, l in zip(tokens, langs):
-            if pieces and pieces[-1][0] == l:
-                pieces[-1][1].append(tok)
-            else:
-                pieces.append([l, [tok]])
-        if len(pieces) <= 1 and (not pieces or pieces[0][0] == "en"):
-            out.append(e)
+        pieces = pieces_of(body, own, learner_english)
+        if len(pieces) <= 1:
+            out.append({**e, "lang": pieces[0][0]} if pieces else e)
             continue
-        for l, toks in pieces:
-            out.append({**e, "text": (tag + " " + " ".join(toks)).strip(), "lang": l})
+        for lang, text in pieces:
+            out.append({**e, "text": (tag + " " + text).strip(), "lang": lang})
     return out
 
 
