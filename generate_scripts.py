@@ -73,6 +73,72 @@ def _announced_teaching(dialogue):
     return hits
 
 
+def _taught_phrases(idea):
+    """Phrases taught in earlier episodes, from the continuity brief's 'Already taught' list."""
+    text = idea.get("continuity") or ""
+    marker = text.find("Already taught in earlier episodes")
+    if marker < 0:
+        return []
+    lines = text[marker:].split("\n")
+    return [p.strip() for p in (lines[1] if len(lines) > 1 else "").split(";") if p.strip()]
+
+
+# Words that are both English and Finnish ("on", "sit", "me"): never a reason to split a line.
+_ALSO_ENGLISH = {"okay", "ok", "on", "sit", "me", "uh", "no", "a", "i"}
+_WORD_RE = re.compile(r"[A-Za-zÄÖÅäöå]+")
+
+
+def _split_mixed_lines(dialogue, learner_voice_id, lang_code, target_phrases=(), names=()):
+    """Split the learner's English lines that contain target-language words into en/xx pieces.
+
+    Each entry is voiced with ONE language code, so a Finnish word inside an "en" line is read
+    with English pronunciation ("Anna, moi!" came out as "Mooaa" with a non-native voice).
+    A word counts as target language when it appears in the scene's target-language lines or
+    `target_phrases`, or has å/ä/ö; `names` never decide a split. Native speakers' lines are
+    left alone: their voices read the odd Finnish word fine.
+    """
+    target = {w.lower() for p in target_phrases for w in _WORD_RE.findall(p)}
+    for e in dialogue:
+        if e.get("type") != "sfx" and e.get("lang") == lang_code:
+            target |= {w.lower() for w in _WORD_RE.findall(re.sub(r"\[[^\]]*\]", "", e.get("text", "")))}
+    neutral = {w.lower() for n in names for w in _WORD_RE.findall(n)}
+
+    def lang_of(token):
+        words = [w.lower() for w in _WORD_RE.findall(token)]
+        if not words or all(w in neutral for w in words):
+            return None
+        if all(w in neutral or ((w in target or re.search("[äöå]", w)) and w not in _ALSO_ENGLISH)
+               for w in words):
+            return lang_code
+        return "en"
+
+    out = []
+    for e in dialogue:
+        if e.get("type") == "sfx" or e.get("lang") != "en" or e.get("voice_id") != learner_voice_id:
+            out.append(e)
+            continue
+        m = re.match(r"^\s*(\[[^\]]*\])\s*(.*)$", e.get("text", ""), re.S)
+        tag, body = (m.group(1), m.group(2)) if m else ("", e.get("text", ""))
+        tokens = body.split()
+        langs = [lang_of(t) for t in tokens]
+        for i, l in enumerate(langs):            # a name joins the piece next to it
+            if l is None:
+                langs[i] = (next((langs[j] for j in range(i - 1, -1, -1) if langs[j]), None)
+                            or next((langs[j] for j in range(i + 1, len(langs)) if langs[j]), None) or "en")
+        pieces = []
+        for tok, l in zip(tokens, langs):
+            if pieces and pieces[-1][0] == l:
+                pieces[-1][1].append(tok)
+            else:
+                pieces.append([l, [tok]])
+        if len(pieces) <= 1 and (not pieces or pieces[0][0] == "en"):
+            out.append(e)
+            continue
+        for l, toks in pieces:
+            out.append({**e, "text": (tag + " " + " ".join(toks)).strip(), "lang": l})
+    return out
+
+
 def _season_block(idea):
     """Time of year for a series episode (empty when the idea has no season).
 
@@ -599,6 +665,9 @@ def generate_guided_lesson(idea, metadata):
                 for entry in dialogue:
                     if entry.get("type") != "sfx" and not entry.get("lang"):
                         entry["lang"] = lang_code
+                dialogue[:] = _split_mixed_lines(dialogue, learner.get("voice_id"), lang_code,
+                                                 key_phrases + _taught_phrases(idea),
+                                                 [c["name"] for c in characters])
                 # A scene that announces the lesson ("a perfect time to learn...") is rewritten;
                 # the last attempt is kept either way, with a warning.
                 announced = _announced_teaching(dialogue)
