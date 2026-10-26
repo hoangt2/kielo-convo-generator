@@ -370,6 +370,133 @@
       "chapter": "Out and About",
       "level": "Beginner",
       "language_level": "A1"
+    },
+    {
+      "id": 12,
+      "lessons_covered": [
+        "What Time Is It? (mitä kello on)"
+      ],
+      "title": "Mitä kello on?",
+      "title_en": "What time is it?",
+      "description": "Sunnuntaiaamu lokakuun lopussa, ja kellot siirrettiin yöllä tunnilla taaksepäin. Alex ja Linnea istuvat tutussa kahvilassa. Alexilla on kello yksitoista videopuhelu kotiin Brasiliaan, mutta hänen puhelimensa akku on loppu, eikä hän ole varma, onko hänen rannekellonsa oikeassa ajassa. Linnea neuvoo häntä kysymään Sannilta: Anteeksi, mitä kello on? Sanni vastaa: Kello on kymmenen. Linnea selittää, että puoli yksitoista tarkoittaa puoli tuntia ennen yhtätoista, ja Alex lähtee ajoissa.",
+      "characters": [
+        "alex",
+        "linnea",
+        "sanni"
+      ],
+      "ambient_setting": "cafe",
+      "tone": "Cosy, a little rushed, friendly",
+      "key_phrases": [
+        "Mitä kello on?",
+        "Kello on kymmenen",
+        "Puoli yksitoista"
+      ],
+      "notes": "Linnea is the guide. Sanni, the barista, knows them both (he is becoming a regular) and only answers briefly; she never teaches. The reason is real: Alex's phone is dead, he has a video call home at eleven, and the clocks went back an hour last night, so he does not trust his old wristwatch (it still shows the summer time). He asks Sanni the time ('Anteeksi' from episode 2 is a callback). Sanni says 'Kello on kymmenen'. Alex says he must leave at half past ten; Linnea teaches 'puoli yksitoista' and explains that Finns say 'half eleven' for 10:30, which surprises him. 'Yksitoista' (eleven) is glossed in passing, not drilled. Season: late October, the first Sunday of winter time, grey and dark outside the café window; candles on the tables.",
+      "illustration_scene": "Inside a cosy Helsinki café on a grey late-October Sunday morning, candles on the tables and dark rainy trees outside the window. Alex, a young man with short black curly hair, holds up his wrist and frowns at an old wristwatch; Linnea, a student with glasses and a blonde braid, sits opposite him with a coffee and laughs; Sanni, the barista with a dark bob, stands behind the counter. No clocks on the walls. No writing anywhere.",
+      "season": "autumn",
+      "when": "a late-October Sunday morning, the day the clocks went back",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Telling Time & Days",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 13,
+      "lessons_covered": [
+        "Days of the Week",
+        "Parts of the Day"
+      ],
+      "title": "Tiistaina illalla",
+      "title_en": "On Tuesday evening",
+      "description": "Arki-ilta lokakuun lopussa. Alex kantaa likapyykkikassia talon kellariin, koska hänen asunnossaan ei ole pesukonetta. Pesutuvassa on Anna, joka näyttää hänelle varauslistan. Alex kysyy: Mikä päivä tänään on? Anna kertoo viikonpäivät ja sen, milloin pesutupa on vapaana: maanantaina aamulla, tiistaina illalla. Anna kertoo myös omasta viikostaan: perjantaina illalla hän menee taloyhtiön saunaan. Alex varaa vuoron tiistaiksi illaksi.",
+      "characters": [
+        "alex",
+        "anna"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Homely, warm, a little funny",
+      "key_phrases": [
+        "Mikä päivä tänään on?",
+        "Maanantai, tiistai, keskiviikko, torstai",
+        "Perjantai, lauantai, sunnuntai",
+        "Aamulla, illalla"
+      ],
+      "notes": "Anna is the guide (neighbour, patient). The reason is real: Alex has no washing machine in his flat and must book the building's shared laundry room in the basement; the booking board has a row for each weekday and a morning and an evening slot, and Anna is there doing her own washing. The days are needed because Anna tells him which slots are free; 'aamulla' (in the morning) and 'illalla' (in the evening) because each day has two slots. Alex picks 'tiistaina illalla' (Tuesday evening). Anna mentions her own week in passing (sauna in the building on Friday evenings, a very Finnish routine) so the days come up again; 'sauna' needs no gloss. Today is Monday. Teach the days in two groups. The booking board is drawn without writing. Late October, dark outside; washing machines hum.",
+      "illustration_scene": "A tidy shared laundry room in the basement of a Helsinki apartment building, late-October evening, a small high window shows darkness. Two white washing machines, one running, a drying rack and a wooden bench. Anna, a neighbour in her fifties with shoulder-length brown hair, holds a folded towel and points at a plain booking board on the wall with rows of small empty squares and some coloured pegs, no writing; Alex, a young man with short black curly hair, holds a full laundry bag and looks at the board. No letters, numbers or writing anywhere.",
+      "season": "autumn",
+      "when": "a Monday evening at the end of October",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Telling Time & Days",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 14,
+      "lessons_covered": [
+        "When Shall We Meet? (milloin)",
+        "Bigger Numbers in Time & Dates"
+      ],
+      "title": "Milloin nähdään?",
+      "title_en": "When shall we meet?",
+      "description": "Alex ja Linnea ovat kaupungin kirjastossa. Linnealla on tentti marraskuussa, ja Alex haluaa harjoitella suomea, joten he päättävät opiskella yhdessä joka viikko. Linnea kysyy: Milloin nähdään? Alex ehdottaa torstaita, ja Linnea vastaa: torstaina kello viisi. Alex kysyy, kuinka kauan, ja Linnea sanoo: kaksi tuntia. Lopuksi Linnea näyttää, että kirjaston opiskeluhuone varataan aina kahdeksi tunniksi.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "library",
+      "tone": "Friendly, focused, playful",
+      "key_phrases": [
+        "Milloin nähdään?",
+        "Torstaina kello viisi",
+        "Kuinka kauan?",
+        "Kaksi tuntia"
+      ],
+      "notes": "Alex and Linnea are good friends. Linnea is the guide. The reason is real: Linnea has an exam in November and Alex wants regular practice, so they agree a weekly study time and book a library study room, which is booked in two-hour blocks. Each phrase is needed to settle the plan: when ('Milloin nähdään?'), the day and hour ('torstaina kello viisi', using 'torstaina' from episode 13 and 'kello' from episode 12), how long ('Kuinka kauan?'), the answer ('kaksi tuntia'). Linnea may mention that in writing and timetables Finns use the 24-hour clock ('seitsemäntoista' for 17), glossed once, not drilled. Quiet voices: library. Last days of October, dark at five, rain on the big windows.",
+      "illustration_scene": "A big bright modern city library on a dark late-October afternoon, rain streaking the huge windows and city lights outside. Alex and Linnea sit at a long wooden table with notebooks and two cups; Linnea, a student with glasses and a blonde braid, holds up two fingers; Alex, a young man with short black curly hair, writes in a notebook. Their raincoats hang on the chairs. Shelves of books with plain spines. No writing anywhere.",
+      "season": "autumn",
+      "when": "a rainy afternoon in the last days of October",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Telling Time & Days",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 15,
+      "lessons_covered": [
+        "Months of the Year",
+        "Talking About the Date"
+      ],
+      "title": "Hyvää syntymäpäivää!",
+      "title_en": "Happy birthday!",
+      "description": "Anna kutsuu Alexin kahville, koska hän on leiponut täytekakun. Keittiössä Alex huomaa, että kakussa on kynttilöitä, ja kysyy, onko tänään erityinen päivä. Anna kertoo, että tänään on hänen syntymäpäivänsä. Alex sanoo: Hyvää syntymäpäivää! Anna kysyy Alexilta: Milloin sun syntymäpäivä on? Alex vastaa: toukokuussa. Anna kertoo kuukaudet ja sen, että hänen syntymäpäivänsä on aina lokakuussa, kun ruska on jo ohi.",
+      "characters": [
+        "alex",
+        "anna"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Warm, touching, light",
+      "key_phrases": [
+        "Hyvää syntymäpäivää!",
+        "Milloin sun syntymäpäivä on?",
+        "Lokakuussa",
+        "Toukokuussa"
+      ],
+      "notes": "Anna is the guide. The reason is real: Anna has baked a cream cake and asks Alex for coffee without saying why; the candles give it away, and Alex wants to wish her happy birthday properly. Then birthdays lead to months: Anna asks when his birthday is (spoken 'sun'), he answers 'toukokuussa' (in May); hers is 'lokakuussa' (in October). Anna lists the months quickly as a curiosity (the names come from nature, e.g. 'lokakuu' is the mud month), glossed, not drilled; only the two months above are practised. Callbacks: 'Kiitos' (episode 2). Alex's careful standard Finnish: he may ask 'Milloin sinun syntymäpäivä on?' and Anna notes the spoken 'sun'. Her flat: warm kitchen, coffee, candles, dark rainy evening at the very end of October.",
+      "illustration_scene": "A warm, cosy Finnish home kitchen on a dark rainy evening at the end of October. A round table with a cream layer cake with a few lit candles, two coffee cups and a coffee pot. Anna, a neighbour in her fifties with shoulder-length brown hair, is at home in her cream knitted cardigan and blouse, NO coat or scarf, and smiles shyly; Alex, a young man with short black curly hair, in his light-blue hoodie, raises his coffee cup to her, delighted; his wet yellow raincoat hangs on a hook by the kitchen door. Candles in the window, rain outside. No writing anywhere, no numbers on the cake.",
+      "season": "autumn",
+      "when": "the last day of October, a rainy evening",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Telling Time & Days",
+      "level": "Beginner",
+      "language_level": "A1"
     }
   ]
 }

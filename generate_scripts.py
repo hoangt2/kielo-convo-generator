@@ -132,7 +132,8 @@ def _split_mixed_lines(dialogue, learner_voice_id, lang_code, target_phrases=(),
 
     - Every speaker's target-language lines and the learner's English lines are split into
       sentences and quoted parts; each part takes the language most of its words belong to.
-      Native speakers' English lines are left alone: their voices read the odd Finnish word fine.
+      Native speakers read the odd Finnish word fine inside English, except a quoted one that is
+      also an English word ("I used 'sun'" came out as the English "sun"): only those are split.
     - Inside the learner's English parts, phrases already taught (`target_phrases`, this and
       earlier episodes) are split out too ("Kiitos again for these" -> "Kiitos" + the rest).
 
@@ -142,7 +143,7 @@ def _split_mixed_lines(dialogue, learner_voice_id, lang_code, target_phrases=(),
     not English. Names and two-language words ("on", "me") count for neither side.
     """
     neutral = {w for n in names for w in _WORD_RE.findall(n.lower())}
-    taught = {w for p in target_phrases for w in _words(p)}
+    taught = {w for p in target_phrases for w in _words(p)} - _AMBIGUOUS
     in_english_lines, in_target_lines = set(), set()
     for e in dialogue:
         if e.get("type") == "sfx":
@@ -164,10 +165,17 @@ def _split_mixed_lines(dialogue, learner_voice_id, lang_code, target_phrases=(),
         en = sum(1 for w in ws if w in english and not is_target(w))
         return lang_code if fi > en else "en" if en > fi else None
 
-    def pieces_of(body, own, learner_english):
+    def pieces_of(body, own, learner_english, native_english=False):
         parts = []
         for chunk in _chunks(body):
             lang = chunk_lang(chunk, own)
+            if native_english:
+                # a native speaker's English line: only a quoted target word that is also an
+                # English word ('sun', 'on', 'Moi') is read wrongly, so only that is split out
+                quoted = _QUOTED_RE.fullmatch(chunk.strip())
+                homograph = any(w in dictionary for w in _words(chunk))
+                parts.append([lang_code if quoted and lang == lang_code and homograph else "en", chunk + " "])
+                continue
             if lang != lang_code and learner_english and any(w in taught for w in _words(chunk)):
                 # taught words inside an English sentence of the learner get their own piece
                 for tok in chunk.split():
@@ -193,12 +201,13 @@ def _split_mixed_lines(dialogue, learner_voice_id, lang_code, target_phrases=(),
     for e in dialogue:
         own = e.get("lang")
         learner_english = own == "en" and e.get("voice_id") == learner_voice_id
-        if e.get("type") == "sfx" or not (own == lang_code or learner_english):
+        native_english = own == "en" and not learner_english
+        if e.get("type") == "sfx" or own not in (lang_code, "en"):
             out.append(e)
             continue
         m = re.match(r"^\s*(\[[^\]]*\])\s*(.*)$", e.get("text", ""), re.S)
         tag, body = (m.group(1), m.group(2)) if m else ("", e.get("text", ""))
-        pieces = pieces_of(body, own, learner_english)
+        pieces = pieces_of(body, own, learner_english, native_english)
         if len(pieces) <= 1:
             out.append({**e, "lang": pieces[0][0]} if pieces else e)
             continue

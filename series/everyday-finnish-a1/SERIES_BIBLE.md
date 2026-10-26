@@ -17,7 +17,7 @@ Alex has just moved to Helsinki from Brazil for a new job as a programmer at a s
 - The season is felt, not talked about: a wet jacket, the early dark, snow underfoot. Only the weather episodes (29, 30) make it the topic.
 
 ## How the scenes sound
-The Finnish comes out of the situation, the way a friend helps in passing. Nobody announces a lesson ("this is a perfect time to learn", "our first lesson for today", "your turn", "thanks for the lesson"); the scene starts for a reason of its own (a heavy box, the rain, a party on Saturday), Alex tries each phrase for real, and the scene ends when the situation does. The script generator rewrites a draft that announces the teaching.
+The Finnish comes out of the situation, the way a friend helps in passing. Nobody announces a lesson ("this is a perfect time to learn", "our first lesson for today", "your turn", "thanks for the lesson"); the scene starts for a reason of its own (a heavy box, the rain, a party on Saturday), Alex tries each phrase for real, and the scene ends when the situation does. The script generator rewrites a draft that announces the teaching. A Finnish word inside an English line is read the English way, so lines are split by language (the generator does this). A short Finnish word that is also an English word ('sun', 'on', 'Moi') is never said on its own, even as a Finnish line: the voice still reads it as English. Keep it inside a Finnish phrase ('Milloin sun syntymäpäivä on?'). Learned 2026-10-26 from 'Moi' (ep 8) and 'sun' (ep 15).
 
 ## Who knows whom, and when
 | Character | First meets Alex | How the relationship grows |
@@ -49,10 +49,10 @@ Rule from the script writer: in an English-led (guided) lesson the teacher must 
 | 9 | Talk about work | Alex, Linnea | park | good friends; his team lunch on Monday |
 | 10 | Finding where things are; getting around town | Alex, Linnea | street | good friends; Alex has a cold and needs a pharmacy; they walk, then take the tram home |
 | 11 | Asking for the price; numbers 10-100 | Alex, Anna, Markku | kiosk | Anna guides; Markku recognises Alex, says his name; Alex loads a month's tram ticket and must understand the price Markku says aloud |
-| 12 | What time is it? | Alex, Linnea, Sanni | café | Linnea guides; he is becoming a regular |
-| 13 | Days of the week; parts of the day | Alex, Anna | home/courtyard | her weekly routine |
-| 14 | When shall we meet?; bigger numbers in time & dates | Alex, Linnea | library | arranging to study together |
-| 15 | Months; talking about the date | Alex, Anna | home_kitchen | her birthday |
+| 12 | What time is it? | Alex, Linnea, Sanni | café | Linnea guides; he is becoming a regular; the morning the clocks went back, his phone is dead and he has a call home at eleven |
+| 13 | Days of the week; parts of the day | Alex, Anna | basement laundry room | booking the shared laundry room (morning and evening slots); her sauna evenings |
+| 14 | When shall we meet?; bigger numbers in time & dates | Alex, Linnea | library | a weekly study time before her November exam; a two-hour study room |
+| 15 | Months; talking about the date | Alex, Anna | her kitchen | her birthday (October, cake and coffee); his is in May |
 | 16 | At the café; ordering a meal | Alex, Linnea, Sanni | café | Linnea guides; he is a regular |
 | 17 | Likes & dislikes; asking about the food | Alex, Linnea | restaurant | friends |
 | 18 | Paying the bill | Alex, Linnea, Sanni | café | Sanni knows his order |
@@ -73,7 +73,7 @@ Rule from the script writer: in an English-led (guided) lesson the teacher must 
 | 33 | On the phone | Alex, Linnea | split (call) | |
 | 34 | Making plans; "See you soon!" | Alex, Linnea, Leo | park | ends with a goodbye to Anna |
 
-Episodes are written chapter by chapter with Tung. Episodes 1-11 are written (chapters Survival Basics, Asking & Buying, Who Am I?, Out and About); the rest wait for their chapter. Episodes 6-9 settle details for later ones: Alex is from Brazil and a programmer; Linnea is from Oulu and studies biology; Anna lives on floor 4, Alex on floor 6, and she has a summer cottage with an apple tree.
+Episodes are written chapter by chapter with Tung. Episodes 1-15 are written (chapters Survival Basics, Asking & Buying, Who Am I?, Out and About, Telling Time & Days); the rest wait for their chapter. Episodes 6-9 settle details for later ones: Alex is from Brazil and a programmer; Linnea is from Oulu and studies biology; Anna lives on floor 4, Alex on floor 6, and she has a summer cottage with an apple tree. Episodes 12-15 add: Alex video-calls home to Brazil; his flat has no washing machine (the building has a laundry room and a sauna); Linnea has an exam in November; Anna's birthday is at the end of October, Alex's in May.
 
 ## Cast voices
 Linnea = Aurora, Sanni = Aava, Markku = Petteri, Leo = Jussi and Anna = Soili are native Finnish voices from the ElevenLabs library. Alex = Davi Andrei (library voice 2CECaLAGTS5NRGxgbcxr), a young Brazilian Portuguese voice: Alex is from Brazil, so he speaks English and Finnish with a Brazilian accent (Tung, 2026-10-25, picked by ear from six Brazilian voices; it says 'Moi' correctly, unlike the old French voice). He replaced Matias, and episodes 1-9 were revoiced. Anna is middle-aged (the library has no native elderly woman), so she is a friendly neighbour in her fifties, no longer 'retired'.
