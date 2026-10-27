@@ -497,6 +497,136 @@
       "chapter": "Telling Time & Days",
       "level": "Beginner",
       "language_level": "A1"
+    },
+    {
+      "id": 16,
+      "lessons_covered": [
+        "At the Café (kahvilassa)",
+        "Ordering a Meal"
+      ],
+      "title": "Mä otan keiton",
+      "title_en": "I'll have the soup",
+      "description": "Alex ja Linnea tulevat sateesta kahvilaan opiskelemaan Linnean tenttiin. Heillä on nälkä. Sanni tunnistaa Alexin. Alex tilaa itse ensimmäistä kertaa lounaan: Mä otan keiton. Ja kahvi, kiitos. Sanni kysyy: Täällä vai mukaan? Linnea auttaa, ja Alex vastaa: Täällä.",
+      "characters": [
+        "alex",
+        "linnea",
+        "sanni"
+      ],
+      "ambient_setting": "cafe_quiet",
+      "tone": "Cosy, light, a small win",
+      "key_phrases": [
+        "Mä otan keiton",
+        "Ja kahvi, kiitos",
+        "Täällä vai mukaan?",
+        "Täällä, kiitos"
+      ],
+      "notes": "Linnea is the guide; Sanni has only short service lines. The reason is real: they come in from the rain to study for Linnea's November exam (episode 14) and are hungry; the soup of the day is on the board. In the queue Alex asks Linnea how to say he'll take the soup; she gives the spoken 'Mä otan...' and he tries it for real at the counter. Sanni asks 'Täällä vai mukaan?', which he does not understand; Linnea glosses it quietly and he answers 'Täällä, kiitos'. Sanni recognises him (regular since episode 12). Callbacks: 'Kiitos' (episode 2), the study plan (episode 14). Never say a short Finnish word that is also English on its own (series bible).",
+      "illustration_scene": "A warm, cosy Helsinki café on a grey early-November afternoon, already getting dark outside, rain on the big window, wet yellow leaves on the pavement. At the counter Sanni, tall and slim with a sharp dark-brown bob, in her black turtleneck, smiles at Alex; Alex, a young man with short black curly hair, in his mustard-yellow rain jacket open over his light-blue hoodie, points at a soup pot; Linnea, blonde ponytail, glasses and freckles, in her lilac raincoat and mint scarf, stands beside him with a book bag. A small menu board with a soup pictogram, no readable writing anywhere.",
+      "season": "autumn",
+      "when": "an early November afternoon, grey and rainy, dark by four",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Food & Drink",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 17,
+      "lessons_covered": [
+        "Likes & Dislikes (tykkään, en tykkää)",
+        "Asking About the Food"
+      ],
+      "title": "Tykkäätkö tästä?",
+      "title_en": "Do you like this?",
+      "description": "Linnea vie Alexin suomalaiseen lounasravintolaan. Alex näkee karjalanpiirakan ja salmiakkia ensimmäistä kertaa. Hän kysyy: Mitä tässä on? Onko tämä tulista? Linnea nauraa. Alex maistaa: karjalanpiirakasta hän tykkää, salmiakista hän ei tykkää.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "restaurant",
+      "tone": "Playful, funny, warm",
+      "key_phrases": [
+        "Tykkäätkö tästä?",
+        "Tykkään",
+        "En tykkää",
+        "Mitä tässä on?",
+        "Onko tämä tulista?"
+      ],
+      "notes": "Linnea is the guide. The reason is real: Linnea takes Alex to a Finnish lunch buffet near the university on a wet November weekday, because he keeps eating the same sandwich at work. At the buffet he points at a karjalanpiirakka and asks 'Mitä tässä on?' (rice inside); he asks 'Onko tämä tulista?' half as a joke, coming from Brazil, and Linnea laughs that Finnish food is almost never spicy. He likes the pie with egg butter ('Tykkään!'). At the till there is a bowl of salmiakki; Linnea dares him, he takes a careful bite and makes a face: 'En tykkää.' Linnea asks 'Tykkäätkö tästä?' each time. Callbacks: 'Mikä tämä on?' (episode 4).",
+      "illustration_scene": "A bright, simple Finnish lunch restaurant on a wet November day, rain on the windows, coats on hooks. At a buffet table with soup, salad and a tray of karjalanpiirakka pies, Alex, a young man with short black curly hair, in his light-blue hoodie (his mustard-yellow rain jacket on a hook), holds up a small black salmiakki sweet and makes a doubtful face; Linnea, blonde ponytail, glasses and freckles, in her pastel striped sweater, laughs beside him with a plate. No readable writing anywhere.",
+      "season": "autumn",
+      "when": "a wet weekday lunchtime in early November",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Food & Drink",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 18,
+      "lessons_covered": [
+        "Paying the Bill"
+      ],
+      "title": "Saisinko laskun?",
+      "title_en": "Could I have the bill?",
+      "description": "Ensimmäinen lumi sataa. Alex ja Linnea syövät illalla kahvilassa, jossa on nyt pöytiintarjoilu. Sanni tietää jo Alexin tilauksen. Lopuksi Alex kysyy: Saisinko laskun? Linnea sanoo: Maksetaan erikseen. Alex maksaa kortilla.",
+      "characters": [
+        "alex",
+        "linnea",
+        "sanni"
+      ],
+      "ambient_setting": "cafe_quiet",
+      "tone": "Warm, quietly happy, a first-snow evening",
+      "key_phrases": [
+        "Saisinko laskun?",
+        "Maksetaan erikseen",
+        "Kortilla",
+        "Ihan hyvin, kiitos"
+      ],
+      "notes": "Linnea is the guide; Sanni has only short service lines. The reason is real: the first snow is falling and they stay at the café for its new evening table service; Sanni brings Alex 'the usual' without him ordering, which delights him (callback to episode 2, when he could not order coffee properly). When they want to leave, Alex wants to pay for both to thank Linnea for her help; Linnea says 'Maksetaan erikseen' (Finns usually split). He asks Sanni 'Saisinko laskun?', and when she asks how he pays he answers 'Kortilla'. Sanni asks how the food was; he answers 'Ihan hyvin, kiitos' and Linnea teases that this is a very Finnish compliment. Outside, snow on everything.",
+      "illustration_scene": "A cosy Helsinki café in the evening, candles on the tables, the FIRST SNOW falling in big flakes outside the window, yellow street lights, snow just settling on the pavement. THREE people: SANNI, the barista, tall and slim with olive skin and a sharp dark-brown bob, in her black turtleneck, STANDS beside the table and holds a small card payment terminal out towards Alex. ALEX, a young man with light brown skin and short black curly hair, in his light-blue hoodie, sits at the table and taps his bank card on Sanni's terminal; his navy winter parka and red beanie hang on his chair. LINNEA, blonde braid, glasses and freckles, in her pastel striped sweater, sits across from him with her hands around a coffee cup, smiling; she holds nothing else. Two empty plates and coffee cups on the table. No readable writing anywhere.",
+      "season": "winter",
+      "when": "a mid-November evening, the first snow falling",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Food & Drink",
+      "level": "Beginner",
+      "language_level": "A1"
+    },
+    {
+      "id": 19,
+      "lessons_covered": [
+        "At the Grocery Shop"
+      ],
+      "title": "Missä on maito?",
+      "title_en": "Where is the milk?",
+      "description": "Alex on kaupassa ja etsii maitoa, leipää ja kaurajuomaa. Anna näkee hänet ja auttaa. Alex kysyy: Missä on maito? Anna näyttää. Kassalla on Markku. Markku kysyy: Tarvitsetko kassin? Alex vastaa: Ei kiitos. Markku vitsailee.",
+      "characters": [
+        "alex",
+        "anna",
+        "markku"
+      ],
+      "ambient_setting": "supermarket",
+      "tone": "Friendly, everyday, a little funny",
+      "key_phrases": [
+        "Missä on maito?",
+        "Missä on leipä?",
+        "Tarvitsetko kassin?",
+        "Ei kiitos"
+      ],
+      "notes": "Anna is the guide; Markku has only short service lines. The reason is real: a snowy late-November afternoon, Alex is in the neighbourhood supermarket with a shopping list and cannot find anything, because the shelves are in Finnish; Anna, shopping too, sees him lost. He asks her 'Missä on maito?' (callback to 'Missä on...?' from episode 10) and 'Missä on leipä?'; she shows him, and the oat drink (kaurajuoma) next to the milk, which is what he really wanted. At the till Markku works his other job; he recognises Alex and is warmer now (callback to episode 11, 'Taas sä!'). Markku asks 'Tarvitsetko kassin?'; Alex has his own bag and says 'Ei kiitos'. Markku makes a small dry joke about the snow or the oat drink.",
+      "illustration_scene": "A Finnish neighbourhood supermarket on a snowy late-November afternoon, snow visible through the glass doors, wet boot prints on the floor. By a dairy cooler with milk cartons (no readable writing), Anna, a woman in her fifties with shoulder-length brown hair with silver streaks, in her long dark-green wool coat and cream knitted hat, points at a shelf and smiles; Alex, a young man with short black curly hair, in his navy padded parka, red beanie and grey scarf, holds a basket with bread and a shopping list. In the background at the till Markku, stocky with short grey hair on the sides, in a work vest over a flannel shirt, waves. No readable writing anywhere.",
+      "season": "winter",
+      "when": "a snowy late-November afternoon",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Food & Drink",
+      "level": "Beginner",
+      "language_level": "A1"
     }
   ]
 }

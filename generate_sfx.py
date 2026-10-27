@@ -25,6 +25,9 @@ AMBIENCE_DIR = Path("presets") / "ambience"
 AMBIENT_PROMPTS = {
     "bus": "City bus interior ambience with engine humming steadily, soft passenger chatter, occasional stop announcements, and muffled traffic outside",
     "cafe": "Cozy café ambience with espresso machine steaming, cups and saucers clinking, soft background chatter, and gentle background music",
+    # The café without the espresso machine's hiss (Tung, 2026-10-27: the steaming hiss is
+    # unpleasant under dialogue). Set "ambient_setting": "cafe_quiet" on an episode to use it.
+    "cafe_quiet": "Calm cozy café ambience with cups and saucers clinking softly, spoons stirring, soft murmur of background chatter, and gentle background music. No espresso machine, no steam, no hissing",
     "street": "City street ambience with cars passing, distant traffic, pedestrian footsteps, occasional horn, and urban atmosphere",
     "park": "Outdoor park ambience with birds chirping, gentle wind through trees, distant children playing, and natural atmosphere",
     "office": "Office ambience with keyboard typing, muffled phone conversations, printer humming, and gentle air conditioning",
