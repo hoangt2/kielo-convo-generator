@@ -732,6 +732,13 @@ def generate_guided_lesson(idea, metadata):
             )
 
             json_output = json.loads(response.text.strip())
+            # The model sometimes returns the bare list of lines instead of {"dialogue_list": [...]}
+            # (or that object wrapped in a one-item list); accept both rather than crash.
+            if isinstance(json_output, list):
+                if len(json_output) == 1 and isinstance(json_output[0], dict) and "dialogue_list" in json_output[0]:
+                    json_output = json_output[0]
+                else:
+                    json_output = {"dialogue_list": json_output}
 
             dialogue = json_output.get("dialogue_list")
             if dialogue and len(dialogue) > 0:

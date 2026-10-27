@@ -627,6 +627,102 @@
       "chapter": "Food & Drink",
       "level": "Beginner",
       "language_level": "A1"
+    },
+    {
+      "id": 20,
+      "lessons_covered": [
+        "My Family (perhe)",
+        "Brothers, Sisters & Kids (sisarukset)"
+      ],
+      "title": "Onko sulla sisaruksia?",
+      "title_en": "Do you have siblings?",
+      "description": "Alex on juuri soittanut videopuhelun kotiin Brasiliaan. Puistossa on joulun valot. Alex näyttää Linnealle kuvan perheestään. Linnea kysyy: Onko sulla sisaruksia? Alex vastaa: Minulla on yksi sisko ja kaksi veljeä. Hänen siskollaan on vauva: Hänellä on yksi lapsi. Linnealla on pikkuveli Oulussa.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "park",
+      "tone": "Warm, a little homesick, then light",
+      "key_phrases": [
+        "Onko sulla sisaruksia?",
+        "Minulla on yksi sisko ja kaksi veljeä",
+        "Hänellä on yksi lapsi",
+        "Mulla on pikkuveli"
+      ],
+      "notes": "Linnea is the guide. The reason is real: Alex has just ended a video call home to Brazil (callback to episode 12) and is a little homesick in the December dark; Linnea meets him on the bench under the park's Christmas lights. He shows her a photo of his family on his phone, and the Finnish comes from her questions about the photo. She asks 'Onko sulla sisaruksia?' (spoken 'sulla'); he answers in his careful standard Finnish 'Minulla on yksi sisko ja kaksi veljeä', with her help. His sister just had a baby, so 'Hänellä on yksi lapsi' and he is an uncle now. Linnea has a little brother in Oulu: 'Mulla on pikkuveli', who is annoying but she misses him. Family words (äiti, isä) only glossed in passing. Callbacks: video call home (episode 12), Linnea is from Oulu (episode 7). Never say a short Finnish word that is also English on its own (series bible).",
+      "illustration_scene": "A snowy Helsinki park on a dark early-December afternoon, strings of warm white Christmas lights in the bare trees, snow on the ground and benches, a lit street lamp. Alex, a young man with light brown skin and short black curly hair, in his long dark-navy padded winter parka, red knitted beanie and grey scarf, sits on a bench and holds up his phone showing a family photo (no readable text on the screen); Linnea, blonde braid, glasses and freckles, in her lilac padded winter jacket, cream pompom hat and pastel striped scarf, leans in to look, smiling. Breath steaming in the cold. No readable writing anywhere.",
+      "when": "an early-December afternoon, already dark, Christmas lights in the park",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "People & Family (Perhe ja ihmiset)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
+    },
+    {
+      "id": 21,
+      "lessons_covered": [
+        "This Is My Friend",
+        "Describing Someone"
+      ],
+      "title": "Tässä on Leo",
+      "title_en": "This is Leo",
+      "description": "Alex ja Linnea ovat joulumarkkinoilla Senaatintorilla. He odottavat Linnean kaveria Leoa, joka on myöhässä. Linnea kuvailee Leoa: Hän on pitkä. Hänellä on oranssi takki. Alex näkee hänet. Leo tulee: Moro! Linnea sanoo: Tässä on mun kaveri Leo. Alex sanoo: Hauska tavata.",
+      "characters": [
+        "alex",
+        "linnea",
+        "leo"
+      ],
+      "ambient_setting": "street",
+      "tone": "Festive, lively, a bit funny",
+      "key_phrases": [
+        "Hän on pitkä",
+        "Hänellä on oranssi takki",
+        "Tässä on mun kaveri Leo",
+        "Hauska tavata"
+      ],
+      "notes": "Linnea is the guide; this is Leo's first episode and the first time Alex meets him. The reason is real: Linnea has asked her friend Leo to come to the Christmas market with them, and he is late as usual. The square is crowded, so Linnea describes him so Alex can help spot him: 'Hän on pitkä', 'Hänellä on oranssi takki' (his bright orange puffer jacket). Alex spots him and says it in Finnish. Leo arrives in a rush with a loud 'Moro!' and fast spoken Finnish; Linnea introduces them: 'Tässä on mun kaveri Leo'. Alex answers 'Hauska tavata' and gives his own name. Leo is energetic and forgets to slow down; Linnea tells him to speak slowly (callback to 'Hitaammin, kiitos', episode 3). Glögi in paper cups, Christmas stalls. Nobody uses Leo's name before Linnea says it.",
+      "illustration_scene": "The Helsinki Christmas market on Senate Square on a snowy early-December evening: wooden stalls with warm lights, a big lit Christmas tree, the white cathedral steps glowing in the background, people in winter coats, light snow falling. In front, Linnea, blonde braid, glasses and freckles, in her lilac padded winter jacket and cream pompom hat, waves and smiles; Alex, a young man with light brown skin and short black curly hair, in his dark-navy parka, red beanie and grey scarf, holds a paper cup of glögi; LEO, a tall athletic young man with fair skin and messy reddish-brown hair under a grey beanie, in a bright orange puffer jacket and black neck warmer, arrives grinning with a raised hand. Exactly three main people. No readable writing anywhere.",
+      "when": "an early-December evening at the Christmas market, light snow",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "People & Family (Perhe ja ihmiset)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
+    },
+    {
+      "id": 22,
+      "lessons_covered": [
+        "\"Do you have...?\" (onko sinulla)"
+      ],
+      "title": "Onko sulla luistimet?",
+      "title_en": "Do you have skates?",
+      "description": "Viikkoa myöhemmin Leo vie Alexin ulkojäälle luistelemaan. Leo kysyy: Onko sulla luistimet? Alex vastaa: Ei ole. Leo kysyy: Onko sulla aikaa? Alex vastaa: On! He vuokraavat luistimet. Alex kaatuu kerran, mutta nauraa.",
+      "characters": [
+        "alex",
+        "leo"
+      ],
+      "ambient_setting": "park",
+      "tone": "Energetic, funny, friendly",
+      "key_phrases": [
+        "Onko sulla luistimet?",
+        "Ei ole",
+        "Onko sulla aikaa?",
+        "On!"
+      ],
+      "notes": "Leo is the guide here (he is a friend now, met in episode 21), but he talks fast in casual spoken Finnish and has to slow down for Alex. The reason is real: a week after the Christmas market Leo bumps into Alex in the street near the park (they have not swapped phone numbers yet; that happens in episode 31) and drags him along to the outdoor ice rink. Leo asks 'Onko sulla luistimet?'; Alex has never skated (he is from Brazil): 'Ei ole.' Leo: 'Onko sulla aikaa?' Alex: 'On!' They rent skates at the rink kiosk. Answer pattern on/ei ole explained by Leo in English, simply. Alex falls once and laughs; Leo helps him up. Leo's slang: 'Moro', 'Joo joo'. Callback: the Christmas market (episode 21).",
+      "illustration_scene": "An outdoor ice rink in a snowy Helsinki park on a cold, clear December afternoon, floodlights on, snow banks around the rink, bare trees with a few Christmas lights, a small wooden rental kiosk. LEO, a tall athletic young man with messy reddish-brown hair under a grey beanie, in a bright orange puffer jacket and black neck warmer, glides confidently and reaches a hand out; ALEX, a young man with light brown skin and short black curly hair, in his dark-navy parka, red beanie and grey scarf, wobbles on rental skates, arms out, laughing. Exactly two people in front. No readable writing anywhere.",
+      "when": "a cold, clear mid-December afternoon at the outdoor ice rink",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "People & Family (Perhe ja ihmiset)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
     }
   ]
 }
