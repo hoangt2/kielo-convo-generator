@@ -723,6 +723,101 @@
       "level": "Beginner",
       "language_level": "A1",
       "season": "winter"
+    },
+    {
+      "id": 23,
+      "lessons_covered": [
+        "Where I Live (asun...)",
+        "Rooms at Home (kotona)"
+      ],
+      "title": "Tämä on olohuone",
+      "title_en": "This is the living room",
+      "description": "Tapaninpäivänä Anna kutsuu Alexin kahville. Alex vietti ensimmäisen joulunsa yksin. Anna näyttää asuntonsa: Tämä on olohuone. Alex kertoo: Asun yksiössä. Hän kysyy: Missä on vessa?",
+      "characters": [
+        "alex",
+        "anna"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Warm, cosy, gently funny",
+      "key_phrases": [
+        "Missä sinä asut?",
+        "Asun yksiössä.",
+        "Tämä on olohuone.",
+        "Missä on vessa?"
+      ],
+      "notes": "The day after Christmas (Tapaninpäivä, 26 December). Alex spent his first Christmas alone in Helsinki (his family is in Brazil; he video-called them, callback to episode 12). Anna meets him in the stairwell and invites him up from floor 6 to her flat on floor 4 for coffee and joulutorttu (star-shaped Christmas pastries with plum jam). She shows him round because he asks how big the flats on her floor are: keittiö, olohuone, makuuhuone. Anna asks 'Missä sinä asut?' in a friendly testing way although she knows he lives upstairs; he answers 'Asun yksiössä' (a studio) and explains in English that it is small and has no washing machine (callback to the laundry room in episode 13). Midway he needs the toilet and asks 'Missä on vessa?' for real. Anna explains in English, simply, that 'tämä on' points at a room and that yksiö is a one-room flat. Callbacks: her birthday cake in this kitchen (episode 15), apples from her cottage (episode 8). Indoors, no coats.",
+      "illustration_scene": "Inside Anna's warm Finnish apartment on a dark winter afternoon (26 December): a kitchen table in front with a plate of star-shaped joulutorttu pastries and two coffee cups, an open doorway behind leading to a cosy living room with a sofa and candles, snow outside the window, a straw Christmas ornament in the window. On the left, ANNA, a woman in her fifties with shoulder-length brown hair with silver streaks, in her cream knitted cardigan over a light-blue blouse and green trousers, stands and points warmly towards the living-room doorway, smiling. On the right, ALEX, a young man with light brown skin and short black curly hair, in his light-blue hoodie and dark trousers, sits at the table holding a coffee cup and looks where she points. Both are indoors with no coats, hats or scarves; no coat hangs anywhere. Exactly two people in the whole picture: Anna and Alex, both clearly visible and facing the viewer at three-quarter angle. Nobody else, no one in the living room. No readable writing anywhere.",
+      "when": "26 December (Tapaninpäivä), a dark afternoon in Anna's flat",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Home & Daily Life (Koti ja arki)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
+    },
+    {
+      "id": 24,
+      "lessons_covered": [
+        "My Morning (aamulla)",
+        "A Normal Day (tavallinen päivä)"
+      ],
+      "title": "Mä herään seitsemältä",
+      "title_en": "I wake up at seven",
+      "description": "Tammikuun aamuna kello puoli kahdeksan on vielä pimeää. Linnea ja Alex kävelevät raitiovaunupysäkille. Linnea haukottelee. He kertovat päivästään: Mä herään seitsemältä. Mä juon kahvia. Mä meen töihin. Illalla mä luen.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "street",
+      "tone": "Sleepy, friendly, light",
+      "key_phrases": [
+        "Mä herään seitsemältä.",
+        "Mä juon kahvia.",
+        "Mä meen töihin.",
+        "Illalla mä luen."
+      ],
+      "notes": "Early January, 7:30 a.m., still pitch dark and snowy. Linnea is back from Christmas in Oulu and has started a morning lab course, so for the first time she and Alex leave the building at the same time; they walk together to the tram stop (callback to the tram in episode 10). She yawns; he teases her. They compare their mornings and their usual day because Linnea complains that she now has to wake up early: she says 'Mä herään seitsemältä' (spoken forms, mä/meen). Alex says he drinks coffee first ('Mä juon kahvia'). Then work: 'Mä meen töihin.' Linnea explains in English, simply, that 'meen' is how people say 'menen' and that -ltä after a number means 'at' that hour (callback to telling time, episode 12). The evening: she reads for her course, 'Illalla mä luen.' The tram arrives and the scene ends. Callbacks: her exam in November went well (episode 14), the café study evenings (episode 16).",
+      "illustration_scene": "A snowy Helsinki street before sunrise on a dark January morning, streetlights glowing orange, snow banks along the pavement, a green tram stop shelter ahead with a tram's headlights approaching. LINNEA, a young woman with a blonde braid under a cream knitted pompom hat, in a lilac padded winter jacket and pastel striped scarf, yawns behind a mittened hand while walking; ALEX, a young man with light brown skin and short black curly hair, in his dark-navy parka, red beanie and grey scarf, walks beside her holding a takeaway coffee cup, smiling. Exactly two people in front. No readable writing anywhere.",
+      "when": "an early January morning at 7:30, still dark, on the way to the tram stop",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Home & Daily Life (Koti ja arki)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
+    },
+    {
+      "id": 25,
+      "lessons_covered": [
+        "\"What are you up to?\" (mitä teet)"
+      ],
+      "title": "Mitä sä teet nyt?",
+      "title_en": "What are you doing now?",
+      "description": "Tammikuun iltapäivänä Alex harjoittelee luistelua yksin. Leo juoksee ohi ja pysähtyy. Moro! Mitä sä teet? Alex vastaa: Mä luistelen. Entä sä? Leo: Mä juoksen. Lapset rakentavat lumiukkoa.",
+      "characters": [
+        "alex",
+        "leo"
+      ],
+      "ambient_setting": "park",
+      "tone": "Energetic, funny, friendly",
+      "key_phrases": [
+        "Mitä sä teet?",
+        "Mä luistelen.",
+        "Entä sä?",
+        "Mä juoksen."
+      ],
+      "notes": "A January afternoon at the outdoor ice rink in the park near Leo's home (callback to episode 22, where Leo taught Alex to skate). Alex now has his own second-hand skates and practises alone, wobbling less. Leo jogs past on the snowy path in running gear and stops when he sees him; they meet by chance because they still have no phone numbers (exchanged only in episode 31). Leo: 'Moro! Mitä sä teet?' (the title is 'Mitä sä teet nyt?' because episode 9 is already 'Mitä sä teet?' about work; Leo can add 'nyt' once to contrast with that episode's 'what do you do for work') Alex: 'Mä luistelen.' Alex asks back 'Entä sä?' Leo: 'Mä juoksen.' Leo explains in English, simply, that 'Mitä sä teet?' asks what someone is doing right now, and that the answer is just mä + the verb. Leo points at kids building a snowman, and Alex tries to say what they are doing; keep extra verbs inside full phrases, never alone. Alex shows he can skate backwards a little; Leo is impressed, then has to keep running before he gets cold. Leo's slang: 'Moro', 'Joo joo'. Never say a short word like 'Entä' alone: keep 'Entä sä?' together.",
+      "illustration_scene": "An outdoor ice rink in a snowy Helsinki park on a grey January afternoon, low pale sun, snow banks around the rink, bare trees, a few children building a snowman in the background, small and out of focus. LEO, a tall athletic young man with messy reddish-brown hair under a grey beanie, in black running tights, his bright orange puffer jacket and black neck warmer, stands on the snowy path just outside the rink's low boards, jogging on the spot in black running shoes (he is NOT on the ice and wears NO skates); ALEX, a young man with light brown skin and short black curly hair, in his dark-navy parka, red beanie and grey scarf, glides towards him on skates, arms slightly out, proud. Exactly two people in front. No readable writing anywhere.",
+      "when": "a grey January afternoon at the outdoor ice rink",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Home & Daily Life (Koti ja arki)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
     }
   ]
 }
