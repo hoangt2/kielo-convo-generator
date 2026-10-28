@@ -19,7 +19,7 @@
         "sounds": "snow crunching underfoot, cold wind, a door shutting out the cold, boots stamped off on a mat"
       },
       "spring": {
-        "look": "the last snow melting into puddles, bare trees with the first light-green buds and leaves, bright sun, long light evenings returning, early flowers.",
+        "look": "outdoors, the last snow melting in the streets, bare trees with the first light-green buds and leaves, bright sun, long light evenings returning, early flowers.",
         "sounds": "meltwater dripping, birdsong returning, bicycles on the street"
       }
     }
@@ -1010,6 +1010,102 @@
       "level": "Beginner",
       "language_level": "A1",
       "season": "winter"
+    },
+    {
+      "id": 32,
+      "illustration_layout": "split",
+      "lessons_covered": [
+        "A Quick Message (viesti)"
+      ],
+      "title": "Lähdetkö kävelylle?",
+      "title_en": "Are you coming for a walk?",
+      "description": "Huhtikuun ensimmäisenä lämpimänä päivänä Linnea lähettää Alexille ääniviestin laboratoriosta. Moi! Aurinko paistaa! Lähdetkö kävelylle? Alex vastaa: Joo, tulen! Nähdään kello viisi.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "quiet",
+      "tone": "Light, sunny, friendly",
+      "key_phrases": [
+        "Lähdetkö kävelylle?",
+        "Joo, tulen!",
+        "Missä nähdään?",
+        "Nähdään kello viisi."
+      ],
+      "notes": "The first warm day of April: snow is melting, sun on wet streets, the light evenings are back. Since episode 31 Alex and Linnea have each other's numbers. Linnea is at the university lab in a white lab coat; Alex is at home at his desk (he works from home on Fridays). They talk ONLY through short voice messages on their phones, so each line is one voice message, recorded and then heard by the other; never a live call. Linnea's first message: 'Moi!' and 'Aurinko paistaa!' (callback to 29), then 'Lähdetkö kävelylle?' In her next message she explains in English that 'Lähdetkö...?' asks 'are you coming...?' and 'kävelylle' means 'for a walk'. Alex records an answer: 'Joo, tulen!' (she explains 'tulen' means 'I'm coming'). He asks 'Missä nähdään?'; she answers in the park by the rink (the ice is gone, callback to 22, 25, 28 and 30) and 'Nähdään kello viisi.' Alex double-checks the time with numbers he knows. End: Alex says the rink without ice looks strange; she sends a laughing voice message. Keep it short and natural, like real voice messages: a few seconds each. Every line is all Finnish or all English: when someone explains a Finnish word, the English explanation is one line and the Finnish word is its own line; never a Finnish word inside an English line, and never a line that is only a fragment of a sentence.",
+      "illustration_scene": "A split picture, two panels side by side. LEFT: a bright university lab on a sunny April afternoon, lab benches with flasks, a window with sunshine and melting snow outside; LINNEA, a young woman with freckles, glasses and long blonde hair in a ponytail, in a white lab coat over her pastel striped sweater, holds her phone close to her mouth recording a voice message and smiles. RIGHT: Alex's small studio flat at home in the sunshine, a desk with a laptop, a window with dripping icicles and a blue sky; ALEX, a young man with light brown skin and short black curly hair, wearing ONLY his light-blue hoodie and dark trousers, NO jacket, NO coat (he is indoors at home), holds his phone to his ear listening, grinning. Exactly two people, one in each panel. Both panels are framed from the waist up, like a video call: floors, feet and shoes are not in the picture. No readable writing anywhere, including on phone screens and the laptop.",
+      "when": "the first warm afternoon of April, she at the lab, he at home",
+      "format": "guided",
+      "track": "Everyday Finnish",
+      "chapter": "Staying in Touch (Yhteydenpito)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "spring"
+    },
+    {
+      "id": 33,
+      "illustration_layout": "split",
+      "lessons_covered": [
+        "On the Phone (puhelimessa)"
+      ],
+      "title": "Kuuletko mua?",
+      "title_en": "Can you hear me?",
+      "description": "Toukokuussa Alex soittaa Linnealle Kauppatorilta. Torilla on kova melu. Haloo? Täällä Alex. Kuuletko mua? Soitan myöhemmin.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "street",
+      "tone": "Funny, warm, a little chaotic",
+      "key_phrases": [
+        "Haloo?",
+        "Täällä Alex.",
+        "Kuuletko mua?",
+        "Soitan myöhemmin."
+      ],
+      "notes": "A sunny Saturday in early May. Alex is at the busy Kauppatori market square by the harbour (seagulls, a ferry horn, market stalls with early strawberries and tulips) and calls Linnea, who is at home. First phone call in Finnish. Linnea answers 'Haloo?' and later explains in English that Finns answer the phone with 'Haloo?' or by saying their name. Alex says 'Täällä Alex.' (she explains: 'This is Alex', the way Finns say who is calling). The line breaks up because of the noise and a seagull: Linnea asks 'Kuuletko mua?' ('Can you hear me?'), Alex answers 'Joo, kuulen!' Then a ferry horn drowns everything; he cannot hear her, so he says 'Soitan myöhemmin.' ('I'll call later.'). Second short call a moment later from a quieter spot: he wanted to ask if she wants tulips or strawberries for the picnic next weekend (sets up episode 34). She answers 'Mansikoita!' and laughs. Every line is all Finnish or all English: when someone explains a Finnish word, the English explanation is one line and the Finnish word is its own line; never a Finnish word inside an English line, and never a line that is only a fragment of a sentence. Keep the call lines short; the noise (seagulls, ferry horn) is in the sound effects, not described in dialogue.",
+      "illustration_scene": "A split picture, two panels side by side. LEFT: the busy Helsinki market square by the harbour on a sunny May day, colourful market stalls with strawberries and tulips, seagulls in the blue sky, a white ferry in the background; ALEX, a young man with light brown skin and short black curly hair, in a light beige windbreaker open over his light-blue hoodie, holds his phone to one ear and covers the other ear with his hand, laughing. RIGHT: Linnea's cosy room at home with plants and books, sunlight through the window; LINNEA, a young woman with freckles, glasses and long blonde hair in a ponytail, wearing ONLY her pastel striped sweater and light-blue jeans, NO jacket (she is indoors at home), sits on her sofa holding her phone to her ear, smiling, puzzled. Exactly two people, one in each panel. Both panels are framed from the waist up, like a video call: floors, feet and shoes are not in the picture. No readable writing anywhere.",
+      "when": "a sunny Saturday in early May, he at the market square, she at home",
+      "format": "guided",
+      "track": "Everyday Finnish",
+      "chapter": "Staying in Touch (Yhteydenpito)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "spring"
+    },
+    {
+      "id": 34,
+      "illustration_layout": "single",
+      "lessons_covered": [
+        "Making Plans (sovitaan)",
+        "\"See you soon!\" (nähdään)"
+      ],
+      "title": "Nähdään pian!",
+      "title_en": "See you soon!",
+      "description": "Toukokuun lopussa Alex, Linnea ja Leo ovat puistossa. He suunnittelevat piknikiä. Sovitaanko lauantaina? Sopii! Anna lähtee kesämökille. Hyvää kesää! Nähdään pian!",
+      "characters": [
+        "alex",
+        "linnea",
+        "leo",
+        "anna"
+      ],
+      "ambient_setting": "park",
+      "tone": "Warm, happy, a little nostalgic",
+      "key_phrases": [
+        "Sovitaanko lauantaina?",
+        "Sopii!",
+        "Hyvää kesää!",
+        "Nähdään pian!"
+      ],
+      "notes": "Late May, the end of the series: green leaves, long light evenings, people on the grass in the park by the rink (now a sandy field). It is almost a year since Alex arrived in Helsinki. Alex, Linnea and Leo sit on the grass with ice cream and plan a picnic with strawberries (callback to 33). Leo asks 'Sovitaanko lauantaina?' and explains in English that 'sovitaan' is how you fix a plan ('shall we agree on Saturday?'). Linnea: 'Sopii!' ('Works for me'). Alex agrees too, and they fix the time with 'kello kaksi' (callback to 28). Then ANNA comes along the path pulling a small suitcase: she is leaving for her summer cottage (episode 29) for the whole summer. She invites Alex again to visit the cottage in July. Goodbyes: 'Hyvää kesää!' (Linnea explains it means 'Have a good summer', what Finns say in late May). Anna: 'Nähdään pian!' Alex, moved, says thank you in Finnish and remembers his first day, when 'Moi!' was the only word he knew (callback to episode 1). Final line, Alex to everyone: 'Nähdään pian!' Every line is all Finnish or all English: when someone explains a Finnish word, the English explanation is one line and the Finnish word is its own line; never a Finnish word inside an English line, and never a line that is only a fragment of a sentence. Keep 'Hyvää kesää!', 'Nähdään pian!' and 'Sopii!' whole.",
+      "illustration_scene": "A green Helsinki park on a sunny late-May evening, fresh green leaves, long golden light, a gravel path by the grass, a picnic blanket on the grass in the background with nobody on it. ANNA, a woman in her fifties with shoulder-length brown hair with silver streaks, in a light beige trench coat over her cream cardigan and green trousers, holds the handle of a small brown suitcase with one hand and waves goodbye with the other, smiling warmly. Facing her, ALEX, a young man with light brown skin and short black curly hair, in a light beige windbreaker over his light-blue hoodie, waves back, moved and smiling. Exactly two people in the picture. No readable writing anywhere.",
+      "when": "a sunny late-May evening in the park, almost a year after Alex arrived",
+      "format": "guided",
+      "track": "Everyday Finnish",
+      "chapter": "Staying in Touch (Yhteydenpito)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "spring"
     }
   ]
 }

@@ -87,6 +87,15 @@ def create_generic_prompt(data: dict) -> str:
             f"scarves and gloves are off (hung up or over a chair) unless the person is just arriving "
             f"or leaving.\n"
         )
+    # Indoors stays indoors: the season's snow, rain and puddles belong outside (spring's "snow
+    # melting into puddles" came out as puddles on a flat floor), and Finns take their shoes off
+    # at home (Tung, 2026-10-28).
+    season_clause += (
+        "INDOORS: weather (snow, rain, puddles, meltwater) appears only outdoors or through a "
+        "window; indoor floors are dry and clean. In a home (a flat, a room, a kitchen) people wear "
+        "socks or slippers, never shoes or boots: Finns take their shoes off at the door. In a "
+        "workplace, lab, shop, café, gym or other public place, shoes stay on.\n"
+    )
 
     n = len(names)
 
