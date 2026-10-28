@@ -818,6 +818,102 @@
       "level": "Beginner",
       "language_level": "A1",
       "season": "winter"
+    },
+    {
+      "id": 26,
+      "lessons_covered": [
+        "My Hobbies (harrastukset)",
+        "\"I like to...\" (tykkään)"
+      ],
+      "title": "Mikä sun harrastus on?",
+      "title_en": "What's your hobby?",
+      "description": "Tammikuun lopussa Alex kokeilee kiipeilyä urheiluhallissa. Leo on siellä kiipeilyporukkansa kanssa. Mikä sun harrastus on? Mä kiipeilen. Alex tykkää pelata, mutta ei tykkää juosta.",
+      "characters": [
+        "alex",
+        "leo"
+      ],
+      "ambient_setting": "quiet",
+      "tone": "Playful, warm, teasing",
+      "key_phrases": [
+        "Mikä sun harrastus on?",
+        "Mä kiipeilen.",
+        "Mä tykkään pelata.",
+        "Mä en tykkää juosta."
+      ],
+      "notes": "A dark Thursday evening in late January at an indoor climbing wall in a sports centre. Alex has come to a beginners' evening (a colleague told him about it) and stands at the bottom of the wall in rental climbing shoes, unsure. Leo is there with his Thursday climbing group and drops down from the wall; they meet by chance again because they still have no phone numbers (they swap them only in episode 31). Indoors: no coats. Leo asks 'Mikä sun harrastus on?' and answers his own question: 'Mä kiipeilen.' Leo explains in English that 'harrastus' is a hobby and that the answer is simply mä + the verb. Alex says his hobbies are video games and cooking Brazilian food: he learns 'Mä tykkään pelata.' (Leo explains that 'tykkään' is the everyday way to say 'I like', followed by the basic verb). Leo, the runner from episode 25, asks if Alex likes running; Alex: 'Mä en tykkää juosta.' Leo laughs and teases that Alex at least likes skating now (callback to 22 and 25). Alex can say 'Mä tykkään luistella.' End: Leo talks him into trying the easy green route; Alex climbs two holds and is proud. Leo's slang: 'Moro', 'Joo joo'. Every line is all Finnish or all English: when Leo explains a Finnish word, the English explanation is one line and the Finnish word is its own line. Never say a short Finnish word alone; keep 'Mä tykkään pelata.' and 'Mä en tykkää juosta.' whole.",
+      "illustration_scene": "An indoor climbing gym in a Helsinki sports centre on a dark winter evening, a tall wall covered in colourful plastic holds, thick blue crash mats on the floor, black windows showing night outside. LEO, a tall athletic young man with messy reddish-brown hair under his grey beanie, in a faded band t-shirt and black sports trousers, chalk on his hands, stands on the mat grinning and pointing up at the wall; ALEX, a young man with light brown skin and short black curly hair, in his light-blue hoodie and dark trousers, wears rental climbing shoes and looks up at the wall, unsure but smiling. No coats. Exactly two people in front. No readable writing anywhere.",
+      "when": "a dark Thursday evening in late January at an indoor climbing wall",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Free Time & Hobbies (Vapaa-aika)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
+    },
+    {
+      "id": 27,
+      "lessons_covered": [
+        "At the Weekend (viikonloppuna)"
+      ],
+      "title": "Mitä sä teet viikonloppuna?",
+      "title_en": "What are you doing at the weekend?",
+      "description": "Perjantai-iltapäivänä Alex ja Linnea istuvat Sannin kahvilassa. Mitä sä teet viikonloppuna? Lauantaina Linnea hiihtää. Sunnuntaina Alex lepää. Kiva!",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "cafe_quiet",
+      "tone": "Cosy, light, friendly",
+      "key_phrases": [
+        "Mitä sä teet viikonloppuna?",
+        "Lauantaina mä hiihdän.",
+        "Sunnuntaina mä lepään.",
+        "Kiva!"
+      ],
+      "notes": "A snowy Friday afternoon at the end of January, already dark at four, at Sanni's café (their study place since episode 16; Sanni has no lines in this episode). Indoors: coats hang on the chair backs. Linnea's lab course week is over and she is in a good mood. Present tense only (Finnish uses the present for plans), so no past tense anywhere. Linnea asks 'Mitä sä teet viikonloppuna?' and explains in English that 'viikonloppuna' means 'at the weekend'. She answers: 'Lauantaina mä hiihdän.' She is going cross-country skiing in Paloheinä with friends from her course. Alex has never skied; she explains 'hiihtää' is cross-country skiing, Finland's favourite winter sport. Alex: Saturday evening he has the building's sauna slot (callback to Anna's sauna evenings in episode 13), and on Sunday he rests and video-calls his family in Brazil (episode 12): 'Sunnuntaina mä lepään.' Linnea: 'Kiva!' and explains it is the everyday word for 'nice'. Alex then says his whole weekend in Finnish with lauantaina and sunnuntaina. End: Linnea says maybe one day he can try skiing too; Alex: 'Ehkä.' (sets up episode 28). Every line is all Finnish or all English; never a Finnish word inside an English line. Keep 'Kiva!' as its own Finnish line, never alone in English.",
+      "illustration_scene": "A warm, cosy Helsinki café on a dark, snowy late-January afternoon, big window with snow falling outside and streetlights glowing, candles on the tables. At a window table LINNEA, a young woman with freckles, glasses and long blonde hair in a ponytail, in a colourful knitted sweater, mimes cross-country skiing with both arms, laughing; ALEX, a young man with light brown skin and short black curly hair, in his light-blue hoodie, holds a coffee cup and laughs. Their winter jackets hang on the chair backs (her lilac jacket, his dark-navy parka). Exactly two people in front. No readable writing anywhere.",
+      "when": "a dark, snowy Friday afternoon at the end of January at the café",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Free Time & Hobbies (Vapaa-aika)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
+    },
+    {
+      "id": 28,
+      "lessons_covered": [
+        "\"Shall we...?\" (mennäänkö)",
+        "Yes, No, or Maybe"
+      ],
+      "title": "Mennäänkö luistelemaan?",
+      "title_en": "Shall we go skating?",
+      "description": "Helmikuun alussa Alex, Linnea ja Leo tapaavat puistossa. Mennäänkö luistelemaan lauantaina? Joo, mennään! Ehkä. Ei, valitettavasti. He sopivat: kello kaksi kentällä.",
+      "characters": [
+        "alex",
+        "linnea",
+        "leo"
+      ],
+      "ambient_setting": "park_winter",
+      "tone": "Lively, funny, warm",
+      "key_phrases": [
+        "Mennäänkö luistelemaan?",
+        "Joo, mennään!",
+        "Ehkä.",
+        "Ei, valitettavasti."
+      ],
+      "notes": "Early February at dusk by the outdoor ice rink in the park near Leo's home (episodes 22 and 25), floodlights coming on. Alex and Linnea are walking home through the park and meet Leo, who is out running again. Leo has the idea: 'Mennäänkö luistelemaan lauantaina?' He explains in English that 'Mennäänkö...?' means 'Shall we go...?'. Linnea at once: 'Joo, mennään!' Alex hesitates because Saturday afternoon he may have a video call home: 'Ehkä.' Linnea explains 'ehkä' means 'maybe'. Leo then asks Linnea if she wants to go running with him on Sunday morning and she laughs: 'Ei, valitettavasti.' (she explains 'valitettavasti' means 'unfortunately', the polite no). Alex then checks his phone, the call is in the evening, so he says 'Joo, mennään!' too. They agree: Saturday at two, at the rink ('Kello kaksi!', callback to the time in episode 12). End: Alex asks how he can tell them if he is late, and they realise none of them have each other's phone numbers; Leo laughs that next time they swap numbers (sets up episode 31). Every line is all Finnish or all English; never a Finnish word inside an English line. Keep 'Ei, valitettavasti.' and 'Joo, mennään!' whole, never 'Ei' or 'Joo' alone.",
+      "illustration_scene": "The outdoor ice rink in a snowy Helsinki park at dusk in early February, deep blue sky, floodlights just switching on over the ice, snow banks and bare trees, a few skaters small in the background. On the snowy path by the low boards: LEO, a tall athletic young man with FAIR, pale Nordic skin, light freckles and messy reddish-brown (ginger) hair under his grey beanie, clean-shaven, in his bright orange puffer jacket and black neck warmer, in black running shoes, points at the ice with a big grin; LINNEA, a young woman with a blonde braid under a cream knitted pompom hat, in her lilac padded winter jacket and pastel striped scarf, gives a thumbs-up; ALEX, a young man with light brown skin and short black curly hair, in his dark-navy parka, red beanie and grey scarf, shrugs with a hesitant smile. Exactly three people in front. No readable writing anywhere.",
+      "when": "early February at dusk by the outdoor ice rink in the park",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "chapter": "Free Time & Hobbies (Vapaa-aika)",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
     }
   ]
 }

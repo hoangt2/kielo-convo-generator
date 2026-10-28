@@ -122,6 +122,25 @@ def _words(text):
     return [w.lower() for w in _WORD_RE.findall(re.sub(r"\[[^\]]*\]", "", text or ""))]
 
 
+def _fold_bare_tags(dialogue):
+    """Move a line that is only a delivery tag ("[enthusiastic]") onto the speaker's next line.
+
+    The LLM sometimes writes the tag as its own entry before a short Finnish line; ElevenLabs
+    refuses an entry with no text once tags are removed (input_text_empty), which stops the build.
+    """
+    out = []
+    for i, e in enumerate(dialogue):
+        if e.get("type") != "sfx" and not _words(e.get("text")):
+            tag = (e.get("text") or "").strip()
+            nxt = next((n for n in dialogue[i + 1:] if n.get("type") != "sfx"), None)
+            if nxt is not None and nxt.get("voice_id") == e.get("voice_id") and tag:
+                if not re.match(r"^\s*\[", nxt.get("text", "")):
+                    nxt["text"] = f"{tag} {nxt.get('text', '').strip()}"
+            continue
+        out.append(e)
+    return out
+
+
 def _split_mixed_lines(dialogue, learner_voice_id, lang_code, target_phrases=(), names=()):
     """Split lines that mix English and the target language into single-language pieces.
 
@@ -170,11 +189,10 @@ def _split_mixed_lines(dialogue, learner_voice_id, lang_code, target_phrases=(),
         for chunk in _chunks(body):
             lang = chunk_lang(chunk, own)
             if native_english:
-                # a native speaker's English line: only a quoted target word that is also an
-                # English word ('sun', 'on', 'Moi') is read wrongly, so only that is split out
-                quoted = _QUOTED_RE.fullmatch(chunk.strip())
-                homograph = any(w in dictionary for w in _words(chunk))
-                parts.append([lang_code if quoted and lang == lang_code and homograph else "en", chunk + " "])
+                # a native speaker's English line: every target-language part is split out, so
+                # each line is all English or all target language (Tung, 2026-10-27: "'Meen' is
+                # just how most people say 'menen'" read as one English line sounded wrong)
+                parts.append([lang_code if lang == lang_code else "en", chunk + " "])
                 continue
             if lang != lang_code and learner_english and any(w in taught for w in _words(chunk)):
                 # taught words inside an English sentence of the learner get their own piece
@@ -749,6 +767,7 @@ def generate_guided_lesson(idea, metadata):
                 for entry in dialogue:
                     if entry.get("type") != "sfx" and not entry.get("lang"):
                         entry["lang"] = lang_code
+                dialogue[:] = _fold_bare_tags(dialogue)
                 dialogue[:] = _split_mixed_lines(dialogue, learner.get("voice_id"), lang_code,
                                                  key_phrases + _taught_phrases(idea),
                                                  [c["name"] for c in characters])
