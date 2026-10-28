@@ -914,6 +914,102 @@
       "level": "Beginner",
       "language_level": "A1",
       "season": "winter"
+    },
+    {
+      "id": 29,
+      "chapter": "Weather & Small Talk (Sää ja jutustelu)",
+      "lessons_covered": [
+        "What's the Weather? (millainen sää)",
+        "The Four Seasons (vuodenajat)"
+      ],
+      "title": "Millainen sää on?",
+      "title_en": "What's the weather like?",
+      "description": "Helmikuun iltapäivänä Alex juo kahvia Annan keittiössä. Ulkona sataa lunta. Jääkaapin ovessa on kuvia Annan mökistä: talvi, kevät, kesä, syksy. Millainen sää on? Sataa lunta. Kesällä on lämmin.",
+      "characters": [
+        "alex",
+        "anna"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Warm, calm, gently funny",
+      "key_phrases": [
+        "Millainen sää on?",
+        "Sataa lunta.",
+        "Aurinko paistaa.",
+        "Kesällä on lämmin."
+      ],
+      "notes": "A snowy mid-February afternoon in Anna's kitchen (callback to episode 23 in her flat and episode 15's birthday coffee). Indoors: no coats. Anna has just come in; Alex is helping her carry shopping up because the lift is broken, so she offers coffee. Snow falls past the window. Anna asks 'Millainen sää on?' as small talk and explains in English that Finns always talk about the weather. Answer: 'Sataa lunta.' On the fridge door are four photos of her summer cottage with the apple tree (episode 8's apples) in winter, spring, summer and autumn. She names the seasons one by one as her own Finnish lines (talvi, kevät, kesä, syksy), never inside English. In the summer photo the sun shines: 'Aurinko paistaa.' and 'Kesällä on lämmin.' Alex, from Brazil, says summer is his favourite and asks when it comes; Anna laughs: in June. She invites him to the cottage in summer (a hint for later episodes, nothing promised). Keep the Finnish at A1. Every line is all Finnish or all English: when someone explains a Finnish word, the English explanation is one line and the Finnish word is its own line; never a Finnish word inside an English line. Never say a lone short Finnish word that is also an English word.",
+      "illustration_scene": "Anna's warm Finnish kitchen on a snowy February afternoon, big snowflakes falling past the window, two coffee cups and a plate of cinnamon buns on the table. On the white fridge door, four small photos of the same red wooden summer cottage with an apple tree: in snow, with spring blossom, in green summer sunshine, and with yellow autumn leaves. ANNA, a woman in her fifties with shoulder-length brown hair with silver streaks, in her cream knitted cardigan over a light-blue blouse and green trousers, points at the summer photo and smiles; ALEX, a young man with light brown skin and short black curly hair, in his light-blue hoodie and dark trousers, holds a coffee cup and looks at the photos with interest. Both indoors with no coats, hats or scarves. Exactly two people in the picture. No readable writing anywhere.",
+      "when": "a snowy mid-February afternoon in Anna's kitchen",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
+    },
+    {
+      "id": 30,
+      "chapter": "Weather & Small Talk (Sää ja jutustelu)",
+      "lessons_covered": [
+        "\"It's so cold!\" (on kylmä)",
+        "Easy Small Talk"
+      ],
+      "title": "Onpa kylmä!",
+      "title_en": "It's so cold!",
+      "description": "Lauantaina kello kaksi on pakkasta kaksikymmentä astetta. Alex, Linnea ja Leo tapaavat luistinradalla. Onpa kylmä! On tosi kylmä. Kiva nähdä! Samoin!",
+      "characters": [
+        "alex",
+        "linnea",
+        "leo"
+      ],
+      "ambient_setting": "park_winter",
+      "tone": "Lively, funny, warm",
+      "key_phrases": [
+        "Onpa kylmä!",
+        "On tosi kylmä.",
+        "Kiva nähdä!",
+        "Samoin!"
+      ],
+      "notes": "The Saturday skating agreed in episode 28: two o'clock at the outdoor rink in the park, a hard frost of minus twenty, bright low sun, breath steaming. Linnea and Leo are already there in skates. Alex arrives a few minutes late, wrapped up to the eyes, and could not tell them because they still have no phone numbers. Leo greets him: 'Onpa kylmä!' and explains in English it is the everyday way to say 'it's so cold', the line every Finn says on a day like this. Linnea adds 'On tosi kylmä.' and explains 'tosi' means 'really'. Small talk: Leo says 'Kiva nähdä!', Alex answers 'Samoin!' (Linnea explains it means 'same to you'). Linnea teaches that small talk in Finland is short and that is fine. Alex jokes that in Brazil minus twenty does not exist. They skate; Alex can now skate a little backwards (callback to 25). End: Alex says it is cold but a nice day, and the three agree to warm up with hot chocolate. Do not settle the phone numbers here (that is episode 31). Every line is all Finnish or all English: when someone explains a Finnish word, the English explanation is one line and the Finnish word is its own line; never a Finnish word inside an English line. Keep 'Onpa kylmä!', 'Kiva nähdä!' and 'Samoin!' whole.",
+      "illustration_scene": "An outdoor ice rink in a snowy Helsinki park on a bright, freezing February afternoon, low golden sun, frost on the bare trees, breath steaming in the air. On the ice by the low boards: LINNEA, a young woman with freckles, glasses and a blonde braid under a cream knitted pompom hat, in her lilac padded winter jacket, pastel striped scarf and white skates, laughs and hugs herself against the cold; LEO, a tall athletic young man with FAIR, pale Nordic skin, light freckles and messy reddish-brown (ginger) hair under his grey beanie, clean-shaven, in his bright orange puffer jacket and black neck warmer, on black skates, rubs his gloved hands together and grins; ALEX, a young man with light brown skin and short black curly hair, in his dark-navy parka, red beanie pulled low and grey scarf wrapped up to his nose, arrives on the snowy path at the edge of the rink carrying his skates, waving. Exactly three people in front. No readable writing anywhere.",
+      "when": "a freezing February Saturday at two o'clock at the outdoor ice rink",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
+    },
+    {
+      "id": 31,
+      "chapter": "Staying in Touch (Yhteydenpito)",
+      "lessons_covered": [
+        "\"What's your number?\" (puhelinnumero)"
+      ],
+      "title": "Mikä sun numero on?",
+      "title_en": "What's your number?",
+      "description": "Luistelun jälkeen Alex ja Linnea kävelevät kotiin. He ovat naapureita, mutta heillä ei ole toistensa numeroita. Mikä sun numero on? Mun numero on nolla neljä nolla... Laita viesti! Soitan sulle.",
+      "characters": [
+        "alex",
+        "linnea"
+      ],
+      "ambient_setting": "street_winter",
+      "tone": "Warm, light, a little funny",
+      "key_phrases": [
+        "Mikä sun numero on?",
+        "Mun numero on...",
+        "Laita viesti!",
+        "Soitan sulle."
+      ],
+      "notes": "Straight after episode 30: late afternoon, already getting dark, Alex and Linnea walk home together through the snowy street (they live in the same building, neighbours since episode 1). Leo stayed at the rink and they still need his number too. Alex says it is silly: neighbours for months and no phone numbers. Linnea asks 'Mikä sun numero on?' and explains 'sun' is the spoken 'your'. Alex says his number digit by digit in Finnish ('Mun numero on...' then the digits as their own Finnish lines, using nolla to yhdeksän from episode 8), slowly; Linnea types it and checks it back. Use a clearly fake number starting 040 and keep it short (say 040 123 4567, read in groups). Linnea: 'Laita viesti!' (explain: send me a message) so she has his number; his phone buzzes. Alex: 'Soitan sulle.' as a joke when they are two metres apart; she laughs. End: she sends Leo's number too, which she got at the rink; sets up episode 32 (a quick message). Every line is all Finnish or all English: when someone explains a Finnish word, the English explanation is one line and the Finnish word is its own line; never a Finnish word inside an English line. Each digit group is its own Finnish line; never a digit word inside an English line.",
+      "illustration_scene": "A snowy Helsinki street at dusk in February, streetlights coming on, warm yellow windows in a five-storey apartment building, snow banks along the pavement. LINNEA, a young woman with freckles, glasses and a blonde braid under a cream knitted pompom hat, in her lilac padded winter jacket and pastel striped scarf, mittens off, types on her phone and smiles; ALEX, a young man with light brown skin and short black curly hair, in his dark-navy parka, red beanie and grey scarf, holds up his own phone showing a plain screen with no readable text, laughing. Their skates hang over their shoulders. Exactly two people in the picture. No readable writing anywhere, including on the phone screens.",
+      "when": "late afternoon at dusk in February, walking home from the rink",
+      "format": "guided",
+      "illustration_layout": "single",
+      "track": "Everyday Finnish",
+      "level": "Beginner",
+      "language_level": "A1",
+      "season": "winter"
     }
   ]
 }
