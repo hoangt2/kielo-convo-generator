@@ -1,0 +1,219 @@
+{
+  "title": "Tarkistus 1: mini-YKI",
+  "description": "Checkpoint: one small task from each YKI part. Reading, listening, writing and speaking.",
+  "category": "YKI: Minä ja YKI",
+  "difficulty_level": "beginner",
+  "cefr_level": "A1",
+  "estimated_duration_minutes": 7,
+  "lesson_content": {
+    "kind": "lesson",
+    "shape": "drill",
+    "steps": [
+      {
+        "type": "info_card",
+        "emoji": "⏱️",
+        "title": "Checkpoint 1",
+        "content_html": "One small task from each part of YKI: lue, kuuntele, kirjoita, puhu. No new words. Show what you can do.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-1"
+      },
+      {
+        "type": "explanation",
+        "title": "Lue: read the text",
+        "content_html": "<fi>Hei! Minun nimeni on Mehmet. Olen kotoisin Turkista. Asun Vantaalla. Olen asunut Suomessa kuusi vuotta. Minulla on vaimo ja kaksi lasta. Puhun turkkia, englantia ja vähän suomea.</fi>",
+        "tts_text": "Hei! Minun nimeni on Mehmet. Olen kotoisin Turkista. Asun Vantaalla. Olen asunut Suomessa kuusi vuotta. Minulla on vaimo ja kaksi lasta. Puhun turkkia, englantia ja vähän suomea.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-2"
+      },
+      {
+        "type": "true_false",
+        "title": "Lue: true or false?",
+        "statement": "Mehmet asuu Helsingissä.",
+        "is_true": false,
+        "explanation": "Mehmet asuu Vantaalla.",
+        "id": "step-3"
+      },
+      {
+        "type": "quiz",
+        "title": "Lue: answer the question",
+        "question": "Kauanko Mehmet on asunut Suomessa?",
+        "options": [
+          {
+            "text": "Kuusi vuotta",
+            "is_correct": true
+          },
+          {
+            "text": "Kaksi vuotta",
+            "is_correct": false
+          },
+          {
+            "text": "Viisi vuotta",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: kuusi vuotta.",
+        "incorrect_feedback": "The text says: Olen asunut Suomessa kuusi vuotta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-4"
+      },
+      {
+        "type": "listening_comprehension",
+        "title": "Kuuntele",
+        "tts_text": "Hei, minä olen Anna. Olen kotoisin Ukrainasta. Asun Espoossa. Minulla on yksi tytär.",
+        "question": "Missä Anna asuu?",
+        "options": [
+          {
+            "text": "Espoossa",
+            "is_correct": true
+          },
+          {
+            "text": "Ukrainassa",
+            "is_correct": false
+          },
+          {
+            "text": "Vantaalla",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: Asun Espoossa.",
+        "incorrect_feedback": "Anna is from Ukraine, but she lives in Espoo: Asun Espoossa.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-5"
+      },
+      {
+        "type": "listening_comprehension",
+        "title": "Kuuntele uudelleen",
+        "tts_text": "Hei, minä olen Anna. Olen kotoisin Ukrainasta. Asun Espoossa. Minulla on yksi tytär.",
+        "question": "Onko Annalla lapsia?",
+        "options": [
+          {
+            "text": "On, yksi tytär.",
+            "is_correct": true
+          },
+          {
+            "text": "On, kaksi poikaa.",
+            "is_correct": false
+          },
+          {
+            "text": "Ei ole.",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: Minulla on yksi tytär.",
+        "incorrect_feedback": "Listen for minulla on: yksi tytär.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-6"
+      },
+      {
+        "type": "fill_blank",
+        "title": "Kirjoita: a message to the teacher",
+        "sentence_template": "Hei! Minun nimeni on Linh. Olen ___ Vietnamista.",
+        "translation_hint": "Hi! My name is Linh. I am from Vietnam.",
+        "options": [
+          {
+            "text": "kotoisin",
+            "is_correct": true
+          },
+          {
+            "text": "asun",
+            "is_correct": false
+          },
+          {
+            "text": "puhun",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: olen kotoisin Vietnamista.",
+        "incorrect_feedback": "From a country: olen kotoisin ...sta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-7"
+      },
+      {
+        "type": "fill_blank",
+        "title": "Kirjoita: continue the message",
+        "sentence_template": "Asun Vantaalla. Puhun vietnamia ja vähän ___.",
+        "translation_hint": "I live in Vantaa. I speak Vietnamese and a little Finnish.",
+        "options": [
+          {
+            "text": "suomea",
+            "is_correct": true
+          },
+          {
+            "text": "suomi",
+            "is_correct": false
+          },
+          {
+            "text": "Suomessa",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: vähän suomea.",
+        "incorrect_feedback": "After puhun: suomea.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-8"
+      },
+      {
+        "type": "spot_error",
+        "title": "Kirjoita: check the message",
+        "context": "The last sentence of Linh's message.",
+        "sentence": "Minulla on kaksi lapsi.",
+        "options": [
+          {
+            "text": "lapsi should be lasta.",
+            "is_correct": true
+          },
+          {
+            "text": "Minulla should be Minä.",
+            "is_correct": false
+          },
+          {
+            "text": "kaksi should be kahden.",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: kaksi lasta.",
+        "incorrect_feedback": "After a number from two up: lasta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-9"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "Puhu: your introduction",
+        "phrase": "Minun nimeni on Linh. Asun Vantaalla. Olen asunut Suomessa viisi vuotta.",
+        "translation": "My name is Linh. I live in Vantaa. I have lived in Finland for five years.",
+        "tts_text": "Minun nimeni on Linh. Asun Vantaalla. Olen asunut Suomessa viisi vuotta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-10"
+      },
+      {
+        "type": "info_card",
+        "emoji": "🎉",
+        "title": "Checkpoint 1 done",
+        "content_html": "You can now read YKI instructions, answer the first speaking questions, fill a form and write three sentences about yourself. Next: a Juka call where you introduce yourself, out loud and freely.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-11"
+      }
+    ],
+    "practice_words": [
+      "teksti",
+      "kysymys",
+      "viesti"
+    ],
+    "grammar_concepts": [
+      "kertaus"
+    ],
+    "learning_language_code": "fi"
+  }
+}

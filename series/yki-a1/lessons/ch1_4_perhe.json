@@ -1,0 +1,224 @@
+{
+  "title": "Perhe",
+  "description": "Talk about your family with minulla on, and count from one to ten.",
+  "category": "YKI: Minä ja YKI",
+  "difficulty_level": "beginner",
+  "cefr_level": "A1",
+  "estimated_duration_minutes": 6,
+  "lesson_content": {
+    "kind": "lesson",
+    "shape": "discovery",
+    "steps": [
+      {
+        "type": "info_card",
+        "emoji": "👨‍👩‍👧",
+        "title": "Family",
+        "content_html": "The speaking test and many forms ask about your family. Finnish has no verb 'to have', so you learn a new pattern.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-1"
+      },
+      {
+        "type": "explanation",
+        "title": "minulla on: I have",
+        "content_html": "<fi>Minulla on tytär.</fi> I have a daughter. <fi>Minulla on mies ja tytär.</fi> I have a husband and a daughter. Literally: at me is a daughter.",
+        "tts_text": "Minulla on tytär. Minulla on mies ja tytär.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-2"
+      },
+      {
+        "type": "match_pairs",
+        "title": "The family",
+        "instruction": "Match each word with its meaning.",
+        "pairs": [
+          {
+            "left": "mies",
+            "right": "husband"
+          },
+          {
+            "left": "vaimo",
+            "right": "wife"
+          },
+          {
+            "left": "poika",
+            "right": "son"
+          },
+          {
+            "left": "tytär",
+            "right": "daughter"
+          }
+        ],
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-3"
+      },
+      {
+        "type": "explanation",
+        "title": "One to ten",
+        "content_html": "<fi>yksi, kaksi, kolme, neljä, viisi, kuusi, seitsemän, kahdeksan, yhdeksän, kymmenen</fi>. After two or more the word gets -a or -ä: <fi>kaksi lasta</fi> (two children), <fi>kolme veljeä</fi> (three brothers).",
+        "tts_text": "yksi, kaksi, kolme, neljä, viisi, kuusi, seitsemän, kahdeksan, yhdeksän, kymmenen",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-4"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "I have a daughter",
+        "phrase": "Minulla on yksi tytär.",
+        "translation": "I have one daughter.",
+        "tts_text": "Minulla on yksi tytär.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-5"
+      },
+      {
+        "type": "fill_blank",
+        "title": "Two children",
+        "sentence_template": "Minulla on kaksi ___.",
+        "translation_hint": "I have two children.",
+        "options": [
+          {
+            "text": "lasta",
+            "is_correct": true
+          },
+          {
+            "text": "lapsi",
+            "is_correct": false
+          },
+          {
+            "text": "lapset",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Yes: kaksi lasta.",
+        "incorrect_feedback": "After kaksi, lapsi becomes lasta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-6"
+      },
+      {
+        "type": "listening_comprehension",
+        "title": "Listen",
+        "tts_text": "Minulla on mies ja kaksi lasta.",
+        "question": "How many people are in her family, with her?",
+        "options": [
+          {
+            "text": "Four",
+            "is_correct": true
+          },
+          {
+            "text": "Three",
+            "is_correct": false
+          },
+          {
+            "text": "Two",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: she, her husband and two children.",
+        "incorrect_feedback": "Mies is one, kaksi lasta is two, and she is one more: four.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-7"
+      },
+      {
+        "type": "sentence_builder",
+        "title": "Build it",
+        "prompt": "Say: I have three children.",
+        "target_phrase": "Minulla on kolme lasta.",
+        "tts_text": "Minulla on kolme lasta.",
+        "word_tiles": [
+          "Minulla",
+          "on",
+          "kolme",
+          "lasta",
+          "lapsi",
+          "Minä"
+        ],
+        "translation": "I have three children.",
+        "correct_feedback": "Good.",
+        "incorrect_feedback": "Minulla on, then the number, then lasta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-8"
+      },
+      {
+        "type": "branching_dialogue",
+        "title": "Family questions",
+        "scenario": "The YKI speaking test asks about your family.",
+        "persona": {
+          "name": "YKI-testi",
+          "age": 50,
+          "context": "The recorded YKI speaking test: a voice on the computer asks each question once, clearly, then records the answer."
+        },
+        "turns": [
+          {
+            "turn_id": "t1",
+            "speaker": "YKI-testi",
+            "phrase": "Onko sinulla perhettä?",
+            "translation": "Do you have a family?",
+            "options": [
+              {
+                "text": "On. Minulla on mies ja tytär.",
+                "is_correct": true,
+                "feedback": "Good: on (yes) and then the family."
+              },
+              {
+                "text": "Olen kotoisin Vietnamista.",
+                "is_correct": false,
+                "feedback": "The question is about your family."
+              }
+            ]
+          },
+          {
+            "turn_id": "t2",
+            "speaker": "YKI-testi",
+            "phrase": "Kuinka vanha tyttäresi on?",
+            "translation": "How old is your daughter?",
+            "options": [
+              {
+                "text": "Hän on yhdeksän vuotta vanha.",
+                "is_correct": true,
+                "feedback": "Excellent."
+              },
+              {
+                "text": "Minulla on yhdeksän.",
+                "is_correct": false,
+                "feedback": "Say her age: Hän on yhdeksän vuotta vanha."
+              }
+            ]
+          }
+        ],
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-9"
+      },
+      {
+        "type": "info_card",
+        "emoji": "🧩",
+        "title": "Your answer grows",
+        "content_html": "Name, country, languages, home, years in Finland, and now family. Next: the forms you fill in Finland.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-10"
+      }
+    ],
+    "practice_words": [
+      "perhe",
+      "mies",
+      "vaimo",
+      "poika",
+      "tytär",
+      "lapsi",
+      "minulla"
+    ],
+    "grammar_concepts": [
+      "omistusrakenne",
+      "partitiivi"
+    ],
+    "learning_language_code": "fi"
+  }
+}

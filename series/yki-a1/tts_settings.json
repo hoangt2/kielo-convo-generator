@@ -1,0 +1,6 @@
+{
+  "_comment": "YKI videos: ElevenLabs eleven_v3 only (Tung, 2026-10-29: \"dont use turbo voice\"). Each line is levelled to the same loudness and single words get up to 6 retries.",
+  "max_attempts": 6,
+  "level_lines_dbfs": -20,
+  "cache_lines": true
+}

@@ -1,0 +1,108 @@
+{
+  "dialogue_list": [
+    {
+      "type": "sfx",
+      "text": "a quiet library, pages turning, a chair pulled back",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[warm, slowly] Hei! Minä olen Kaarina. Minä olen opettaja.",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Hei. Minä olen Linh. Minulla on YKI-testi maaliskuussa.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Hyvä. Harjoitellaan.",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] YKI-testissä sinä puhut tietokoneelle. Tietokone kysyy vain kerran.",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a stopwatch clicking, then a quiet tick-tock",
+      "duration": 1.5,
+      "timing": "before"
+    },
+    {
+      "text": "[slowly, like a recorded test voice] Mikä sinun nimesi on?",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Minun nimeni on Linh.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly, like a recorded test voice] Missä sinä asut?",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a loud clock ticking in a long, awkward silence",
+      "duration": 2.5,
+      "timing": "before"
+    },
+    {
+      "text": "[panicking] Lue! Kuuntele! Kirjoita! Puhu!",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[laughing gently] Ei hätää, Linh.",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Kuuntele kysymys. Missä sinä asut? Sinä asut. Minä asun.",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Aa! Minä asun Vantaalla.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Hyvä! Kauanko sinä olet asunut Suomessa?",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Olen asunut Suomessa viisi vuotta.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[pleased, slowly] Hienoa! YKI-testissä on tärkeää puhua, ei olla hiljaa.",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a stopwatch clicking",
+      "duration": 1.0,
+      "timing": "before"
+    },
+    {
+      "text": "[a small smile, slowly] Ensi viikolla sinä puhut kaksi minuuttia.",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "lang": "fi"
+    },
+    {
+      "text": "[groaning] Voi ei.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    }
+  ]
+}

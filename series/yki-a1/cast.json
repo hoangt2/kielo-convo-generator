@@ -1,0 +1,58 @@
+{
+  "_comment": "Finnish for Citizenship (YKI) videos: short (about 60 s) Finnish-only videos, one per story lesson of the YKI track (T-tung-1n4 in kielo-work-assistant). Cast proposed 2026-10-29 from the app languages of citizenship-goal learners; Tung: 'cast looks good'. Voices picked by Tung by ear, 2026-10-29 (yki-voices-test/round2): Linh Ngân Nguyễn (Vietnamese), Minh Yuna (Vietnamese), Mehmet Mehmet Akif (Turkish), Kaarina Kaisa (native Finnish), so Linh's, Minh's and Mehmet's Finnish carries their home accent. Tung: 'You should change Minh the boy to a girl', then 'change Minh name to a girl name as well': she is Mai. Keep voice_id and appearance STABLE. Tung, 2026-10-29: 'the videos should not be English led, because YKI test will always be in Finnish anyway. Just make the characters speak and explain things slowly and clearly', and only the characters an episode needs ('why are all the characters in the same episode now... so confusing and not natural').",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "linh": {
+      "name": "Linh",
+      "role": "The learner. Vietnamese, five years in Vantaa, studying to become a practical nurse. Can now apply for citizenship and needs YKI grade 3; her test date is in March.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "gender": "Female",
+      "age": "Adult (about 35)",
+      "default_tone": "Earnest, nervous before tests, quick to laugh at herself",
+      "language_level": "A1",
+      "speech_style": "Speaks only Finnish in the videos: slow, simple, correct standard Finnish, with a light accent. Freezes under a stopwatch, then manages.",
+      "personality": "Hard-working and organised, colour-codes her notes, secretly competitive with Mehmet. The audience's stand-in.",
+      "appearance": "Medium height, slim, light-tan skin, straight black shoulder-length hair with a neat side part held by a small pearl hair clip, dark eyes. Wears a light coral cardigan over a white blouse, navy trousers, and carries a canvas tote bag full of colourful sticky notes.",
+      "reference_image": "series/yki-a1/characters/linh.png"
+    },
+    "mehmet": {
+      "name": "Mehmet",
+      "role": "The comic partner. Turkish, bus driver in Vantaa, in Kaarina's language café with Linh.",
+      "voice_id": "qHdpkLDluFJPQyEvzZ5E",
+      "gender": "Male",
+      "age": "Adult (about 40)",
+      "default_tone": "Confident, cheerful, unbothered",
+      "language_level": "A1",
+      "speech_style": "Speaks only Finnish in the videos, slowly. Says every bus stop name and announcement perfectly and little else; answers questions with one word.",
+      "personality": "Big-hearted show-off who brings simit for everyone. Treats every mistake as a joke.",
+      "appearance": "Stocky and broad-shouldered, olive skin, short dark curly hair greying at the temples, a thick black moustache, warm brown eyes. Wears his bus driver uniform: a light-blue shirt under a dark-navy V-neck sweater, dark-grey trousers, no logos.",
+      "reference_image": "series/yki-a1/characters/mehmet.png"
+    },
+    "kaarina": {
+      "name": "Kaarina",
+      "role": "The Finn and teacher. Retired Finnish teacher and former YKI examiner; runs the library language café.",
+      "voice_id": "2Yg0KQ858zsEJOsoPmT2",
+      "gender": "Female",
+      "age": "Older (about 68)",
+      "default_tone": "Firm, dry, warm underneath",
+      "language_level": "Native",
+      "speech_style": "Native Finn. Speaks only Finnish in the videos, slowly and clearly, with short sentences and words a learner knows. Plays the recorded YKI test voice when they practise.",
+      "personality": "Strict about timers and full sentences, never unkind; a tiny smile when someone gets it right. Has a stopwatch on a cord around her neck.",
+      "appearance": "Tall and slim, pale skin with rosy cheeks, short silver-white bob, rectangular red reading glasses on a beaded chain. Wears a teal wool cardigan with a round silver brooch, a grey knee-length skirt, and a silver stopwatch on a cord around her neck.",
+      "reference_image": "series/yki-a1/characters/kaarina.png"
+    },
+    "mai": {
+      "name": "Mai",
+      "role": "Linh's daughter. Grew up in Finland; comes along to the language café with her homework.",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "gender": "Female",
+      "age": "Child (9)",
+      "default_tone": "Cheeky, giggly",
+      "language_level": "Native",
+      "speech_style": "Speaks only native Finnish, short and simple. Likes to play teacher with her mum.",
+      "personality": "Proud of her mum, embarrassed by her, both at once.",
+      "appearance": "A 9-year-old girl, light-tan skin, thick black hair in two short pigtails with orange hair ties, a big gap-toothed grin. Wears a bright-orange hoodie, blue jeans and a small green backpack.",
+      "reference_image": "series/yki-a1/characters/mai.png"
+    }
+  }
+}

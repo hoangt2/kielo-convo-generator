@@ -1,0 +1,101 @@
+{
+  "dialogue_list": [
+    {
+      "type": "sfx",
+      "text": "a letterbox flap clattering, an envelope dropping on a hallway floor",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[excited] Äiti! Posti tuli!",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Kiitos, Mai. Katsotaan.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "an envelope being torn open, paper unfolding",
+      "duration": 1.5,
+      "timing": "before"
+    },
+    {
+      "text": "[surprised, slowly] Se on YKI-kirje!",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[curious] Mikä on YKI?",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Se on suomen kielen testi. Minä tarvitsen sen.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "Miksi?",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Minä haluan Suomen kansalaisuuden.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[reading, slowly] Testi on maaliskuussa.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[surprised] Maaliskuussa? Se on pian!",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Testissä on neljä osaa: lukeminen, kuunteleminen, kirjoittaminen ja puhuminen.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[playful] Minä olen testi! Kerro itsestäsi!",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "lang": "fi"
+    },
+    {
+      "text": "[nervous, slowly] Öö... Minun nimeni on Linh.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[playful] Ja?",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "lang": "fi"
+    },
+    {
+      "text": "[slowly] Olen kotoisin Vietnamista. Asun Vantaalla.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[proud] Hyvä, äiti!",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "lang": "fi"
+    },
+    {
+      "text": "[laughing] Sinä olet hyvä opettaja.",
+      "voice_id": "DvG3I1kDzdBY3u4EzYh6",
+      "lang": "fi"
+    },
+    {
+      "text": "[deadpan] Tiedän.",
+      "voice_id": "aHC3XZOMg3HZuXVYK6hy",
+      "lang": "fi"
+    }
+  ]
+}

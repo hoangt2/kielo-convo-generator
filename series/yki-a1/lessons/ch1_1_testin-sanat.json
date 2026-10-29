@@ -1,0 +1,210 @@
+{
+  "title": "Lue, kuuntele, kirjoita, puhu",
+  "description": "The seven instruction words of every YKI task. Read a real task instruction in five minutes.",
+  "category": "YKI: Minä ja YKI",
+  "difficulty_level": "beginner",
+  "cefr_level": "A1",
+  "estimated_duration_minutes": 5,
+  "lesson_content": {
+    "kind": "lesson",
+    "shape": "discovery",
+    "steps": [
+      {
+        "type": "info_card",
+        "emoji": "🎯",
+        "title": "Your first YKI words",
+        "content_html": "Every YKI task starts with an instruction in Finnish. Learn seven words today and you can read a real task.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-1"
+      },
+      {
+        "type": "explanation",
+        "title": "Four parts, four words",
+        "content_html": "YKI has four parts, and each one has its word: <fi>Lue</fi> (read), <fi>Kuuntele</fi> (listen), <fi>Kirjoita</fi> (write), <fi>Puhu</fi> (speak). They are commands: the test speaks to you directly.",
+        "tts_text": "Lue. Kuuntele. Kirjoita. Puhu.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-2"
+      },
+      {
+        "type": "match_pairs",
+        "title": "Four parts",
+        "instruction": "Match each word with its meaning.",
+        "pairs": [
+          {
+            "left": "Lue",
+            "right": "Read"
+          },
+          {
+            "left": "Kuuntele",
+            "right": "Listen"
+          },
+          {
+            "left": "Kirjoita",
+            "right": "Write"
+          },
+          {
+            "left": "Puhu",
+            "right": "Speak"
+          }
+        ],
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-3"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "Read the text",
+        "phrase": "Lue teksti.",
+        "translation": "Read the text.",
+        "tts_text": "Lue teksti.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-4"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "Listen to the conversation",
+        "phrase": "Kuuntele keskustelu.",
+        "translation": "Listen to the conversation.",
+        "tts_text": "Kuuntele keskustelu.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-5"
+      },
+      {
+        "type": "explanation",
+        "title": "Answer, choose, tell",
+        "content_html": "Three more words tell you what to do: <fi>Vastaa</fi> (answer), <fi>Valitse</fi> (choose), <fi>Kerro</fi> (tell). You will see them in full instructions: <fi>Vastaa kysymyksiin.</fi> Answer the questions. <fi>Valitse oikea vaihtoehto.</fi> Choose the right option.",
+        "tts_text": "Vastaa kysymyksiin. Valitse oikea vaihtoehto. Kerro itsestäsi.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-6"
+      },
+      {
+        "type": "quiz",
+        "title": "What do you do?",
+        "question": "The task says: Valitse oikea vaihtoehto. What do you do?",
+        "options": [
+          {
+            "text": "Choose the right option",
+            "is_correct": true
+          },
+          {
+            "text": "Write a message",
+            "is_correct": false
+          },
+          {
+            "text": "Listen twice",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: valitse = choose, oikea vaihtoehto = the right option.",
+        "incorrect_feedback": "Valitse means choose. Oikea vaihtoehto is the right option.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-7"
+      },
+      {
+        "type": "fill_blank",
+        "title": "Complete the instruction",
+        "sentence_template": "___ teksti ja vastaa kysymyksiin.",
+        "translation_hint": "Read the text and answer the questions.",
+        "options": [
+          {
+            "text": "Lue",
+            "is_correct": true
+          },
+          {
+            "text": "Puhu",
+            "is_correct": false
+          },
+          {
+            "text": "Kuuntele",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Yes. Lue teksti: read the text.",
+        "incorrect_feedback": "A text is read: Lue teksti.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-8"
+      },
+      {
+        "type": "scenario_prompt",
+        "title": "A writing task",
+        "scenario": "The instruction says: Kirjoita viesti ystävälle.",
+        "prompt": "What is the task?",
+        "options": [
+          {
+            "text": "Write a message to a friend",
+            "is_correct": true
+          },
+          {
+            "text": "Read a message from a friend",
+            "is_correct": false
+          },
+          {
+            "text": "Call a friend",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: kirjoita = write, viesti = message, ystävälle = to a friend.",
+        "incorrect_feedback": "Kirjoita means write. The task is to write a message.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-9"
+      },
+      {
+        "type": "listening_comprehension",
+        "title": "Listen to the instruction",
+        "tts_text": "Kerro itsestäsi.",
+        "question": "What does the test ask you to do?",
+        "options": [
+          {
+            "text": "Tell about yourself",
+            "is_correct": true
+          },
+          {
+            "text": "Read about yourself",
+            "is_correct": false
+          },
+          {
+            "text": "Write your name",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Yes. Kerro itsestäsi: tell about yourself. It is the first speaking task.",
+        "incorrect_feedback": "Kerro means tell. Itsestäsi means about yourself.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-10"
+      },
+      {
+        "type": "info_card",
+        "emoji": "✅",
+        "title": "You can read YKI instructions",
+        "content_html": "Lue, kuuntele, kirjoita, puhu, vastaa, valitse, kerro. Seven words, and every YKI task now tells you what to do.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-11"
+      }
+    ],
+    "practice_words": [
+      "lukea",
+      "kuunnella",
+      "kirjoittaa",
+      "puhua",
+      "vastata",
+      "valita",
+      "kertoa"
+    ],
+    "grammar_concepts": [
+      "imperatiivi"
+    ],
+    "learning_language_code": "fi"
+  }
+}

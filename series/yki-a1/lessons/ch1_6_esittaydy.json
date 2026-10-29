@@ -1,0 +1,254 @@
+{
+  "title": "Esittäydy",
+  "description": "Put it together: answer the first YKI speaking questions in full sentences, and never stay silent.",
+  "category": "YKI: Minä ja YKI",
+  "difficulty_level": "beginner",
+  "cefr_level": "A1",
+  "estimated_duration_minutes": 7,
+  "lesson_content": {
+    "kind": "lesson",
+    "shape": "drill",
+    "steps": [
+      {
+        "type": "info_card",
+        "emoji": "🎤",
+        "title": "The speaking test",
+        "content_html": "In YKI you speak to a computer. A voice asks a question once, then records your answer. Nobody can repeat it for you, so never stay silent: answer in a full sentence.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-1"
+      },
+      {
+        "type": "explanation",
+        "title": "Answer with the question's verb",
+        "content_html": "<fi>Missä sinä asut?</fi> <fi>Asun Vantaalla.</fi> Take the verb from the question and answer in a full sentence, not one word. Full sentences show the examiners what you can do.",
+        "tts_text": "Missä sinä asut? Asun Vantaalla.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-2"
+      },
+      {
+        "type": "match_pairs",
+        "title": "Question and answer",
+        "instruction": "Match each question with its answer.",
+        "pairs": [
+          {
+            "left": "Mikä sinun nimesi on?",
+            "right": "Minun nimeni on Linh."
+          },
+          {
+            "left": "Mistä olet kotoisin?",
+            "right": "Olen kotoisin Vietnamista."
+          },
+          {
+            "left": "Missä asut?",
+            "right": "Asun Vantaalla."
+          },
+          {
+            "left": "Mitä kieliä puhut?",
+            "right": "Puhun vietnamia ja suomea."
+          }
+        ],
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-3"
+      },
+      {
+        "type": "explanation",
+        "title": "If your head goes empty",
+        "content_html": "Start with the question's own verb and say what you can. <fi>Missä sinä asut?</fi> <fi>Asun ...</fi> <fi>Mistä sinä olet kotoisin?</fi> <fi>Olen kotoisin ...</fi> A short sentence gets points. Silence gets none.",
+        "tts_text": "Missä sinä asut? Asun Vantaalla. Mistä sinä olet kotoisin? Olen kotoisin Vietnamista.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-4"
+      },
+      {
+        "type": "quiz",
+        "title": "How do you start?",
+        "question": "The computer asks: Kauanko olet asunut Suomessa? How do you start your answer?",
+        "options": [
+          {
+            "text": "Olen asunut ...",
+            "is_correct": true
+          },
+          {
+            "text": "Asun ...",
+            "is_correct": false
+          },
+          {
+            "text": "Anteeksi, voitteko toistaa?",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: the question says olet asunut, so you say olen asunut.",
+        "incorrect_feedback": "The computer does not repeat the question. Give the verb back: Olen asunut ...",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-5"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "Name and country",
+        "phrase": "Minun nimeni on Linh ja olen kotoisin Vietnamista.",
+        "translation": "My name is Linh and I am from Vietnam.",
+        "tts_text": "Minun nimeni on Linh ja olen kotoisin Vietnamista.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-6"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "Home and years",
+        "phrase": "Asun Vantaalla ja olen asunut Suomessa viisi vuotta.",
+        "translation": "I live in Vantaa and I have lived in Finland for five years.",
+        "tts_text": "Asun Vantaalla ja olen asunut Suomessa viisi vuotta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-7"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "Family",
+        "phrase": "Minulla on mies ja yksi tytär.",
+        "translation": "I have a husband and one daughter.",
+        "tts_text": "Minulla on mies ja yksi tytär.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-8"
+      },
+      {
+        "type": "spot_error",
+        "title": "Find the mistake",
+        "context": "Linh wants to say 'I live in Vantaa'.",
+        "sentence": "Minä asun Vantaa.",
+        "options": [
+          {
+            "text": "Vantaa needs an ending: Vantaalla.",
+            "is_correct": true
+          },
+          {
+            "text": "Minä is wrong.",
+            "is_correct": false
+          },
+          {
+            "text": "Asun is wrong.",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: Asun Vantaalla.",
+        "incorrect_feedback": "Minä and asun are fine. In Vantaa is Vantaalla.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-9"
+      },
+      {
+        "type": "branching_dialogue",
+        "title": "The whole speaking test",
+        "scenario": "The YKI test asks four questions on the computer. Answer each in a full sentence.",
+        "persona": {
+          "name": "YKI-testi",
+          "age": 50,
+          "context": "The recorded YKI speaking test: a voice on the computer asks each question once, clearly, then records the answer."
+        },
+        "turns": [
+          {
+            "turn_id": "t1",
+            "speaker": "YKI-testi",
+            "phrase": "Mikä sinun nimesi on?",
+            "translation": "What is your name?",
+            "options": [
+              {
+                "text": "Minun nimeni on Linh.",
+                "is_correct": true,
+                "feedback": "Good."
+              },
+              {
+                "text": "Linh.",
+                "is_correct": false,
+                "feedback": "Use a full sentence."
+              }
+            ]
+          },
+          {
+            "turn_id": "t2",
+            "speaker": "YKI-testi",
+            "phrase": "Missä sinä asut?",
+            "translation": "Where do you live?",
+            "options": [
+              {
+                "text": "Asun Vantaalla.",
+                "is_correct": true,
+                "feedback": "Good."
+              },
+              {
+                "text": "Vantaa.",
+                "is_correct": false,
+                "feedback": "Use a full sentence: Asun Vantaalla."
+              }
+            ]
+          },
+          {
+            "turn_id": "t3",
+            "speaker": "YKI-testi",
+            "phrase": "Kauanko olet asunut Suomessa?",
+            "translation": "How long have you lived in Finland?",
+            "options": [
+              {
+                "text": "Olen asunut Suomessa viisi vuotta.",
+                "is_correct": true,
+                "feedback": "Excellent."
+              },
+              {
+                "text": "Viisi.",
+                "is_correct": false,
+                "feedback": "A full sentence: Olen asunut Suomessa viisi vuotta."
+              }
+            ]
+          },
+          {
+            "turn_id": "t4",
+            "speaker": "YKI-testi",
+            "phrase": "Mitä kieliä sinä puhut?",
+            "translation": "Which languages do you speak?",
+            "options": [
+              {
+                "text": "Puhun vietnamia, englantia ja vähän suomea.",
+                "is_correct": true,
+                "feedback": "Excellent."
+              },
+              {
+                "text": "Suomea.",
+                "is_correct": false,
+                "feedback": "One word. Give the verb back: Puhun vietnamia, englantia ja vähän suomea."
+              }
+            ]
+          }
+        ],
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-10"
+      },
+      {
+        "type": "info_card",
+        "emoji": "🏁",
+        "title": "Your 30-second introduction",
+        "content_html": "Say your four sentences in a row, out loud, without stopping. Next is the checkpoint: one small task from each part of YKI.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-11"
+      }
+    ],
+    "practice_words": [
+      "asua",
+      "kauan",
+      "kotoisin",
+      "puhua"
+    ],
+    "grammar_concepts": [
+      "persoonamuodot"
+    ],
+    "learning_language_code": "fi"
+  }
+}

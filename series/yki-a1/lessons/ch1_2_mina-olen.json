@@ -1,0 +1,235 @@
+{
+  "title": "Minä olen ...",
+  "description": "Say who you are, where you are from and which languages you speak, in standard Finnish.",
+  "category": "YKI: Minä ja YKI",
+  "difficulty_level": "beginner",
+  "cefr_level": "A1",
+  "estimated_duration_minutes": 6,
+  "lesson_content": {
+    "kind": "lesson",
+    "shape": "discovery",
+    "steps": [
+      {
+        "type": "info_card",
+        "emoji": "🙋",
+        "title": "The first question",
+        "content_html": "The YKI speaking test and every form start the same way: who are you? Today you say your name, your country and your languages.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-1"
+      },
+      {
+        "type": "explanation",
+        "title": "Your name",
+        "content_html": "<fi>Minun nimeni on Linh.</fi> My name is Linh. <fi>Minä olen Linh.</fi> I am Linh. In writing and in the test, use <fi>minä olen</fi>. Friends say <fi>mä oon</fi>; that comes later.",
+        "tts_text": "Minun nimeni on Linh. Minä olen Linh.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-2"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "My name is ...",
+        "phrase": "Minun nimeni on Linh.",
+        "translation": "My name is Linh.",
+        "tts_text": "Minun nimeni on Linh.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-3"
+      },
+      {
+        "type": "explanation",
+        "title": "Where you are from",
+        "content_html": "<fi>Mistä sinä olet kotoisin?</fi> Where are you from? <fi>Olen kotoisin Vietnamista.</fi> I am from Vietnam. The country gets <fi>-sta</fi>, or <fi>-stä</fi> when the word has ä, ö or y: <fi>Turkista, Ukrainasta, Egyptistä</fi>.",
+        "tts_text": "Mistä sinä olet kotoisin? Olen kotoisin Vietnamista.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-4"
+      },
+      {
+        "type": "match_pairs",
+        "title": "From which country?",
+        "instruction": "Match the country with 'from the country'.",
+        "pairs": [
+          {
+            "left": "Vietnam",
+            "right": "Vietnamista"
+          },
+          {
+            "left": "Turkki",
+            "right": "Turkista"
+          },
+          {
+            "left": "Ukraina",
+            "right": "Ukrainasta"
+          },
+          {
+            "left": "Egypti",
+            "right": "Egyptistä"
+          }
+        ],
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-5"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "I am from ...",
+        "phrase": "Olen kotoisin Turkista.",
+        "translation": "I am from Turkey.",
+        "tts_text": "Olen kotoisin Turkista.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-6"
+      },
+      {
+        "type": "explanation",
+        "title": "Your languages",
+        "content_html": "<fi>Minun äidinkieleni on turkki.</fi> My mother tongue is Turkish. <fi>Puhun turkkia ja vähän suomea.</fi> I speak Turkish and a little Finnish. After <fi>puhun</fi> the language gets -a or -ä: <fi>suomea, englantia, turkkia</fi>. Language names are written in small letters.",
+        "tts_text": "Minun äidinkieleni on turkki. Puhun turkkia ja vähän suomea.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-7"
+      },
+      {
+        "type": "fill_blank",
+        "title": "A little Finnish",
+        "sentence_template": "Puhun englantia ja vähän ___.",
+        "translation_hint": "I speak English and a little Finnish.",
+        "options": [
+          {
+            "text": "suomea",
+            "is_correct": true
+          },
+          {
+            "text": "suomi",
+            "is_correct": false
+          },
+          {
+            "text": "Suomessa",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Yes: puhun suomea.",
+        "incorrect_feedback": "After puhun the language ends in -a: suomea.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-8"
+      },
+      {
+        "type": "sentence_builder",
+        "title": "Build it",
+        "prompt": "Say: I am from Vietnam.",
+        "target_phrase": "Olen kotoisin Vietnamista.",
+        "tts_text": "Olen kotoisin Vietnamista.",
+        "word_tiles": [
+          "Olen",
+          "kotoisin",
+          "Vietnamista",
+          "Vietnam",
+          "olet"
+        ],
+        "translation": "I am from Vietnam.",
+        "correct_feedback": "Perfect.",
+        "incorrect_feedback": "Olen first, then kotoisin, then the country with -sta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-9"
+      },
+      {
+        "type": "branching_dialogue",
+        "title": "The test begins",
+        "scenario": "The YKI speaking test asks the first questions on the computer.",
+        "persona": {
+          "name": "YKI-testi",
+          "age": 50,
+          "context": "The recorded YKI speaking test: a voice on the computer asks each question once, clearly, then records the answer."
+        },
+        "turns": [
+          {
+            "turn_id": "t1",
+            "speaker": "YKI-testi",
+            "phrase": "Mikä sinun nimesi on?",
+            "translation": "What is your name?",
+            "options": [
+              {
+                "text": "Minun nimeni on Linh.",
+                "is_correct": true,
+                "feedback": "Good: a full sentence."
+              },
+              {
+                "text": "Olen kotoisin Vietnamista.",
+                "is_correct": false,
+                "feedback": "That says where you are from. The question is your name."
+              }
+            ]
+          },
+          {
+            "turn_id": "t2",
+            "speaker": "YKI-testi",
+            "phrase": "Mistä sinä olet kotoisin?",
+            "translation": "Where are you from?",
+            "options": [
+              {
+                "text": "Olen kotoisin Vietnamista.",
+                "is_correct": true,
+                "feedback": "Good."
+              },
+              {
+                "text": "Puhun vietnamia.",
+                "is_correct": false,
+                "feedback": "That is your language. The question is where you are from."
+              }
+            ]
+          },
+          {
+            "turn_id": "t3",
+            "speaker": "YKI-testi",
+            "phrase": "Mitä kieliä sinä puhut?",
+            "translation": "Which languages do you speak?",
+            "options": [
+              {
+                "text": "Puhun vietnamia, englantia ja vähän suomea.",
+                "is_correct": true,
+                "feedback": "Excellent."
+              },
+              {
+                "text": "Minun nimeni on Linh.",
+                "is_correct": false,
+                "feedback": "The question is about languages: Puhun ..."
+              }
+            ]
+          }
+        ],
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-10"
+      },
+      {
+        "type": "info_card",
+        "emoji": "🗣️",
+        "title": "Your three sentences",
+        "content_html": "Minun nimeni on ... Olen kotoisin ...sta. Puhun ...a ja vähän suomea. Say them about yourself, out loud.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-11"
+      }
+    ],
+    "practice_words": [
+      "nimi",
+      "kotoisin",
+      "puhua",
+      "äidinkieli",
+      "suomi",
+      "englanti",
+      "vähän"
+    ],
+    "grammar_concepts": [
+      "olla",
+      "elatiivi"
+    ],
+    "learning_language_code": "fi"
+  }
+}

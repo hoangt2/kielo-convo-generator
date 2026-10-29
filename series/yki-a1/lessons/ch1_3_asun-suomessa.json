@@ -1,0 +1,203 @@
+{
+  "title": "Asun Suomessa",
+  "description": "Say where you live and how long you have lived in Finland.",
+  "category": "YKI: Minä ja YKI",
+  "difficulty_level": "beginner",
+  "cefr_level": "A1",
+  "estimated_duration_minutes": 6,
+  "lesson_content": {
+    "kind": "lesson",
+    "shape": "discovery",
+    "steps": [
+      {
+        "type": "info_card",
+        "emoji": "🏠",
+        "title": "Where you live",
+        "content_html": "YKI and every office ask where you live and how long you have lived in Finland. Two sentences answer both.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-1"
+      },
+      {
+        "type": "explanation",
+        "title": "asua: to live",
+        "content_html": "<fi>Minä asun</fi>, <fi>sinä asut</fi>, <fi>hän asuu</fi>. <fi>Asun Suomessa.</fi> I live in Finland. Most places get <fi>-ssa/-ssä</fi>, some get <fi>-lla/-llä</fi>. Learn your own town as one word.",
+        "tts_text": "Minä asun. Sinä asut. Hän asuu. Asun Suomessa.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-2"
+      },
+      {
+        "type": "match_pairs",
+        "title": "Where?",
+        "instruction": "Match the town with 'in the town'.",
+        "pairs": [
+          {
+            "left": "Helsinki",
+            "right": "Helsingissä"
+          },
+          {
+            "left": "Espoo",
+            "right": "Espoossa"
+          },
+          {
+            "left": "Vantaa",
+            "right": "Vantaalla"
+          },
+          {
+            "left": "Tampere",
+            "right": "Tampereella"
+          }
+        ],
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-3"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "I live in Vantaa",
+        "phrase": "Asun Vantaalla.",
+        "translation": "I live in Vantaa.",
+        "tts_text": "Asun Vantaalla.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-4"
+      },
+      {
+        "type": "quiz",
+        "title": "In Finland",
+        "question": "How do you say 'I live in Finland'?",
+        "options": [
+          {
+            "text": "Asun Suomessa.",
+            "is_correct": true
+          },
+          {
+            "text": "Asun Suomi.",
+            "is_correct": false
+          },
+          {
+            "text": "Asun Suomesta.",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right: Suomessa = in Finland.",
+        "incorrect_feedback": "In Finland is Suomessa.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-5"
+      },
+      {
+        "type": "explanation",
+        "title": "How long?",
+        "content_html": "<fi>Olen asunut Suomessa viisi vuotta.</fi> I have lived in Finland for five years. Learn it as one block: <fi>olen asunut</fi> + place + number + <fi>vuotta</fi>. One year is <fi>vuoden</fi>: <fi>Olen asunut Suomessa vuoden.</fi>",
+        "tts_text": "Olen asunut Suomessa viisi vuotta. Olen asunut Suomessa vuoden.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-6"
+      },
+      {
+        "type": "fill_blank",
+        "title": "Three years",
+        "sentence_template": "Olen asunut Suomessa kolme ___.",
+        "translation_hint": "I have lived in Finland for three years.",
+        "options": [
+          {
+            "text": "vuotta",
+            "is_correct": true
+          },
+          {
+            "text": "vuosi",
+            "is_correct": false
+          },
+          {
+            "text": "vuoden",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Yes: kolme vuotta.",
+        "incorrect_feedback": "After a number from two up, vuosi becomes vuotta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-7"
+      },
+      {
+        "type": "listen_repeat",
+        "title": "Five years",
+        "phrase": "Olen asunut Suomessa viisi vuotta.",
+        "translation": "I have lived in Finland for five years.",
+        "tts_text": "Olen asunut Suomessa viisi vuotta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-8"
+      },
+      {
+        "type": "scenario_prompt",
+        "title": "At the service point",
+        "scenario": "At the Kela service point the clerk asks: Kauanko olet asunut Suomessa?",
+        "prompt": "Answer: two years.",
+        "options": [
+          {
+            "text": "Olen asunut Suomessa kaksi vuotta.",
+            "is_correct": true
+          },
+          {
+            "text": "Asun Suomessa.",
+            "is_correct": false
+          },
+          {
+            "text": "Kaksi vuosi.",
+            "is_correct": false
+          }
+        ],
+        "correct_feedback": "Right. A full sentence with olen asunut.",
+        "incorrect_feedback": "The clerk asks how long. Answer with olen asunut ... kaksi vuotta.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-9"
+      },
+      {
+        "type": "sentence_builder",
+        "title": "Build it",
+        "prompt": "Say: I live in Tampere.",
+        "target_phrase": "Asun Tampereella.",
+        "tts_text": "Asun Tampereella.",
+        "word_tiles": [
+          "Asun",
+          "Tampereella",
+          "Tampere",
+          "asut"
+        ],
+        "translation": "I live in Tampere.",
+        "correct_feedback": "Good.",
+        "incorrect_feedback": "Asun + Tampereella.",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-10"
+      },
+      {
+        "type": "info_card",
+        "emoji": "🧩",
+        "title": "Add it to your answer",
+        "content_html": "Minun nimeni on ... Olen kotoisin ... Asun ... Olen asunut Suomessa ... vuotta. That already answers the first speaking questions.",
+        "tts_text": "",
+        "tts_language": "fi",
+        "learning_language_code": "fi",
+        "id": "step-11"
+      }
+    ],
+    "practice_words": [
+      "asua",
+      "vuosi",
+      "Suomi",
+      "kauan"
+    ],
+    "grammar_concepts": [
+      "inessiivi",
+      "adessiivi",
+      "perfekti"
+    ],
+    "learning_language_code": "fi"
+  }
+}

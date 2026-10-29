@@ -1,0 +1,82 @@
+{
+  "_comment": "Finnish for Citizenship (YKI), A1 chapter 1 'Minä ja YKI': the two story videos, Finnish only, two characters each. Scripts are hand-written in scripts/ep<N>.json; build with the steps in SERIES_BIBLE.md, not series_run.py.",
+  "series": {
+    "title": "Finnish for Citizenship (YKI)",
+    "language": "Finnish",
+    "default_language_level": "A1",
+    "default_length": "Short",
+    "seasons": {
+      "autumn": {
+        "look": "outdoors: dark early evenings, wet streets, yellow leaves. Indoors: a warm, bright library with lamps on.",
+        "sounds": "rain on the windows"
+      }
+    }
+  },
+  "episodes": [
+    {
+      "id": 1,
+      "title": "Kirje tuli!",
+      "title_en": "The Letter Came!",
+      "lessons_covered": [
+        "Lue, kuuntele, kirjoita, puhu",
+        "Minä olen ..."
+      ],
+      "characters": [
+        "linh",
+        "mai"
+      ],
+      "tone": "Warm, funny",
+      "key_phrases": [
+        "YKI on suomen kielen testi",
+        "Testi on maaliskuussa",
+        "Kerro itsestäsi",
+        "Minun nimeni on",
+        "Olen kotoisin",
+        "Asun Vantaalla"
+      ],
+      "description": "At home in Vantaa, the YKI letter arrives. Mai asks what YKI is; Linh explains, slowly: a Finnish language test, she wants Finnish citizenship, the test is in March, and it has four parts. Mai plays the test: 'Kerro itsestäsi!'. Linh introduces herself. 'Sinä olet hyvä opettaja.' 'Tiedän.'",
+      "notes": "Hand-written, Finnish only, about 60 s. Rewritten after Tung's review: not English-led, and only Linh and Mai.",
+      "illustration_scene": "A small, cosy kitchen in a Vantaa apartment, autumn evening, dark outside the window. Linh, in her coral cardigan and navy trousers, stands by the kitchen table holding an opened official letter with both hands, surprised and a little nervous. Mai, a girl in her orange hoodie and jeans, with two short black pigtails,, kneels on a kitchen chair next to her, leaning in to look at the letter, curious. A school backpack on the floor, a bowl of oranges on the table. Indoors at home: both wear socks, no shoes. The letter has no readable text.",
+      "when": "late October",
+      "track": "Finnish for Citizenship (YKI)",
+      "chapter": "Minä ja YKI",
+      "level": "A1: First Steps to YKI",
+      "language_level": "A1",
+      "format": "guided",
+      "illustration_layout": "single",
+      "season": "autumn",
+      "ambient_setting": "home_kitchen"
+    },
+    {
+      "id": 2,
+      "title": "Ensimmäinen haastattelu",
+      "title_en": "The First Interview",
+      "lessons_covered": [
+        "Esittäydy"
+      ],
+      "characters": [
+        "linh",
+        "kaarina"
+      ],
+      "tone": "Tense, then warm and funny",
+      "key_phrases": [
+        "Mikä sinun nimesi on?",
+        "Missä sinä asut?",
+        "Minä asun Vantaalla",
+        "Olen asunut Suomessa viisi vuotta"
+      ],
+      "description": "At the library, Kaarina introduces herself and runs a mock YKI speaking test: the computer asks only once. Linh freezes at 'Missä sinä asut?' and blurts out 'Lue! Kuuntele! Kirjoita! Puhu!'. Kaarina: 'Ei hätää. Sinä asut. Minä asun.' Linh answers in full. Next week: two minutes. 'Voi ei.'",
+      "notes": "Hand-written, Finnish only, about 60-70 s. Rewritten after Tung's review: not English-led, only Linh and Kaarina; the test is recorded on a computer, so no asking to repeat.",
+      "illustration_scene": "A quiet corner of a bright Finnish public library in Vantaa, autumn evening, rain on the big window. Linh, in her coral cardigan, sits at a small wooden table, frozen, eyes wide, hands gripping the table, a tiny sweat drop. Across the table Kaarina, in her teal cardigan, holds up her silver stopwatch with a serious examiner face, a laptop open beside her. Bookshelves behind. Only these two people.",
+      "when": "early November",
+      "track": "Finnish for Citizenship (YKI)",
+      "chapter": "Minä ja YKI",
+      "level": "A1: First Steps to YKI",
+      "language_level": "A1",
+      "format": "guided",
+      "illustration_layout": "single",
+      "season": "autumn",
+      "ambient_setting": "library"
+    }
+  ]
+}
