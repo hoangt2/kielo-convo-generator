@@ -1,0 +1,149 @@
+{
+  "dialogue_list": [
+    {
+      "type": "sfx",
+      "text": "a chair scraping back, slippers shuffling on a wooden floor",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[warm] Hei hei!",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[excited] Wait, I learned this one! See you tomorrow!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[proudly] Tapan sinut huomenna!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a coffee cup clattering onto a saucer",
+      "duration": 1.0,
+      "timing": "before"
+    },
+    {
+      "text": "[alarmed] Mitä?!",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[deadpan] You just told my grandfather you'll kill him tomorrow.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[horrified] What? No! I said meet!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[calm] You said it with a short a. In Finnish, a long sound makes a different word.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Tapan.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "I'll kill.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Tapaan.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "I'll meet. Now you guess. Fire, or wind?",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Tuuli.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a soft clock ticking, a short thinking pause",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[thinking] Long sound... wind!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[nods] Wind. The short one is fire.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Tuli.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "One more. A race, or a cat?",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Kissa.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a soft clock ticking, a short thinking pause",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[confident] Double s, long... the cat!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "type": "sfx",
+      "text": "a cat meowing once, unimpressed",
+      "duration": 1.0,
+      "timing": "before"
+    },
+    {
+      "text": "[smiling] The cat. That is her name, actually.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[sheepish] Väinö, sorry. Let me try again.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Tapaan sinut huomenna.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "text": "[relieved] Hyvä.",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[deadpan] He says good. He was a little worried.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    }
+  ]
+}

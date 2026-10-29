@@ -1,0 +1,183 @@
+{
+  "_comment": "The Sounds of Finnish (Finnish Grammar A1, chapter 1), one episode per lesson. Scripts are hand-written in scripts/<slug>.json (Tung, 2026-10-29: shorter and more engaging than a guided scene). Build with the steps in SERIES_BIBLE.md, not series_run.py, which would regenerate the script.",
+  "series": {
+    "title": "The Sounds of Finnish",
+    "language": "Finnish",
+    "default_language_level": "A1",
+    "default_length": "Short",
+    "seasons": {
+      "autumn": {
+        "look": "outdoors: trees turning yellow and red, fallen leaves, grey skies, dusk coming early. Indoors: a warm, cosy home with lamps on.",
+        "sounds": "rain on the windows, wind outside"
+      }
+    }
+  },
+  "episodes": [
+    {
+      "id": 1,
+      "title": "Tapan vai tapaan?",
+      "title_en": "Kill or Meet?",
+      "lessons_covered": [
+        "Short & Long Sounds"
+      ],
+      "characters": [
+        "priya",
+        "eero",
+        "vaino",
+        "kissa"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Funny, quick, warm",
+      "key_phrases": [
+        "Tapan",
+        "Tapaan",
+        "Tuli",
+        "Tuuli",
+        "Kisa",
+        "Kissa"
+      ],
+      "description": "Väinö is leaving Eero and Priya's kitchen after coffee. Priya proudly says goodbye with \"Tapan sinut huomenna\" (I'll kill you tomorrow) instead of \"Tapaan sinut huomenna\" (I'll meet you tomorrow). Eero explains that a long sound makes a different word.",
+      "notes": "Hand-written script, about 50 seconds. One sound: short vs long. Pairs: tapan/tapaan, tuli/tuuli, kisa/kissa. A guess moment with a ticking pause.",
+      "illustration_scene": "A cosy small kitchen in a Tampere flat. Väinö, in his grey Nordic sweater and slippers, stands by the kitchen door holding a coffee cup, eyebrows raised in shock. Priya, in her mustard cardigan and grey socks, covers her mouth in horror. Eero, leaning on the counter in his flannel shirt and patterned wool socks, watches deadpan. Kissa the grey-and-white cat sits on a chair, unimpressed. A plate of pulla on the table. Indoors in a home: everyone wears socks or slippers, no shoes, no coats; the floor is dry and clean. Autumn evening, dark outside the window. Kissa is a normal-sized real house cat (knee-high to the people), in a natural cat pose, never posed like a person.",
+      "track": "Finnish Grammar",
+      "chapter": "The Sounds of Finnish (Äänteet)",
+      "level": "Finnish Grammar A1",
+      "language_level": "A1",
+      "format": "guided",
+      "illustration_layout": "single",
+      "season": "autumn",
+      "when": "late October"
+    },
+    {
+      "id": 2,
+      "title": "Ylös vai ulos?",
+      "title_en": "Up or Out?",
+      "lessons_covered": [
+        "The Extra Vowels (ä, ö, y)"
+      ],
+      "characters": [
+        "priya",
+        "eero",
+        "vaino"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Funny, quick, warm",
+      "key_phrases": [
+        "Ylös",
+        "Ulos",
+        "Sää",
+        "Saa",
+        "Ylös, kiitos"
+      ],
+      "description": "In the building's lift, Väinö asks \"Ylös vai alas?\" (up or down?). Priya, carrying shopping bags, answers \"Ulos!\" (out!) instead of \"Ylös!\" (up!), and Väinö holds the door open for her. Eero shows how to make y and ä.",
+      "notes": "Hand-written script, about 50 seconds. One sound: the extra vowels. Pairs: ylös/ulos (y vs u), sää/saa (ä vs a). A guess moment with a ticking pause.",
+      "illustration_scene": "Inside a small old-fashioned apartment-building lift with a mirror and a brass rail. Väinö, in his grey Nordic sweater, holds the open lift door and points outside, puzzled. Priya, in her mustard cardigan with a long dark wool coat over it and ankle boots, holds two shopping bags full of groceries and looks confused. Eero, in a dark parka, stands behind her with a bag of cat food, deadpan. Autumn evening.",
+      "track": "Finnish Grammar",
+      "chapter": "The Sounds of Finnish (Äänteet)",
+      "level": "Finnish Grammar A1",
+      "language_level": "A1",
+      "format": "guided",
+      "illustration_layout": "single",
+      "season": "autumn",
+      "when": "late October"
+    },
+    {
+      "id": 3,
+      "title": "Helsinki, ei HelSINki",
+      "title_en": "HEL-sin-ki, Not Hel-SIN-ki",
+      "lessons_covered": [
+        "Where the Stress Falls"
+      ],
+      "characters": [
+        "priya",
+        "eero",
+        "vaino"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Funny, quick, warm",
+      "key_phrases": [
+        "Helsinki",
+        "Ravintola",
+        "Appelsiini",
+        "Hyvää matkaa"
+      ],
+      "description": "At breakfast Priya tells Väinö she is going to Helsinki for work, stressing the middle syllable. Väinö pretends not to know where that is. Eero explains that in Finnish the beat is always on the first syllable.",
+      "notes": "Hand-written script, about 45 seconds. One sound rule: stress on the first syllable. No guess moment: TTS cannot be trusted to stress a word wrongly on purpose.",
+      "illustration_scene": "Morning in the cosy Tampere flat kitchen. Priya, in her mustard cardigan and grey socks, holds a coffee mug and a laptop bag, ready to leave. Väinö sits at the table with a newspaper and a teasing smile. Eero pours coffee by the counter, deadpan. Kissa sleeps on the windowsill. Indoors in a home: everyone wears socks or slippers, no shoes, no coats. Autumn morning, grey light outside. Kissa is a normal-sized real house cat (knee-high to the people), in a natural cat pose, never posed like a person. Eero wears his patterned wool socks, Väinö his felt slippers, Priya grey socks.",
+      "track": "Finnish Grammar",
+      "chapter": "The Sounds of Finnish (Äänteet)",
+      "level": "Finnish Grammar A1",
+      "language_level": "A1",
+      "format": "guided",
+      "illustration_layout": "single",
+      "season": "autumn",
+      "when": "late October"
+    },
+    {
+      "id": 4,
+      "title": "Rrr kuin Kissa",
+      "title_en": "Rrr, Like Kissa",
+      "lessons_covered": [
+        "Finnish Consonants"
+      ],
+      "characters": [
+        "priya",
+        "eero",
+        "vaino",
+        "kissa"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Funny, quick, warm",
+      "key_phrases": [
+        "Ruoka",
+        "Ruisleipää",
+        "Tampere"
+      ],
+      "description": "Priya cannot roll her r. Eero says to ask Kissa, who is purring loudly. Väinö arrives with rye bread and rolls the r in \"Ruisleipää!\" with pride. Eero adds that p, t and k are soft, with no puff of air.",
+      "notes": "Hand-written script, about 45 seconds. One sound: the rolled r, plus soft p, t, k. No guess moment.",
+      "illustration_scene": "Evening in the cosy Tampere flat kitchen. Kissa the grey-and-white cat purrs on Priya's lap; Priya, in her mustard cardigan and grey socks, laughs with her tongue slightly out, trying to purr. Väinö stands at the door proudly holding up a dark round loaf of Finnish rye bread. Eero leans on the counter, deadpan, with a tiny smile. Indoors in a home: everyone wears socks or slippers, no shoes, no coats; the floor is dry and clean. Autumn evening, dark outside the window. Kissa is a normal-sized real house cat (knee-high to the people), in a natural cat pose, never posed like a person. Eero wears his patterned wool socks, Väinö his felt slippers, Priya grey socks.",
+      "track": "Finnish Grammar",
+      "chapter": "The Sounds of Finnish (Äänteet)",
+      "level": "Finnish Grammar A1",
+      "language_level": "A1",
+      "format": "guided",
+      "illustration_layout": "single",
+      "season": "autumn",
+      "when": "late October"
+    },
+    {
+      "id": 5,
+      "title": "Yö, ei yo!",
+      "title_en": "Night, Not Yo!",
+      "lessons_covered": [
+        "Diphthongs"
+      ],
+      "characters": [
+        "priya",
+        "eero",
+        "vaino"
+      ],
+      "ambient_setting": "home_kitchen",
+      "tone": "Funny, quick, warm",
+      "key_phrases": [
+        "Yö",
+        "Suomi",
+        "Poika",
+        "Hei",
+        "Moi",
+        "Hyvää yötä"
+      ],
+      "description": "Late in the evening Priya greets Väinö on the stairs with an English \"Yo!\". Väinö hears \"yö\" (night) and agrees that it is night. Eero explains that two vowels slide together in one beat.",
+      "notes": "Hand-written script, about 50 seconds. One sound: diphthongs. Words: yö, suomi, poika, hei, moi. A guess moment with a ticking pause. Ends with Hyvää yötä.",
+      "illustration_scene": "Late evening on the warm-lit stairwell landing of an old Tampere apartment building, outside the flat door. Priya, in her mustard cardigan and grey socks, waves cheerfully from the open doorway. Väinö, in his grey Nordic sweater and felt slippers, stands on the stairs with a sleepy smile, holding a small towel as if back from the sauna. Eero leans in the doorway behind Priya, deadpan. A window shows the dark night sky.",
+      "track": "Finnish Grammar",
+      "chapter": "The Sounds of Finnish (Äänteet)",
+      "level": "Finnish Grammar A1",
+      "language_level": "A1",
+      "format": "guided",
+      "illustration_layout": "single",
+      "season": "autumn",
+      "when": "late October"
+    }
+  ]
+}

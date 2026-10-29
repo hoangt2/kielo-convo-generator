@@ -1,0 +1,58 @@
+{
+  "_comment": "The Sounds of Finnish: a new cast for short (45-60 s) English-led videos, one Finnish sound per episode, built around a mishearing joke (Tung, 2026-10-29: 'I want a totally new cast'). Eero and Vaino are voiced by native Finnish ElevenLabs library voices (Oskari, Vaino), so every word pair is said by a native voice. Priya's voice is English (Indian accent); her Finnish is meant to sound learner-like. Keep voice_id and appearance STABLE.",
+  "style_lock": "A playful, modern doodle-style 2D illustration. The image must feature bold, thick, uniform black outlines with flat, naturalistic colors. Do not use gradients, 3D rendering, or complex shading. Characters should have friendly, exaggerated proportions with simple, clean features. Any inanimate objects in the scene must remain strictly as normal objects without any faces, smiles, or anthropomorphic details. Use a soft, cohesive pastel-leaning color palette. High quality vector-art style. No text, no labels, no words, no letters.",
+  "characters": {
+    "priya": {
+      "name": "Priya",
+      "role": "The learner. Moved from Bangalore to Tampere for a job at a games studio; Eero's new flatmate.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "gender": "Female",
+      "age": "Adult (about 30)",
+      "default_tone": "Bright, quick, confident, laughs at herself",
+      "language_level": "A1",
+      "speech_style": "Speaks English, fast and chatty. Tries Finnish words with total confidence and gets one sound wrong, which causes the joke. Repeats a word pair after Eero, slowly.",
+      "personality": "Brave and talkative, loves trying new things, never embarrassed for long. The audience's stand-in: she asks the question the viewer is thinking.",
+      "appearance": "Medium height, warm brown skin, long straight black hair in a high ponytail, big round tortoiseshell glasses, small gold hoop earrings. Wears a mustard-yellow knitted cardigan over a white T-shirt, dark-green trousers and grey socks at home.",
+      "reference_image": "series/finnish-sounds-a1/characters/priya.png"
+    },
+    "eero": {
+      "name": "Eero",
+      "role": "The Finn. Priya's flatmate, a sound engineer who notices every sound; the series' teacher without trying to be one.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "gender": "Male",
+      "age": "Adult (early 30s)",
+      "default_tone": "Deadpan, dry, warm underneath",
+      "language_level": "Native",
+      "speech_style": "Native Finn. Speaks short, calm English with very few words. Says every Finnish word slowly and perfectly, twice, as a clean model to copy. Never explains for long: one sentence per rule.",
+      "personality": "Typical quiet Finn: deadpan humour, a tiny smile when a joke lands, secretly delighted to teach. Loves sauna, coffee and his cat Kissa.",
+      "appearance": "Tall and lanky, pale skin, short messy ash-blond hair, a short light-brown beard, light-blue eyes. Wears big over-ear headphones around his neck, a faded dark-blue flannel shirt over a grey T-shirt, black jeans and thick wool socks with a red pattern at home.",
+      "reference_image": "series/finnish-sounds-a1/characters/eero.png"
+    },
+    "vaino": {
+      "name": "Väinö",
+      "role": "Eero's grandfather (ukki), lives downstairs. Hears everything, especially mistakes.",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "gender": "Male",
+      "age": "Elderly (about 80)",
+      "default_tone": "Slow, calm, mischievous",
+      "language_level": "Native",
+      "speech_style": "Native Finn. Speaks only short Finnish, never English: one or two words that react to Priya's mistake (the punchline), said clearly.",
+      "personality": "Gentle troublemaker with perfect comic timing. Pretends to misunderstand on purpose. Always has coffee and pulla.",
+      "appearance": "Short and round, pale skin with rosy cheeks, bald on top with fluffy white hair at the sides and big white eyebrows, small round glasses. Wears a thick grey Nordic-pattern wool sweater, brown corduroy trousers and felt slippers.",
+      "reference_image": "series/finnish-sounds-a1/characters/vaino.png"
+    },
+    "kissa": {
+      "name": "Kissa",
+      "role": "Eero's cat. Her name means 'cat' (the kisa/kissa gag). Silent: only meows (sound effect).",
+      "voice_id": "",
+      "gender": "Female",
+      "age": "Cat",
+      "default_tone": "Unimpressed",
+      "language_level": "None",
+      "speech_style": "Never speaks. Reacts with a look or a meow.",
+      "personality": "A grumpy, fluffy cat who judges everyone's pronunciation.",
+      "appearance": "A big fluffy grey-and-white cat with a white chest, green eyes and a permanently unimpressed face, as a normal realistic cat (no human features).",
+      "reference_image": "series/finnish-sounds-a1/characters/kissa.png"
+    }
+  }
+}

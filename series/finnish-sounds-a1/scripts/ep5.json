@@ -1,0 +1,112 @@
+{
+  "dialogue_list": [
+    {
+      "type": "sfx",
+      "text": "footsteps on stone stairs, a door opening",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[cheerful] Yo, Väinö!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[thoughtful] Yö? Niin. On yö.",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[deadpan] He heard night. And yes, it is night.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "Two vowels slide together, in one beat.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Yö.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "[carefully] Yö.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "text": "Finland is full of them. Finland itself.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Suomi.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "And a boy.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Poika.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "Now you guess. A boy, or night?",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Poika.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a soft clock ticking, a short thinking pause",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[thinking] O, then i... a boy!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[nods] A boy. And you already say two of them every day.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[warm] Hei. Moi.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "[sleepy] Hyvää yötä.",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[delighted] Good night! I know this one!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[carefully] Hyvää yötä, Väinö!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a door closing softly",
+      "duration": 1.0,
+      "timing": "after"
+    }
+  ]
+}

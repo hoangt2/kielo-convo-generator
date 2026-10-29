@@ -1,0 +1,19 @@
+The Sounds of Finnish
+
+Chapter 1 — CHAPTER_TITLE
+Focus: key grammar or vocabulary themes for this chapter.
+1. Lesson Title — Discovery
+   One-line description of what the learner discovers in this lesson.
+2. Lesson Title — Scenario
+   One-line description of the real-life scenario the learner practises.
+3. Lesson Title — Drill
+   One-line description of the drill (repetitive practice) in this lesson.
+
+Chapter 2 — CHAPTER_TITLE
+Focus: key grammar or vocabulary themes for this chapter.
+1. Lesson Title — Discovery
+   One-line description of what the learner discovers in this lesson.
+2. Lesson Title — Scenario
+   One-line description of the real-life scenario the learner practises.
+3. Lesson Title — Mixed
+   One-line description combining multiple skills from this chapter.

@@ -1,0 +1,101 @@
+{
+  "dialogue_list": [
+    {
+      "type": "sfx",
+      "text": "a kettle clicking off, a spoon stirring in a mug",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[warm] Huomenta!",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[cheerful] Good morning! I'm going to Hel-SIN-ki today, for work.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[innocent] Missä se on?",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[deadpan] He's asking where that is. He knows. He's teasing you.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "In Finnish, the beat is always on the first part of the word.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Helsinki.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "[laughing] Okay, okay.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[carefully] Helsinki.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "text": "[nods] Every word works like that. Restaurant.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Ravintola.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "[carefully] Ravintola.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "text": "Even a long word. Orange.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Appelsiini.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "[carefully] Appelsiini.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "text": "Long sound at the end, but the beat stays at the start.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[smiling] Hyvää matkaa!",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[delighted] He said have a good trip! Thank you, Väinö!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "type": "sfx",
+      "text": "a front door opening and closing",
+      "duration": 1.5,
+      "timing": "after"
+    }
+  ]
+}

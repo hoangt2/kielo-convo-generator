@@ -1,0 +1,6 @@
+{
+  "_comment": "The Sounds of Finnish is voiced by ElevenLabs eleven_v3 only, with native Finnish library voices for Eero (Oskari) and Väinö (Vaino). Tung, 2026-10-29: 'dont use turbo voice' (after the word-pair voice test), so no default_model or word_models here. Each line is levelled to the same loudness and single words get up to 6 retries.",
+  "max_attempts": 6,
+  "level_lines_dbfs": -20,
+  "cache_lines": true
+}

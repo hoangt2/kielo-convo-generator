@@ -1,0 +1,98 @@
+{
+  "dialogue_list": [
+    {
+      "type": "sfx",
+      "text": "a cat purring loudly and contentedly",
+      "duration": 2.5,
+      "timing": "before"
+    },
+    {
+      "text": "[frustrated] Eero, how do Finns roll the r? I sound like an engine that won't start.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[deadpan] Ask Kissa.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "type": "sfx",
+      "text": "the cat purring even louder, close up",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[laughing] I have to purr?",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[calm] Yes. Tip of the tongue behind your top teeth. Let it buzz.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Ruoka.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "Food.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[carefully] Ruoka.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a front door opening, slippers on the floor",
+      "duration": 1.5,
+      "timing": "before"
+    },
+    {
+      "text": "[proudly] Ruisleipää!",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[delighted] Rye bread! And listen to that r!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "One more thing. P, t and k are soft here. No puff of air. Our city.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Tampere.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "[carefully] Tampere.",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "text": "[approving] Hyvä!",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[smiling] He says good. Kissa agrees.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "type": "sfx",
+      "text": "a cat meowing once, satisfied",
+      "duration": 1.0,
+      "timing": "after"
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "dialogue_list": [
+    {
+      "type": "sfx",
+      "text": "old lift doors sliding open with a soft ding",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[friendly] Ylös vai alas?",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[flustered] Oh, he's asking up or down. I know this!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[confident] Ulos!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "lift doors sliding open again",
+      "duration": 1.5,
+      "timing": "before"
+    },
+    {
+      "text": "[puzzled] Ulos?",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[deadpan] He's holding the door for you. You asked to go out.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[confused] But I said up!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[calm] Up has a y. Say ee, then round your lips.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Ylös.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "Up.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Ulos.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "Out. And the ä? Open your mouth wide, like in cat.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Sää.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "Weather.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Saa.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "text": "Allowed. Now you guess. Weather, or allowed?",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[slowly] Sää.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "a soft clock ticking, a short thinking pause",
+      "duration": 2.0,
+      "timing": "before"
+    },
+    {
+      "text": "[thinking] Wide mouth... weather!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "en"
+    },
+    {
+      "text": "[nods] Weather.",
+      "voice_id": "nJ8YqEenIxs18T0Hu4QE",
+      "lang": "en"
+    },
+    {
+      "text": "[patient] Ylös vai alas?",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "text": "[carefully] Ylös, kiitos!",
+      "voice_id": "vnJXCu1mkdsxb9UdCYZp",
+      "lang": "fi"
+    },
+    {
+      "text": "[pleased] Hyvä.",
+      "voice_id": "Gp43kq9FsSlavD7esRtx",
+      "lang": "fi"
+    },
+    {
+      "type": "sfx",
+      "text": "the lift humming as it starts to go up",
+      "duration": 2.0,
+      "timing": "before"
+    }
+  ]
+}
