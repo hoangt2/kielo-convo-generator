@@ -51,6 +51,7 @@ def main():
     topic = None
     level = None
     language = None
+    flags = []
 
     for arg in sys.argv[1:]:
         if arg.isdigit():
@@ -62,6 +63,10 @@ def main():
         elif arg.capitalize() in LANGUAGES:
             language = arg.capitalize()
             print(f"ℹ️  Language: {language} (freestyle: random scene and cast, native voices)")
+        elif arg.lower() in ("slow", "learner"):
+            flags.append(arg.lower())
+            print("ℹ️  " + ("Slow speech for total beginners" if arg.lower() == "slow"
+                           else "A learner with a foreign accent (international voice)"))
         else:
             topic = arg
             print(f"ℹ️  Setting topic to: {topic}")
@@ -74,6 +79,7 @@ def main():
         step1_args.append(level)
     if language:
         step1_args.append(language)
+    step1_args += flags
     if topic:
         step1_args.append(topic)
 

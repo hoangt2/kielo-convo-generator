@@ -251,6 +251,53 @@ FREESTYLE_LOCAL_HINTS = {
 HISTORY_FILE = ".freestyle_history.json"  # local, gitignored (*.json): recent titles per language
 
 
+# Learner voices for `learner` freestyle (python run.py Swedish A1 slow learner): a newcomer
+# who speaks the target language with a foreign accent. International voices in the
+# ElevenLabs account, hand-picked 2026-11-06 (no cartoon, kids' or Nordic voices); `origin`
+# steers the character's name and background. The other character keeps a native voice.
+LEARNER_VOICES = [
+    {"voice_id": "2CECaLAGTS5NRGxgbcxr", "name": "Davi Andrei", "gender": "male", "age": "young", "origin": "Brazil"},
+    {"voice_id": "E9a8LlXPNWtyvvSoZzrb", "name": "Talis", "gender": "male", "age": "young", "origin": "Brazil"},
+    {"voice_id": "IbbR6Av0dWuQJS0b8JVT", "name": "Hugo", "gender": "male", "age": "young", "origin": "France"},
+    {"voice_id": "bIHbv24MWmeRgasZH58o", "name": "Will", "gender": "male", "age": "young", "origin": "the United States"},
+    {"voice_id": "u7bRcYbD7visSINTyAT8", "name": "Rahul Bharadwaj", "gender": "male", "age": "middle_aged", "origin": "India"},
+    {"voice_id": "tILIOdKERNNbBHVEXk7I", "name": "Hasan Yasin", "gender": "male", "age": "middle_aged", "origin": "Turkey"},
+    {"voice_id": "qHdpkLDluFJPQyEvzZ5E", "name": "Mehmet Akif", "gender": "male", "age": "middle_aged", "origin": "Turkey"},
+    {"voice_id": "JBFqnCBsd6RMkjVDRZzb", "name": "George", "gender": "male", "age": "middle_aged", "origin": "the United Kingdom"},
+    {"voice_id": "aHC3XZOMg3HZuXVYK6hy", "name": "Yuna", "gender": "female", "age": "young", "origin": "Vietnam"},
+    {"voice_id": "EXAVITQu4vr4xnSDxMaL", "name": "Sarah", "gender": "female", "age": "young", "origin": "the United States"},
+    {"voice_id": "OYTbf65OHHFELVut7v2H", "name": "Hope", "gender": "female", "age": "young", "origin": "the United States"},
+    {"voice_id": "vnJXCu1mkdsxb9UdCYZp", "name": "Sweta Priyadarshan", "gender": "female", "age": "middle_aged", "origin": "India"},
+    {"voice_id": "Na15FlRRkMEDtEW4nVVP", "name": "Thanh Ngoc", "gender": "female", "age": "middle_aged", "origin": "Vietnam"},
+    {"voice_id": "RmcV9cAq1TByxNSgbii7", "name": "Ha My", "gender": "female", "age": "middle_aged", "origin": "Vietnam"},
+    {"voice_id": "Xb7hH8MSUJpSbSDYk0k2", "name": "Alice", "gender": "female", "age": "middle_aged", "origin": "the United Kingdom"},
+]
+LEARNER_RELATIONSHIPS = [
+    "a newcomer and a local who helps",
+    "a new customer and a staff member",
+    "new neighbours",
+    "a new colleague and a colleague who has worked there for years",
+    "a newcomer asking a stranger in a public place for help",
+]
+
+
+def pick_learner_cast(pool, rng=random):
+    """A learner (international voice, foreign accent) and a native speaker (distinct native voice)."""
+    natives = [v for v in pool if v.get("gender") in ("male", "female")]
+    if not natives:
+        return []
+    learner = rng.choice(LEARNER_VOICES)
+    if rng.random() < 0.7:  # usually a mixed pair
+        natives = [v for v in natives if v["gender"] != learner["gender"]] or natives
+    native = rng.choice(natives)
+    cast = []
+    for v, role in ((learner, "learner"), (native, "native")):
+        band, (lo, hi) = voice_age_band(v.get("age"))
+        cast.append({"voice_id": v["voice_id"], "voice_name": v.get("name", ""), "gender": v["gender"],
+                     "band": band, "age": str(rng.randint(lo, hi)), "role": role, "origin": v.get("origin")})
+    return cast
+
+
 def voice_age_band(age):
     """ElevenLabs age label -> (band, a realistic age range in years)."""
     a = (age or "").lower()
@@ -305,13 +352,25 @@ def freestyle_brief(language, cast, topic=None, rng=random):
     lines = [f"FREESTYLE BRIEF for this {language} conversation (follow it):"]
     if not topic:
         lines.append(f"- Place (ambient_setting): {rng.choice(FREESTYLE_PLACES)}")
-    lines.append(f"- Relationship: {rng.choice(FREESTYLE_RELATIONSHIPS)} (pick what fits the place"
+    has_learner = any(c.get("role") == "learner" for c in cast)
+    relationships = LEARNER_RELATIONSHIPS if has_learner else FREESTYLE_RELATIONSHIPS
+    lines.append(f"- Relationship: {rng.choice(relationships)} (pick what fits the place"
                  + (" and topic" if topic else "") + ")")
     lines.append(f"- Mood: {rng.choice(FREESTYLE_MOODS)}")
     lines.append("- Characters, in this order, EXACTLY this gender and age (each has a matching voice):")
     for i, c in enumerate(cast, 1):
         word = "woman" if c["gender"] == "female" else "man"
-        lines.append(f"  {i}. a {word}, age {c['age']} (gender: {c['gender']}, age: {c['age']})")
+        who = ""
+        if c.get("role") == "learner":
+            who = (f", from {c['origin']}, new in the country and a total beginner in {language}; give them a "
+                   f"first name that is common in {c['origin']}")
+        elif c.get("role") == "native":
+            who = f", a native {language} speaker"
+        lines.append(f"  {i}. a {word}, age {c['age']}{who} (gender: {c['gender']}, age: {c['age']})")
+    if has_learner:
+        lines.append(f"- Say in the description that character 1 is new to {language} and comes from "
+                     f"{cast[0]['origin']}, and that character 2 speaks slowly and kindly to help. The learner "
+                     f"uses very simple {language} and may ask the other to repeat or speak slowly.")
     if FREESTYLE_LOCAL_HINTS.get(language):
         lines.append("- " + FREESTYLE_LOCAL_HINTS[language])
     lines.append(f"- Write the title and description in {language}.")
@@ -433,7 +492,8 @@ def conversation_system_prompt(language):
                         f'(in {language}, e.g. the {language} for "customer and post office clerk" or "two friends")')
 
 
-def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, level=None, language="Finnish"):
+def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, level=None, language="Finnish",
+                                slow=False, learner=False):
     if topic:
         print(f"🪄 Generating {num_ideas} general {language} conversation ideas about '{topic}'...")
     else:
@@ -441,7 +501,7 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
     if not client: return None
 
     pool = []
-    if language != "Finnish":
+    if language != "Finnish" or learner:
         from generate_cast import native_voice_pool  # lazy: generate_cast imports this module
         pool = native_voice_pool(language)
         print(f"🎙️  {len(pool)} native {language} voices in the ElevenLabs account")
@@ -481,7 +541,7 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
         # Freestyle: one random brief and cast per idea, so every video differs.
         data, ideas = None, []
         for _ in range(num_ideas):
-            cast = pick_freestyle_cast(pool)
+            cast = pick_learner_cast(pool) if learner else pick_freestyle_cast(pool)
             brief = freestyle_brief(language, cast, topic)
             print(brief)
             one = ask(1, brief)
@@ -496,6 +556,8 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
         save_history(language, [i.get("title", "") for i in ideas])
 
     data.setdefault("metadata", {})["language"] = language
+    if slow:
+        data["metadata"]["slow"] = True
     if level:
         data["metadata"]["language_level"] = level
     return data, "ideas.json"
@@ -609,13 +671,15 @@ def main():
         return
 
     # Check for command-line arguments
-    # Usage: python generate_ideas_json.py [podcast|conversation] [number_of_ideas] [CEFR level] [language, e.g. Swedish] [topic]
+    # Usage: python generate_ideas_json.py [podcast|conversation] [number_of_ideas] [CEFR level] [language, e.g. Swedish] [slow] [learner] [topic]
 
     mode = 'conversation'
     num_ideas = None
     topic = None
     level = None
     language = "Finnish"
+    slow = False
+    learner = False
 
     # Simple argument parsing
     for arg in sys.argv[1:]:
@@ -627,6 +691,10 @@ def main():
             level = normalize_level(arg)
         elif arg.capitalize() in LANGUAGES:
             language = arg.capitalize()
+        elif arg.lower() == 'slow':
+            slow = True
+        elif arg.lower() == 'learner':
+            learner = True
         else:
             topic = arg
 
@@ -640,7 +708,7 @@ def main():
     else:
         # Default behavior: generate conversations
         count = num_ideas if num_ideas else NUM_CONVERSATION_IDEAS
-        result, output_file = generate_conversation_ideas(count, topic, level, language)
+        result, output_file = generate_conversation_ideas(count, topic, level, language, slow, learner)
         idea_count = count
 
     if result:

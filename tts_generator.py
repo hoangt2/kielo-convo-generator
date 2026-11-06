@@ -64,6 +64,8 @@ PCM_CHANNELS = 1
 # against 1.20s native — ~13% where 0.7 implies ~43% — with the ranges overlapping.
 # Stretching scales vowel and consonant alike, so quantity contrasts (tak/tack) survive.
 GUIDED_TARGET_SPEED = 0.75
+# Slow conversations (metadata.slow) also leave longer pauses between lines.
+SLOW_GAP_FACTOR = 1.6
 
 # How many lines to synthesize concurrently.
 MAX_WORKERS = 4
@@ -107,6 +109,10 @@ def load_dialogue_data(file_path):
         # Guided lessons are English-led (the teaching happens in English), so their
         # audio must NOT be forced to the target language's pronunciation.
         fmt = data.get("idea", {}).get("format", "conversation")
+        # `slow` in the metadata (python run.py Swedish A1 slow): a normal conversation for total
+        # beginners, every line slowed like a guided lesson's target-language lines.
+        if fmt == "conversation" and data.get("metadata", {}).get("slow"):
+            fmt = "slow"
 
         # Optional pronunciation rules for fine-grained phonetic control.
         # Each rule is either:
@@ -679,7 +685,7 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
     overrides = load_pronunciation_overrides()
     total = len(dialogue_list)
     use_gemini = _series_tts_settings().get("provider") == "gemini"
-    if use_gemini and fmt == "guided":
+    if use_gemini and fmt in ("guided", "slow"):
         dialogue_list = [
             ({**d, "_slow_style": True} if _line_language(d, target_iso) == target_iso else d)
             for d in dialogue_list
@@ -694,7 +700,7 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         results = list(pool.map(task, range(total)))
 
-    slow = GUIDED_TARGET_SPEED if fmt == "guided" else 1.0
+    slow = GUIDED_TARGET_SPEED if fmt in ("guided", "slow") else 1.0
     if use_gemini:
         slow = 1.0          # Gemini is asked to speak slowly; no time-stretching
     if slow != 1.0:
@@ -725,6 +731,8 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
                 dialogue_list[i].get("voice_id") == dialogue_list[i - 1].get("voice_id")
             )
             gap_ms = GAP_SAME_SPEAKER_MS if same_speaker else GAP_SPEAKER_CHANGE_MS
+            if fmt == "slow":
+                gap_ms = int(gap_ms * SLOW_GAP_FACTOR)   # a beat longer to take each line in
             pcm_parts.append(_silence(gap_ms))
             cursor_ms += gap_ms
         start_ms = cursor_ms
