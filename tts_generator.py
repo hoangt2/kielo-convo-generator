@@ -81,7 +81,7 @@ MAX_WORKERS = 4
 # at all is a property of the voice: Leo does, Sten does not.
 VERIFY_PRONUNCIATION = True
 STT_MODEL_ID = "scribe_v1"
-MAX_ATTEMPTS = 3
+MAX_ATTEMPTS = 5   # eleven_v3 cuts about a third of Finnish takes short (2026-11-06)
 # Similarity below which a line is considered misread. 0.9 is deliberately strict:
 # "tak" vs "tack" scores 0.857, and catching exactly that is the point.
 MIN_SIMILARITY = 0.9
@@ -499,6 +499,13 @@ MIN_SECONDS_PER_LETTER = 0.045
 # line, English included (15 of 357 lines in Everyday Finnish A1 episodes 1-9 were cut).
 CLIPPED_TAIL_MS = 20
 CLIPPED_TAIL_DB = 0.0
+# A take cut on a quieter final sound slips past that average test: Finnish 2026-11-06,
+# "talossa", "Aino", "tavata", "Isosta-Britanniasta", "suomea" (5 of 13 lines, two voices)
+# stopped 5-27 dB under the line's loudest point, below its average. A finished take decays
+# to near-silence, so the end is also compared with the loudest 50 ms of the take.
+CLIPPED_BELOW_PEAK_DB = 35.0
+# A 10 ms frame this far under the peak counts as the take having gone quiet.
+END_QUIET_BELOW_PEAK_DB = 40.0
 
 
 def _ends_mid_sound(pcm_bytes):
@@ -510,7 +517,96 @@ def _ends_mid_sound(pcm_bytes):
                        channels=PCM_CHANNELS)
     if len(seg) <= CLIPPED_TAIL_MS * 2 or seg.dBFS == float("-inf"):
         return False
-    return seg[-CLIPPED_TAIL_MS:].dBFS - seg.dBFS > CLIPPED_TAIL_DB
+    tail = seg[-CLIPPED_TAIL_MS:].dBFS
+    if tail - seg.dBFS > CLIPPED_TAIL_DB:
+        return True
+    return tail > _peak_dbfs(seg) - CLIPPED_BELOW_PEAK_DB
+
+
+def _peak_dbfs(seg):
+    """Loudness of the loudest 50 ms of a take."""
+    return max(seg[i:i + 50].dBFS for i in range(0, max(len(seg) - 50, 1), 25))
+
+
+# Some lines are cut on every eleven_v3 take ("Mä oon Isosta-Britanniasta." 5 of 5, 2026-11-06).
+# Ending the text with this tag fixed 6 of 6 takes in a test, and it is never read aloud; it
+# leaves up to a few seconds of silence, which _trim_trailing_silence removes. Used only on a
+# retry after a cut take, so lines that come out whole are voiced exactly as before.
+END_PAUSE_TAG = "[pause]"
+END_SILENCE_KEEP_MS = 80
+
+
+def _trim_trailing_silence(pcm_bytes):
+    """Cut the silence after the last spoken sound, keeping END_SILENCE_KEEP_MS of it."""
+    from pydub import AudioSegment
+    if not pcm_bytes:
+        return pcm_bytes
+    seg = AudioSegment(data=pcm_bytes, sample_width=PCM_SAMPLE_WIDTH, frame_rate=PCM_SAMPLE_RATE,
+                       channels=PCM_CHANNELS)
+    if len(seg) < 200 or seg.dBFS == float("-inf"):
+        return pcm_bytes
+    quiet = _peak_dbfs(seg) - END_QUIET_BELOW_PEAK_DB
+    end = len(seg)
+    while end > 100 and seg[end - 10:end].dBFS < quiet:
+        end -= 10
+    return seg[:min(len(seg), end + END_SILENCE_KEEP_MS)].raw_data
+
+
+# Silence in a take: eleven_v3 adds silence before and after the words and long pauses at commas
+# and after tags like [slowly] or [hesitant] (2026-11-06, a slow Finnish video: gaps of 1.1-6.1 s
+# where 0.9 s was planned, 1.8 s inside "Tervetuloa! ... Mistä"). Every take keeps only a short
+# edge, so the gaps between lines are exactly GAP_*; a pause inside a line stays but is capped.
+EDGE_SILENCE_KEEP_MS = 60
+MAX_INNER_PAUSE_MS = 500
+
+
+def _tidy_silence(pcm_bytes):
+    """Trim a take's leading and trailing silence and cap the pauses inside it."""
+    from pydub import AudioSegment
+    from pydub.silence import detect_silence
+    if not pcm_bytes:
+        return pcm_bytes
+    seg = AudioSegment(data=pcm_bytes, sample_width=PCM_SAMPLE_WIDTH, frame_rate=PCM_SAMPLE_RATE,
+                       channels=PCM_CHANNELS)
+    if len(seg) < 300 or seg.dBFS == float("-inf"):
+        return pcm_bytes
+    quiet = _peak_dbfs(seg) - END_QUIET_BELOW_PEAK_DB
+    out, cursor = AudioSegment.empty(), 0
+    for start, end in detect_silence(seg, min_silence_len=EDGE_SILENCE_KEEP_MS * 2, silence_thresh=quiet, seek_step=5):
+        out += seg[cursor:start]
+        if start == 0:                       # leading
+            out += seg[max(0, end - EDGE_SILENCE_KEEP_MS):end]
+        elif end >= len(seg):                # trailing
+            out += seg[start:start + EDGE_SILENCE_KEEP_MS]
+        else:                                # inside the line
+            keep = min(end - start, MAX_INNER_PAUSE_MS)
+            out += seg[start:start + keep // 2] + seg[end - (keep - keep // 2):end]
+        cursor = end
+    out += seg[cursor:]
+    return out.raw_data if len(out) > 100 else pcm_bytes
+
+
+def _trim_end_click(pcm_bytes):
+    """Drop a click after the take has already gone quiet.
+
+    Some eleven_v3 takes finish the word, fall silent, then end on a 10-20 ms spike (measured
+    2026-11-06: silence at -77 dB under the peak, then a last 10 ms at -19 to -32). That is a
+    click, not a cut word: cut everything after the last quiet 10 ms frame in the final 80 ms,
+    so the take neither clicks nor looks clipped to _ends_mid_sound.
+    """
+    from pydub import AudioSegment
+    if not pcm_bytes:
+        return pcm_bytes
+    seg = AudioSegment(data=pcm_bytes, sample_width=PCM_SAMPLE_WIDTH, frame_rate=PCM_SAMPLE_RATE,
+                       channels=PCM_CHANNELS)
+    if len(seg) < 200 or seg.dBFS == float("-inf"):
+        return pcm_bytes
+    quiet = _peak_dbfs(seg) - END_QUIET_BELOW_PEAK_DB
+    n = len(seg)
+    for end in range(n, n - 80, -10):           # last 8 frames, latest first
+        if seg[end - 10:end].dBFS < quiet:
+            return seg[:end].raw_data if end < n else pcm_bytes
+    return pcm_bytes
 
 
 # --- Per-line synthesis ------------------------------------------------------
@@ -594,12 +690,23 @@ def synthesize_line(elevenlabs_client, item, target_iso, locator, index, total, 
             return cached, None
 
     max_attempts = int(settings.get("max_attempts", MAX_ATTEMPTS))
+    clipped = False
     for attempt in range(1, max_attempts + 1):
+        padded = False
         if use_gemini:
             audio = _gemini_pcm(text, gemini_voice, gemini_extra)
         else:
-            audio = b"".join(elevenlabs_client.text_to_speech.convert(**kwargs))
+            call = kwargs
+            if clipped and str(kwargs.get("model_id", "")).startswith("eleven_v3"):
+                # The last take was cut off: give the voice a pause after the last word, so the
+                # cut lands in the pause (see END_PAUSE_TAG).
+                call = {**kwargs, "text": kwargs["text"].rstrip() + " " + END_PAUSE_TAG}
+                padded = True
+            audio = b"".join(elevenlabs_client.text_to_speech.convert(**call))
 
+        audio = _trim_end_click(audio)
+        if padded:
+            audio = _trim_trailing_silence(audio)
         clipped = _ends_mid_sound(audio)
         if not should_verify:
             if clipped:
@@ -719,6 +826,7 @@ def _generate_conversation_audio(elevenlabs_client, dialogue_list, language, loc
             warnings.append(warning)
         if audio is None:
             continue
+        audio = _tidy_silence(audio)
         if slow != 1.0 and _line_language(dialogue_list[i], target_iso) == target_iso:
             audio = _stretch(audio, slow)
         level = _series_tts_settings().get("level_lines_dbfs")
