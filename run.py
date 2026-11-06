@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from cleanup import cleanup
 from cefr_levels import is_cefr_level, normalize_level
+from language_config import LANGUAGES
 
 
 def run_step(script_name: str, description: str, args: list = None) -> bool:
@@ -49,6 +50,7 @@ def main():
     num_outputs = None
     topic = None
     level = None
+    language = None
 
     for arg in sys.argv[1:]:
         if arg.isdigit():
@@ -57,6 +59,9 @@ def main():
         elif is_cefr_level(arg):
             level = normalize_level(arg)
             print(f"ℹ️  Targeting CEFR level: {level}")
+        elif arg.capitalize() in LANGUAGES:
+            language = arg.capitalize()
+            print(f"ℹ️  Language: {language} (freestyle: random scene and cast, native voices)")
         else:
             topic = arg
             print(f"ℹ️  Setting topic to: {topic}")
@@ -67,6 +72,8 @@ def main():
         step1_args.append(str(num_outputs))
     if level:
         step1_args.append(level)
+    if language:
+        step1_args.append(language)
     if topic:
         step1_args.append(topic)
 

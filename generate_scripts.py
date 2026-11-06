@@ -381,6 +381,8 @@ def generate_conversation(idea, metadata):
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
         - NEVER use [clearly], [clear] or any "clear/clearly" tag — the voice engine performs it as
           a throat-clear. Use [slowly] or an emotion tag instead.
+        - Bracket tags are ALWAYS in English, whatever language the dialogue is in ([curious], never [nyfiken]):
+          the voice engine only understands English tags and reads other words aloud.
         - A bracket tag is ONLY one or two words of emotion, tone or pace, e.g. [warm], [slowly], [curious],
           [encouraging]. NEVER put an action or gesture in a tag ([waving goodbye], [nodding], [calling after her],
           [processing]): a voice cannot perform it and may read it aloud.
@@ -704,6 +706,8 @@ def generate_guided_lesson(idea, metadata):
         - The 'text' field must start with an emotion/tone in brackets (e.g., [warm], [encouraging]).
         - NEVER use [clearly], [clear] or any "clear/clearly" tag — the voice engine performs it as
           a throat-clear. Use [slowly] or an emotion tag instead.
+        - Bracket tags are ALWAYS in English, whatever language the dialogue is in ([curious], never [nyfiken]):
+          the voice engine only understands English tags and reads other words aloud.
         - A bracket tag is ONLY one or two words of emotion, tone or pace, e.g. [warm], [slowly], [curious],
           [encouraging]. NEVER put an action or gesture in a tag ([waving goodbye], [nodding], [calling after her],
           [processing]): a voice cannot perform it and may read it aloud.
@@ -855,6 +859,8 @@ def generate_podcast_script(idea, metadata):
         Instructions:
         - Use the **exact** 'voice_id' provided in the Characters list for each line.
         - The 'text' field must start with an emotion/tone in brackets (e.g., [calm], [excited]).
+        - Bracket tags are ALWAYS in English, whatever language the dialogue is in ([curious], never [nyfiken]):
+          the voice engine only understands English tags and reads other words aloud.
         - A bracket tag is ONLY one or two words of emotion, tone or pace, e.g. [warm], [slowly], [curious],
           [encouraging]. NEVER put an action or gesture in a tag ([waving goodbye], [nodding], [calling after her],
           [processing]): a voice cannot perform it and may read it aloud. Never name who a line is

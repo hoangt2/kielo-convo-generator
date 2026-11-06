@@ -6,6 +6,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 from cefr_levels import is_cefr_level, normalize_level
+from language_config import LANGUAGES
 
 # Load environment variables
 load_dotenv()
@@ -214,6 +215,128 @@ def assign_podcast_voice_ids(ideas_list, key="characters"):
                 
     return ideas_list
 
+# --- FREESTYLE: NATIVE VOICES + A RANDOM BRIEF PER RUN (non-Finnish languages) ---
+# Finnish keeps the VOICES pool above. For another language (e.g. Swedish) every run draws a
+# random place, relationship, mood and cast, and each character gets a DISTINCT native voice of
+# that language from the ElevenLabs account, matched by gender and age band. The LLM is told
+# the cast's gender and age up front, so the voice always fits the character.
+
+FREESTYLE_PLACES = [
+    "bus", "cafe", "street", "park", "office", "supermarket", "train", "restaurant",
+    "home_kitchen", "school", "gym", "library", "hospital", "airport", "beach", "quiet",
+]
+FREESTYLE_RELATIONSHIPS = [
+    "strangers in a service situation (customer and staff member)",
+    "two strangers in a public place",
+    "colleagues at work",
+    "neighbours",
+    "two friends",
+    "family members (e.g. siblings, a couple, parent and adult child)",
+    "classmates on a language or evening course",
+    "a newcomer and a local who helps",
+    "a caller and a person answering the phone",
+]
+FREESTYLE_MOODS = [
+    "warm and friendly", "light and funny", "a small misunderstanding that gets cleared up",
+    "practical and to the point", "a little awkward but kind", "a pleasant surprise",
+    "slightly stressed, then relieved", "curious, lots of questions",
+]
+# Real-life places per language, so scenes feel local (names the learner will meet).
+FREESTYLE_LOCAL_HINTS = {
+    "Swedish": "Set it in Sweden. Use realistic Swedish first names (mix traditional and modern, "
+               "and names from Sweden's many backgrounds) and real Swedish places or institutions "
+               "where they fit (e.g. ICA, Coop, Systembolaget, SL, SJ, vårdcentralen, apoteket, "
+               "Skatteverket, Försäkringskassan, Arbetsförmedlingen, biblioteket, fika).",
+}
+HISTORY_FILE = ".freestyle_history.json"  # local, gitignored (*.json): recent titles per language
+
+
+def voice_age_band(age):
+    """ElevenLabs age label -> (band, a realistic age range in years)."""
+    a = (age or "").lower()
+    if "old" in a or "senior" in a:
+        return "senior", (62, 75)
+    if "middle" in a:
+        return "middle-aged", (36, 55)
+    return "young adult", (20, 32)
+
+
+def pick_freestyle_cast(pool, rng=random):
+    """Two distinct native voices, preferring a mixed pair; each gets a concrete age in its band."""
+    pool = [v for v in pool if v.get("gender") in ("male", "female")]
+    if len(pool) < 2:
+        return []
+    first = rng.choice(pool)
+    others = [v for v in pool if v["voice_id"] != first["voice_id"]]
+    # usually a mixed-gender pair, sometimes the same gender, for variety
+    if rng.random() < 0.7:
+        mixed = [v for v in others if v["gender"] != first["gender"]]
+        others = mixed or others
+    second = rng.choice(others)
+    cast = []
+    for v in (first, second):
+        band, (lo, hi) = voice_age_band(v.get("age"))
+        cast.append({"voice_id": v["voice_id"], "voice_name": v.get("name", ""), "gender": v["gender"],
+                     "band": band, "age": str(rng.randint(lo, hi))})
+    return cast
+
+
+def load_history(language):
+    try:
+        with open(HISTORY_FILE, encoding="utf-8") as f:
+            return json.load(f).get(language, [])
+    except (OSError, ValueError):
+        return []
+
+
+def save_history(language, titles):
+    try:
+        with open(HISTORY_FILE, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        data = {}
+    data[language] = (data.get(language, []) + titles)[-40:]
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def freestyle_brief(language, cast, topic=None, rng=random):
+    """The random part of the prompt: place, relationship, mood, the fixed cast, titles to avoid."""
+    lines = [f"FREESTYLE BRIEF for this {language} conversation (follow it):"]
+    if not topic:
+        lines.append(f"- Place (ambient_setting): {rng.choice(FREESTYLE_PLACES)}")
+    lines.append(f"- Relationship: {rng.choice(FREESTYLE_RELATIONSHIPS)} (pick what fits the place"
+                 + (" and topic" if topic else "") + ")")
+    lines.append(f"- Mood: {rng.choice(FREESTYLE_MOODS)}")
+    lines.append("- Characters, in this order, EXACTLY this gender and age (each has a matching voice):")
+    for i, c in enumerate(cast, 1):
+        word = "woman" if c["gender"] == "female" else "man"
+        lines.append(f"  {i}. a {word}, age {c['age']} (gender: {c['gender']}, age: {c['age']})")
+    if FREESTYLE_LOCAL_HINTS.get(language):
+        lines.append("- " + FREESTYLE_LOCAL_HINTS[language])
+    lines.append(f"- Write the title and description in {language}.")
+    recent = load_history(language)
+    if recent:
+        lines.append("- Make it clearly different from these recent videos: " + "; ".join(recent[-25:]))
+    return "\n".join(lines)
+
+
+def assign_freestyle_voices(ideas_list, cast):
+    """Give each character its pre-picked voice: by order, re-paired by gender if the model swapped them."""
+    for idea in ideas_list:
+        chars = idea.get("characters", [])[:len(cast)]
+        idea["characters"] = chars
+        left = list(cast)
+        for ch in chars:
+            g = (ch.get("gender") or "").lower()
+            match = next((c for c in left if c["gender"] == g), left[0])
+            left.remove(match)
+            ch["voice_id"] = match["voice_id"]
+            ch["gender"] = match["gender"]
+            ch["age"] = match["age"]
+    return ideas_list
+
+
 # --- 1. CONVERSATION IDEAS LOGIC (No Change) ---
 
 # Schema for Conversations (2 characters strictly)
@@ -301,43 +424,80 @@ Rules:
 - Only fill in the string values.
 """
 
-def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, level=None):
+def conversation_system_prompt(language):
+    """The idea prompt for `language`; Finnish gets the original text unchanged."""
+    if language == "Finnish":
+        return CONVERSATION_SYSTEM_PROMPT
+    text = CONVERSATION_SYSTEM_PROMPT.replace("Finnish", language)
+    return text.replace('(e.g., "asiakas ja postivirkailija" for strangers, or "kaksi ystävää" for friends)',
+                        f'(in {language}, e.g. the {language} for "customer and post office clerk" or "two friends")')
+
+
+def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, level=None, language="Finnish"):
     if topic:
-        print(f"🪄 Generating {num_ideas} general conversation ideas about '{topic}'...")
+        print(f"🪄 Generating {num_ideas} general {language} conversation ideas about '{topic}'...")
     else:
-        print(f"🪄 Generating {num_ideas} general conversation ideas...")
+        print(f"🪄 Generating {num_ideas} general {language} conversation ideas...")
     if not client: return None
 
-    config = types.GenerateContentConfig(
-        system_instruction=CONVERSATION_SYSTEM_PROMPT,
-        response_mime_type="application/json",
-        response_schema=CONVERSATION_SCHEMA
-    )
+    pool = []
+    if language != "Finnish":
+        from generate_cast import native_voice_pool  # lazy: generate_cast imports this module
+        pool = native_voice_pool(language)
+        print(f"🎙️  {len(pool)} native {language} voices in the ElevenLabs account")
+        if len(pool) < 2:
+            print(f"🛑 Freestyle {language} needs at least two native {language} voices in the ElevenLabs account.")
+            return None, None
 
-    prompt_text = f"Generate {num_ideas} unique ideas for short Finnish conversations"
-    if topic:
-        prompt_text += f" about the topic '{topic}'"
-    if level:
-        prompt_text += (
-            f". The conversations are for CEFR level {level} learners — choose scenarios "
-            f"whose vocabulary and situations suit that level"
+    def ask(n, brief=""):
+        config = types.GenerateContentConfig(
+            system_instruction=conversation_system_prompt(language),
+            response_mime_type="application/json",
+            response_schema=CONVERSATION_SCHEMA,
+            temperature=1.0 if brief else None,
         )
-    prompt_text += ", following the specified JSON structure exactly."
+        prompt_text = f"Generate {n} unique ideas for short {language} conversations"
+        if topic:
+            prompt_text += f" about the topic '{topic}'"
+        if level:
+            prompt_text += (
+                f". The conversations are for CEFR level {level} learners — choose scenarios "
+                f"whose vocabulary and situations suit that level"
+            )
+        prompt_text += ", following the specified JSON structure exactly."
+        if brief:
+            prompt_text += "\n\n" + brief
+        response = client.models.generate_content(
+            model=MODEL_NAME_CONVERSATION,
+            contents=[prompt_text],
+            config=config,
+        )
+        return json.loads(response.text)
 
-    full_prompt = (
-        prompt_text
-    )
+    if not pool:
+        data = ask(num_ideas)
+        data["ideas"] = assign_voice_ids(data.get("ideas", []))
+    else:
+        # Freestyle: one random brief and cast per idea, so every video differs.
+        data, ideas = None, []
+        for _ in range(num_ideas):
+            cast = pick_freestyle_cast(pool)
+            brief = freestyle_brief(language, cast, topic)
+            print(brief)
+            one = ask(1, brief)
+            data = data or one
+            got = assign_freestyle_voices(one.get("ideas", [])[:1], cast)
+            for idea in got:
+                print(f"🎬 {idea.get('title')} — " + ", ".join(
+                    f"{c.get('name')} ({c['gender']}, {c['age']}) → {next(v['voice_name'] for v in cast if v['voice_id'] == c['voice_id'])}"
+                    for c in idea.get("characters", [])))
+            ideas += got
+        data["ideas"] = ideas
+        save_history(language, [i.get("title", "") for i in ideas])
 
-    response = client.models.generate_content(
-        model=MODEL_NAME_CONVERSATION,
-        contents=[full_prompt],
-        config=config,
-    )
-
-    data = json.loads(response.text)
-    data["ideas"] = assign_voice_ids(data.get("ideas", []))
+    data.setdefault("metadata", {})["language"] = language
     if level:
-        data.setdefault("metadata", {})["language_level"] = level
+        data["metadata"]["language_level"] = level
     return data, "ideas.json"
 
 # --- 2. PODCAST IDEAS LOGIC (Minor Changes to System Prompt and Function) ---
@@ -449,12 +609,13 @@ def main():
         return
 
     # Check for command-line arguments
-    # Usage: python generate_ideas_json.py [podcast|conversation] [number_of_ideas] [CEFR level] [topic]
+    # Usage: python generate_ideas_json.py [podcast|conversation] [number_of_ideas] [CEFR level] [language, e.g. Swedish] [topic]
 
     mode = 'conversation'
     num_ideas = None
     topic = None
     level = None
+    language = "Finnish"
 
     # Simple argument parsing
     for arg in sys.argv[1:]:
@@ -464,6 +625,8 @@ def main():
             num_ideas = int(arg)
         elif is_cefr_level(arg):
             level = normalize_level(arg)
+        elif arg.capitalize() in LANGUAGES:
+            language = arg.capitalize()
         else:
             topic = arg
 
@@ -477,7 +640,7 @@ def main():
     else:
         # Default behavior: generate conversations
         count = num_ideas if num_ideas else NUM_CONVERSATION_IDEAS
-        result, output_file = generate_conversation_ideas(count, topic, level)
+        result, output_file = generate_conversation_ideas(count, topic, level, language)
         idea_count = count
 
     if result:
