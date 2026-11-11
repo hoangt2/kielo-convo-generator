@@ -234,7 +234,7 @@ Both modes produce an `ideas.json` (Series Mode via `series_compile.py`, Idea Mo
 |---|---------|------|--------|
 | 1 | `python generate_scripts.py` | Convert ideas → spoken-Finnish dialogue (add `podcast` for podcasts). CEFR read from ideas metadata. | `scripts/` (or `podcast_scripts/`) |
 | 2 | `python check_finnish_grammar.py` | Fix grammar & make phrasing sound like natural spoken Finnish. | `scripts/` (in place) |
-| 3 | `python generate_illustrations.py` | One illustration per script. In Series Mode, uses character reference portraits for consistency and **verifies the head-count with a vision check, retrying if a character was duplicated or extra people appeared**. Accepts slug(s) to target one. | `illustrations/` |
+| 3 | `python generate_illustrations.py` | One illustration per script. In Series Mode, uses character reference portraits for consistency and **verifies the head-count with a vision check, retrying if a character was duplicated or extra people appeared**, at most 3 draws per picture (each draw is paid; raise it for one run with `ILLUSTRATION_MAX_DRAWS=5`), then it keeps the closest and asks you to check it. Accepts slug(s) to target one. | `illustrations/` |
 | 4 | `python generate_sfx.py` | Generate SFX clips from script cues + ambient loops. | `sfx/<slug>/`, `presets/ambience/` |
 | 5 | `python tts_generator.py` | Text-to-speech per dialogue line via ElevenLabs (`podcast` / `all` modes available). | `mp3/` |
 | 6 | `python sfx_mixer.py` | Whisper-align timestamps, insert pauses, place SFX, overlay ambience. | `mp3/` (in place) |

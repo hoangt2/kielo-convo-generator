@@ -26,6 +26,10 @@ except Exception as e:
 INPUT_DIR = "scripts"
 OUTPUT_DIR = "illustrations"
 MODEL_NAME = "gemini-2.5-flash-image"
+# Most draws of one illustration before the best one is kept for a human to review.
+# Each draw is a paid image call; 6 tries made ~7 draws per published picture (T-khanh-oaj, 2026-10-31).
+# Override for one run with ILLUSTRATION_MAX_DRAWS=5.
+MAX_DRAWS = max(1, int(os.environ.get("ILLUSTRATION_MAX_DRAWS", "3")))
 
 # --- Fixed illustration style description ---
 ILLUSTRATION_STYLE = (
@@ -350,7 +354,7 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
     # Expected head-count = number of named characters. Generate, verify the count with a vision
     # check, and retry if the model duplicated a character or added extra people.
     expected = len(data.get("idea", {}).get("characters", []))
-    MAX_ATTEMPTS = 6
+    MAX_ATTEMPTS = MAX_DRAWS
     best_image, best_diff = None, None
     problem = ""
 
@@ -402,7 +406,8 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
     if best_image is not None:
         best_image.save(output_path)
         note = "" if expected <= 0 else f" (could not hit exactly {expected} people in {MAX_ATTEMPTS} tries — saved closest)"
-        print(f"⚠️ Saved best-effort image to {output_path}{note}")
+        print(f"⚠️ Saved best-effort image to {output_path}{note} — check it by eye; "
+              f"redraw only this one with: python generate_illustrations.py {base_filename}")
         return True
 
     print(f"⚠️ No image produced for {label}.")
