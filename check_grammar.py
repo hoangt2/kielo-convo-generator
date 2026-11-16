@@ -380,6 +380,12 @@ def process_script_file(file_path: Path) -> tuple[bool, bool]:
         print(f"   ❌ {e}")
         return False, False
     
+    # The grammar fix can bring back a one-word line ("Moi."), which TTS mis-voices.
+    from line_rules import fix_one_word_lines
+    rewritten = fix_one_word_lines(fixed_dialogue, data.get("idea", {}).get("characters", []), language)
+    for change in rewritten:
+        print(f"   ✏️  one-word line rewritten: {change}")
+    was_modified = was_modified or bool(rewritten)
     if was_modified:
         # Save the fixed version
         data["dialogue_list"] = fixed_dialogue

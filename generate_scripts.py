@@ -946,6 +946,11 @@ def save_scripts(title, script_type, idea, metadata, conversation_data):
     json_path = os.path.join(folder, f"{slug}.json")
 
     dialogue_list = conversation_data.get('dialogue_list', [])
+    if script_type == 'conversation':
+        from line_rules import fix_one_word_lines
+        for change in fix_one_word_lines(dialogue_list, idea.get("characters", []),
+                                         (metadata or {}).get("language", "Finnish")):
+            print(f"   ✏️  one-word line rewritten: {change}")
 
     # The full JSON script (structured data)
     full_json_data = {
