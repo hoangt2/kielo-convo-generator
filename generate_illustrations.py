@@ -38,7 +38,9 @@ ILLUSTRATION_STYLE = (
     "Characters have friendly, realistically proportioned bodies at a consistent scale "
     "relative to each other and the environment. "
     "Soft pastel-leaning color palette. High quality vector-art style. "
-    "No text, labels, words, letters, speech bubbles, or thought bubbles anywhere in the image. "
+    "No text, labels, words, letters, numbers, speech bubbles, or thought bubbles anywhere in the image. "
+    "No signs with writing: shop fronts, walls and windows have no sign boards, shop names, price lists, "
+    "posters or notices; products, books and screens show no lettering. "
     "The artwork fills the ENTIRE tall frame edge to edge, top to bottom: no border, no frame line, "
     "no blank paper or margin at the bottom or sides."
 )
@@ -358,7 +360,13 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
     best_image, best_diff = None, None
     problem = ""
 
-    for attempt in range(1, MAX_ATTEMPTS + 1):
+    # A picture with text is never kept (Tung, 2026-11-16: a misspelled shop sign "PYÖRÄKORJAMO";
+    # "we should avoid any text in the picture"). Text gets up to TEXT_EXTRA_DRAWS more tries.
+    TEXT_EXTRA_DRAWS = 3
+    text_failed = False
+    for attempt in range(1, MAX_ATTEMPTS + TEXT_EXTRA_DRAWS + 1):
+        if attempt > MAX_ATTEMPTS and not (text_failed and best_image is None):
+            break
         # On retries, prepend a correction hint to help the model self-correct
         if attempt > 1 and problem:
             retry_hint = problem
@@ -377,18 +385,22 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
         if image is None:
             continue
         problem, reason = "", ""
+        text_failed = False
         if has_visible_text(image):
+            text_failed = True
             reason = "contains text or a speech bubble"
             problem = ("IMPORTANT: Your previous illustration contained text or speech bubbles. Draw NO text of any kind: "
-                       "no speech bubbles, no captions, no letters, no numbers, no writing on signs, books or screens.")
+                       "no speech bubbles, no captions, no letters, no numbers, no writing on signs, books or screens. "
+                       "Leave out every sign board, shop name, price list, poster and label completely: walls, shop "
+                       "fronts and windows are plain.")
         elif blank_bottom_fraction(image) > 0.06:
             reason = "has a blank strip at the bottom"
             problem = ("IMPORTANT: Your previous illustration left a blank strip at the bottom. The artwork must fill the ENTIRE "
                        "tall frame, edge to edge, with the floor or ground continuing all the way to the very bottom edge.")
         if problem:
             print(f"   🔁 attempt {attempt}/{MAX_ATTEMPTS}: the image {reason} — regenerating")
-            if best_image is None:
-                best_image, best_diff = image, 98      # last resort only
+            if best_image is None and not text_failed:
+                best_image, best_diff = image, 98      # last resort only (never one with text)
             continue
         if expected <= 0:
             best_image = image
@@ -410,6 +422,10 @@ def generate_illustration_from_json(json_path: str, aspect_ratio: str = "9:16") 
               f"redraw only this one with: python generate_illustrations.py {base_filename}")
         return True
 
+    if text_failed:
+        print(f"🛑 Every drawing for {label} had text in it; none was kept. Redraw with: "
+              f"python generate_illustrations.py {base_filename}")
+        return False
     print(f"⚠️ No image produced for {label}.")
     return False
 
