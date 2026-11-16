@@ -509,6 +509,17 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
             print(f"🛑 Freestyle {language} needs at least two native {language} voices in the ElevenLabs account.")
             return None, None
 
+    # Never repeat a situation we already made (topic_guard.py; Tung, 2026-11-16).
+    from topic_guard import past_titles, find_clash
+    past = past_titles(language)
+    print(f"🧭 Topic guard: {len(past)} past {language} videos to compare with")
+    if topic:
+        clash = find_clash(topic, language, past, client)
+        if clash:
+            print(f"🛑 The topic '{topic}' is the same situation as the past video '{clash}'. Pick another topic.")
+            return None, None
+    avoid = []
+
     def ask(n, brief=""):
         config = types.GenerateContentConfig(
             system_instruction=conversation_system_prompt(language),
@@ -527,6 +538,9 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
         prompt_text += ", following the specified JSON structure exactly."
         if brief:
             prompt_text += "\n\n" + brief
+        if avoid:
+            prompt_text += ("\n\nThese situations were already made; do NOT make any of them again, choose a "
+                            "different place and errand: " + "; ".join(avoid))
         response = client.models.generate_content(
             model=MODEL_NAME_CONVERSATION,
             contents=[prompt_text],
@@ -534,26 +548,41 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
         )
         return json.loads(response.text)
 
-    if not pool:
-        data = ask(num_ideas)
-        data["ideas"] = assign_voice_ids(data.get("ideas", []))
+    for attempt in range(1, 4):
+        if not pool:
+            data = ask(num_ideas)
+            data["ideas"] = assign_voice_ids(data.get("ideas", []))
+        else:
+            # Freestyle: one random brief and cast per idea, so every video differs.
+            data, ideas = None, []
+            for _ in range(num_ideas):
+                cast = pick_learner_cast(pool) if learner else pick_freestyle_cast(pool)
+                brief = freestyle_brief(language, cast, topic)
+                print(brief)
+                one = ask(1, brief)
+                data = data or one
+                got = assign_freestyle_voices(one.get("ideas", [])[:1], cast)
+                for idea in got:
+                    print(f"🎬 {idea.get('title')} — " + ", ".join(
+                        f"{c.get('name')} ({c['gender']}, {c['age']}) → {next(v['voice_name'] for v in cast if v['voice_id'] == c['voice_id'])}"
+                        for c in idea.get("characters", [])))
+                ideas += got
+            data["ideas"] = ideas
+        clashes = []
+        for idea in data.get("ideas", []):
+            text = f"{idea.get('title', '')}: {idea.get('description', '')}"
+            clash = find_clash(text, language, past, client)
+            if clash:
+                print(f"🔁 '{idea.get('title')}' is the same situation as '{clash}' (attempt {attempt}/3)")
+                clashes.append(clash)
+                avoid.append(clash)
+        if not clashes:
+            break
     else:
-        # Freestyle: one random brief and cast per idea, so every video differs.
-        data, ideas = None, []
-        for _ in range(num_ideas):
-            cast = pick_learner_cast(pool) if learner else pick_freestyle_cast(pool)
-            brief = freestyle_brief(language, cast, topic)
-            print(brief)
-            one = ask(1, brief)
-            data = data or one
-            got = assign_freestyle_voices(one.get("ideas", [])[:1], cast)
-            for idea in got:
-                print(f"🎬 {idea.get('title')} — " + ", ".join(
-                    f"{c.get('name')} ({c['gender']}, {c['age']}) → {next(v['voice_name'] for v in cast if v['voice_id'] == c['voice_id'])}"
-                    for c in idea.get("characters", [])))
-            ideas += got
-        data["ideas"] = ideas
-        save_history(language, [i.get("title", "") for i in ideas])
+        print("🛑 Three tries in a row repeated a past video. Give a topic that is clearly new.")
+        return None, None
+    if pool:
+        save_history(language, [i.get("title", "") for i in data.get("ideas", [])])
 
     data.setdefault("metadata", {})["language"] = language
     if slow:
@@ -711,6 +740,8 @@ def main():
         result, output_file = generate_conversation_ideas(count, topic, level, language, slow, learner)
         idea_count = count
 
+    if not result:
+        sys.exit(1)  # stop run.py instead of building videos from an old ideas.json
     if result:
         try:
             with open(output_file, "w", encoding="utf-8") as f:
