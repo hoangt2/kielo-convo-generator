@@ -353,9 +353,17 @@ def freestyle_brief(language, cast, topic=None, rng=random):
     if not topic:
         lines.append(f"- Place (ambient_setting): {rng.choice(FREESTYLE_PLACES)}")
     has_learner = any(c.get("role") == "learner" for c in cast)
-    relationships = LEARNER_RELATIONSHIPS if has_learner else FREESTYLE_RELATIONSHIPS
-    lines.append(f"- Relationship: {rng.choice(relationships)} (pick what fits the place"
-                 + (" and topic" if topic else "") + ")")
+    if topic and not has_learner:
+        # A given topic decides who talks, as in Finnish: a random draw made two neighbours
+        # meet by chance at the optician (Tung, 2026-11-20: "Let topic decide").
+        lines.append("- Relationship: whoever would realistically have this conversation, decided by the topic. "
+                     "An errand or service situation (shop, clinic, office, phone call) is a customer and a "
+                     "staff member who are strangers and do not use each other's names, unless the topic says "
+                     "they know each other. Say the relationship in the description.")
+    else:
+        relationships = LEARNER_RELATIONSHIPS if has_learner else FREESTYLE_RELATIONSHIPS
+        lines.append(f"- Relationship: {rng.choice(relationships)} (pick what fits the place"
+                     + (" and topic" if topic else "") + ")")
     lines.append(f"- Mood: {rng.choice(FREESTYLE_MOODS)}")
     lines.append("- Characters, in this order, EXACTLY this gender and age (each has a matching voice):")
     for i, c in enumerate(cast, 1):
