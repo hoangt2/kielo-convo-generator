@@ -121,13 +121,18 @@ def create_generic_prompt(data: dict) -> str:
         is_remote = False
     else:
         # Fallback: keyword detection for episodes without the field
-        remote_keywords = [
-            "soittaa", "puhelimeen", "puhelimessa", "puhelun", "puhelin",
-            "phone", "calling", "call", "video call", "videocall",
-            "asiakaspalvelu", "customer service",
+        # Only words that mean a call. Bare "puhelin"/"phone" also match a phone shop
+        # ("puhelinliikkeeseen", "phone shop") or buying a phone, which are face to face
+        # (2026-11-21: a prepaid-SIM scene at a phone shop was drawn as a split-panel call).
+        import re
+        remote_patterns = [
+            r"soitta", r"soitt[aoi]", r"puhelimessa", r"puhelun", r"puhelinsoit",
+            r"videopuhel", r"\bon the phone\b", r"\bphone call\b", r"\bcalls?\b",
+            r"\bcalling\b", r"\bvideo ?call\b", r"\bringer\b", r"\bi telefon\b",
+            r"telefonsamtal", r"videosamtal", r"asiakaspalvelu", r"customer service",
         ]
         scene_lower = scene.lower()
-        is_remote = any(kw in scene_lower for kw in remote_keywords)
+        is_remote = any(re.search(p, scene_lower) for p in remote_patterns)
 
     # Environment guidance
     setting_clause = (
