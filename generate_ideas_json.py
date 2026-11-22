@@ -22,6 +22,9 @@ except Exception as e:
 MODEL_NAME_CONVERSATION = "gemini-2.5-pro"  # Robust for strict, complex output
 MODEL_NAME_PODCAST = "gemini-2.5-pro"      # Good for instructional, fast output
 NUM_CONVERSATION_IDEAS = 1
+# Fresh ideas tried before giving up: social scenes clash with the large back catalogue more often
+# than errands do, so 3 tries pushed runs toward errands (T-tung-bud, 2026-11-22).
+MAX_IDEA_ATTEMPTS = 6
 NUM_PODCAST_IDEAS = 3
 
 # Consolidated Voice Pool (Used for CONVERSATIONS only)
@@ -464,11 +467,12 @@ Rules:
 - Dialogues must be suitable for beginners learning Finnish.
 - Each idea must be creative, fun, and immediately useful for a beginner.
 - Use realistic Finnish names and situations (e.g., cafés, trams, offices, home).
+- Cover everyday life, not mostly errands: most ideas are people who know each other (friends, a couple or spouses, family members, colleagues, classmates, neighbours) talking about their day, plans, home, work, studies or hobbies. A shop or service errand is only one kind of scene among many.
 - The gender and age of each character must be specified and matched to a voice.
 - **CRITICAL — Choosing the right character relationship for the topic:**
   Think carefully about WHO would realistically have this conversation. Match the character relationship to the topic:
   * For SERVICE or INSTITUTIONAL topics (e.g., enrolling in a course, getting a driver's license, buying a ticket, visiting a doctor, checking into a hotel, opening a bank account, returning an item, asking for directions), the characters MUST be strangers in a professional context — such as a customer and a clerk, a student and an advisor, a patient and a receptionist, a passenger and a driver. Do NOT use friends or family for these topics.
-  * For SOCIAL or EVERYDAY topics (e.g., weekend plans, hobbies, cooking, complaining about weather, catching up), use friends, colleagues, classmates, or family members.
+  * For SOCIAL or EVERYDAY topics (e.g., weekend plans, hobbies, cooking dinner together, a couple deciding what to watch, calling a sibling on their birthday, helping a classmate with homework, a colleague's first day, a sauna evening with friends, complaining about weather, catching up), use friends, a couple, colleagues, classmates, neighbours, or family members.
   * For MIXED topics, use your best judgment — but always prefer the most realistic and natural pairing.
 - In the 'description' field, clearly indicate the relationship between characters (e.g., "asiakas ja postivirkailija" for strangers, or "kaksi ystävää" for friends). This helps the dialogue writer know whether characters should use each other's names.
 - For 'ambient_setting': choose the most appropriate ambient sound category for where the conversation takes place. Available categories:
@@ -498,6 +502,18 @@ def conversation_system_prompt(language):
     text = CONVERSATION_SYSTEM_PROMPT.replace("Finnish", language)
     return text.replace('(e.g., "asiakas ja postivirkailija" for strangers, or "kaksi ystävää" for friends)',
                         f'(in {language}, e.g. the {language} for "customer and post office clerk" or "two friends")')
+
+
+def finnish_brief(rng=random):
+    """A random relationship and mood for a Finnish run without a topic, as Swedish freestyle draws.
+
+    Without it the model reads "suits A1" as survival errands: 14 of 18 Finnish daily videos
+    (2026-11-05..11-22) were shops and services (Tung, 2026-11-22, T-tung-bud). With a topic the
+    topic decides who talks, so no draw is made then.
+    """
+    return ("BRIEF for this Finnish conversation (follow it):\n"
+            f"- Relationship: {rng.choice(FREESTYLE_RELATIONSHIPS)} (say it in the description)\n"
+            f"- Mood: {rng.choice(FREESTYLE_MOODS)}")
 
 
 def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, level=None, language="Finnish",
@@ -541,7 +557,8 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
         if level:
             prompt_text += (
                 f". The conversations are for CEFR level {level} learners — choose scenarios "
-                f"whose vocabulary and situations suit that level"
+                f"whose vocabulary and situations suit that level (simple talk between friends, partners, "
+                f"family, colleagues or classmates suits beginners as well as errands do)"
             )
         prompt_text += ", following the specified JSON structure exactly."
         if brief:
@@ -556,9 +573,25 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
         )
         return json.loads(response.text)
 
-    for attempt in range(1, 4):
+    for attempt in range(1, 1 + MAX_IDEA_ATTEMPTS):
         if not pool:
-            data = ask(num_ideas)
+            if topic:
+                data = ask(num_ideas)
+            else:
+                # One random relationship per idea, so a Finnish run is not always an errand.
+                data, ideas = None, []
+                for _ in range(num_ideas):
+                    brief = finnish_brief()
+                    print(brief)
+                    # The model's first idea for a relationship is the generic beginner scene (lost
+                    # keys, a wrong number, what's for dinner), long since made; show it what exists.
+                    brief += ("\n- Make it a concrete moment from adult life with a specific reason to talk, "
+                              "not a generic beginner topic. These situations were already made, do NOT "
+                              "repeat any of them: " + "; ".join(sorted({t.split(":")[0].strip() for t in past})))
+                    one = ask(1, brief)
+                    data = data or one
+                    ideas += one.get("ideas", [])[:1]
+                data["ideas"] = ideas
             data["ideas"] = assign_voice_ids(data.get("ideas", []))
         else:
             # Freestyle: one random brief and cast per idea, so every video differs.
@@ -581,13 +614,13 @@ def generate_conversation_ideas(num_ideas=NUM_CONVERSATION_IDEAS, topic=None, le
             text = f"{idea.get('title', '')}: {idea.get('description', '')}"
             clash = find_clash(text, language, past, client)
             if clash:
-                print(f"🔁 '{idea.get('title')}' is the same situation as '{clash}' (attempt {attempt}/3)")
+                print(f"🔁 '{idea.get('title')}' is the same situation as '{clash}' (attempt {attempt}/{MAX_IDEA_ATTEMPTS})")
                 clashes.append(clash)
                 avoid.append(clash)
         if not clashes:
             break
     else:
-        print("🛑 Three tries in a row repeated a past video. Give a topic that is clearly new.")
+        print(f"🛑 {MAX_IDEA_ATTEMPTS} tries in a row repeated a past video. Give a topic that is clearly new.")
         return None, None
     if pool:
         save_history(language, [i.get("title", "") for i in data.get("ideas", [])])
