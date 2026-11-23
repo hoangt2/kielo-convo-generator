@@ -12,10 +12,20 @@ past_titles() gathers every title we know of, for one language:
   - the freestyle history (.freestyle_history.json).
 find_clash() asks Gemini whether a new topic or idea is the same everyday situation (same kind of
 place and errand) as any of them, and returns the clashing title or None.
+
+Tung, 2026-11-23 (T-tung-3g9): "a couple at home choosing Christmas presents for their parents" passed once
+and was refused on the next run as the same situation as "Ystävänpäiväkortti (The Friend's Day Card)". One
+fast yes/no over hundreds of bare titles is jumpy near the edges. So:
+  - a published title gets the script archive's one-line description when the archive has that title;
+  - a match from the fast first pass is only a candidate: a second, stronger pass looks at just that pair
+    and must confirm it, with a reason, before anything is refused;
+  - a person who judged a refusal wrong sets TOPIC_GUARD_ALLOW="<why>"; the clash is then let through and
+    written to .topic_guard_overrides.jsonl (local, gitignored), so the override is on record.
 """
 import glob
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -31,7 +41,9 @@ CAPTIONS_TOOL = os.environ.get(
 PROD_CACHE = os.path.join(REPO, ".prod_titles_cache.json")  # gitignored (*.json is local state)
 CACHE_SECONDS = 24 * 3600
 LANG_CODE = {"Finnish": "fi", "Swedish": "sv"}
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-2.5-flash"          # first pass over every past title
+CONFIRM_MODEL = "gemini-2.5-pro"     # second pass over the one candidate pair
+OVERRIDES = os.path.join(REPO, ".topic_guard_overrides.jsonl")
 
 
 def _prod_titles(language):
@@ -99,13 +111,70 @@ def past_titles(language):
             titles += json.load(f).get(language, [])
     except (OSError, ValueError):
         pass
+    return _merge(titles)
+
+
+def _base(title):
+    """'💌 Ystävänpäiväkortti (The Friend's Day Card) (2026-02-14): ...' -> 'ystävänpäiväkortti'"""
+    t = title.split(":", 1)[0]
+    t = re.sub(r"\([^)]*\)", " ", t)
+    return " ".join(re.findall(r"\w+", t.lower()))
+
+
+def _merge(titles):
+    """One entry per video: a published title takes the archive's description, and the archive's
+    duplicate entry is dropped."""
+    desc = {}
+    for t in titles:
+        if ": " in t and _base(t):
+            desc.setdefault(_base(t), t.split(": ", 1)[1])
     seen, out = set(), []
     for t in titles:
-        key = t.lower()
-        if key not in seen:
-            seen.add(key)
-            out.append(t)
+        key = _base(t) or t.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        if ": " not in t and desc.get(key):
+            t = f"{t}: {desc[key]}"
+        out.append(t)
     return out
+
+
+RULE = (
+    "Same situation means the same kind of place AND the same errand or problem (for example two pharmacy "
+    "visits for a cold, two haircuts, two library cards), even with different names, wording or language. "
+    "A different errand in a similar place is NOT the same (buying a train ticket vs. losing a bag on the "
+    "train), and neither is a different problem between the same kind of people (two friends planning a "
+    "trip vs. two friends fixing a bike)."
+)
+
+
+def _ask(client, model, prompt):
+    r = client.models.generate_content(
+        model=model, contents=[prompt],
+        config=types.GenerateContentConfig(response_mime_type="application/json", temperature=0),
+    )
+    return json.loads(r.text)
+
+
+def _confirm(new_text, past_title, language, client):
+    """Second pass: is the NEW video really the same situation as this one PAST video? (same, reason)"""
+    prompt = (
+        f"A language-learning app makes short {language} conversation videos. Each video is one everyday "
+        f"situation. Compare one NEW video idea with one PAST video. {RULE} If you only have a past title and "
+        "it could be either, answer false: a wrong refusal costs more than a near repeat.\n\n"
+        f"NEW: {new_text}\nPAST: {past_title}\n\n"
+        'Answer JSON: {"same": true|false, "reason": "<one short sentence: the place and errand of each>"}'
+    )
+    ans = _ask(client, CONFIRM_MODEL, prompt)
+    return bool(ans.get("same")), (ans.get("reason") or "").strip()
+
+
+def _record_override(new_text, language, past_title, reason, why):
+    entry = {"at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "language": language,
+             "new": new_text, "past": past_title, "guard_reason": reason, "allowed_because": why}
+    with open(OVERRIDES, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
 def find_clash(new_text, language, titles, client=None):
@@ -115,23 +184,30 @@ def find_clash(new_text, language, titles, client=None):
     client = client or genai.Client()
     prompt = (
         f"A language-learning app makes short {language} conversation videos. Each video is one everyday "
-        "situation. Is the NEW video the same situation as any PAST video? Same situation means the same kind "
-        "of place AND the same errand or problem (for example two pharmacy visits for a cold, two haircuts, "
-        "two library cards), even with different names, wording or language. A different errand in a similar "
-        "place is NOT the same (buying a train ticket vs. losing a bag on the train).\n\n"
+        f"situation. Is the NEW video the same situation as any PAST video? {RULE}\n\n"
         f"NEW: {new_text}\n\nPAST:\n" + "\n".join(f"- {t}" for t in titles)
         + '\n\nAnswer JSON: {"same": true|false, "past_title": "<the matching past title, or empty>"}'
     )
     try:
-        r = client.models.generate_content(
-            model=MODEL, contents=[prompt],
-            config=types.GenerateContentConfig(response_mime_type="application/json", temperature=0),
-        )
-        ans = json.loads(r.text)
+        ans = _ask(client, MODEL, prompt)
+        if not ans.get("same"):
+            return None
+        past = ans.get("past_title") or ""
+        match = next((t for t in titles if past and (t == past or t.startswith(past) or past.startswith(t))), past)
+        same, reason = _confirm(new_text, match or "a past video", language, client)
     except Exception as e:  # a failed check must not silently pass a repeat: say so
         print(f"⚠️  topic guard: check failed ({e}); not checked")
         return None
-    return (ans.get("past_title") or "a past video") if ans.get("same") else None
+    if not same:
+        print(f"🧭 topic guard: first pass matched '{match}', second pass says different ({reason})")
+        return None
+    print(f"🧭 topic guard: same as '{match}': {reason}")
+    why = os.environ.get("TOPIC_GUARD_ALLOW", "").strip()
+    if why:
+        _record_override(new_text, language, match, reason, why)
+        print(f"✋ topic guard: allowed anyway (TOPIC_GUARD_ALLOW: {why}); recorded in {os.path.basename(OVERRIDES)}")
+        return None
+    return match or "a past video"
 
 
 if __name__ == "__main__":
